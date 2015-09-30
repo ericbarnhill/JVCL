@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre"/>
+	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar" sourcepath="/home/ericbarnhill/Documents/code/jogamp/jocl-demos/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/ericbarnhill/Documents/code/jogamp/jocl/build/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar" sourcepath="/home/ericbarnhill/Documents/code/jogamp/jocl/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/ericbarnhill/Documents/code/jogamp/jocl/build/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar" sourcepath="/home/ericbarnhill/Documents/code/jogamp/gluegen/src"/>
+	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jtransforms-2.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
