@@ -27,7 +27,7 @@ import static java.lang.System.*;
 import static com.jogamp.opencl.CLMemory.Mem.*;
 import static java.lang.Math.*;
 
-public class GPUFFT {
+public class Stockham {
 	
 	CLFFTPlan fft;
     DimShifter ds;
@@ -35,35 +35,17 @@ public class GPUFFT {
     CLCommandQueue queue;
     CLProgram program;
     CLContext context;
-    CLBuffer<FloatBuffer> bufferReal;
-    CLBuffer<FloatBuffer> bufferImag;
-    CLBuffer<FloatBuffer> bufferEvenR;
-    CLBuffer<FloatBuffer> bufferEvenI;
-    CLBuffer<FloatBuffer> bufferOddR;
-    CLBuffer<FloatBuffer> bufferOddI;
     long totalTime;
     CLKernel Kernel;
     int local, global;
     
     
-	public GPUFFT(int size, int global, int local) {
+	public Stockham() {
 		try {
 			context = CLContext.create();
 			device = context.getMaxFlopsDevice();
 	        queue = device.createCommandQueue();
-	        Path currentRelativePath = Paths.get("");
-	        String s = currentRelativePath.toAbsolutePath().toString();
-	        String source = readFile("src/fft1d.cl");
-		    program = context.createProgram(source).build();
-		    Kernel = program.createCLKernel("fft1d");
-		    bufferReal = context.createFloatBuffer(size, WRITE_ONLY);
-	    	bufferImag = context.createFloatBuffer(size, WRITE_ONLY);
-	    	bufferEvenR = context.createFloatBuffer(size, READ_ONLY);
-	    	bufferEvenI = context.createFloatBuffer(size, READ_ONLY);
-	    	bufferOddR = context.createFloatBuffer(size, READ_ONLY);
-	    	bufferOddI = context.createFloatBuffer(size, READ_ONLY);
-			this.global = global;
-			this.local = local;
+	        
 		} catch (Exception e) {}		
 		
 	}
@@ -72,57 +54,29 @@ public class GPUFFT {
 	// Higher memory requirements and redundancy although more intuitive
 	void fft_simple(float[] real, float[] imag) {
 	    int N = real.length;
-	    if (N <= 1) return;	
     try{
-	    // divide
-	    float[] evenR = new float[N/2];
-	    float[] evenI = new float[N/2];
-	    float[] oddR = new float[N/2];
-	    float[] oddI = new float[N/2];
-	    for (int n = 0; n < N/2; n++) {
-	    	evenR[n] = real[n*2];
-	    	evenI[n] = imag[n*2];
-	    	oddR[n] = real[n*2+1];
-	    	oddI[n] = imag[n*2+1];
-	    }
-	 
-	    // conquer
-    	fft_simple(evenR, evenI);
-    	fft_simple(oddR, oddI);
-    	
+        String source = readFile("src/stockham.cl");
+	    program = context.createProgram(source).build();
+	    Kernel = program.createCLKernel("stockham");
     	// combine
+    	 CLBuffer<FloatBuffer> bufferReal;
+    	 CLBuffer<FloatBuffer> bufferImag;   
+    	bufferReal = context.createFloatBuffer(N);
+    	bufferImag = context.createFloatBuffer(N);
     	bufferReal.getBuffer().clear();
     	bufferReal.getBuffer().put(real);
     	bufferReal.getBuffer().rewind();
     	bufferImag.getBuffer().clear();
     	bufferImag.getBuffer().put(imag);
     	bufferImag.getBuffer().rewind();
-    	bufferEvenR.getBuffer().clear();
-    	bufferEvenR.getBuffer().put(evenR);
-    	bufferEvenR.getBuffer().rewind();
-    	bufferEvenI.getBuffer().clear();
-    	bufferEvenI.getBuffer().put(evenI);
-    	bufferEvenI.getBuffer().rewind();
-    	bufferOddR.getBuffer().clear();
-    	bufferOddR.getBuffer().put(oddR);
-    	bufferOddR.getBuffer().rewind();
-    	bufferOddI.getBuffer().clear();
-    	bufferOddI.getBuffer().put(oddI);
-    	bufferOddI.getBuffer().rewind();
     	Kernel.setArg(0, bufferReal)
 			.setArg(1, bufferImag)	
-	    	.setArg(2, bufferEvenR)
-			.setArg(3, bufferEvenI)
-			.setArg(4, bufferOddR)
-			.setArg(5, bufferOddI)
-			.setArg(6, N);
+			.setArg(2, -1)
+    		.setArg(3, N)
+    		.setArg(4, (int)(Math.log(N)/Math.log(2)));
     	queue.putWriteBuffer(bufferReal, false);
 		queue.putWriteBuffer(bufferImag, false);
-    	queue.putWriteBuffer(bufferEvenR, false);
-    	queue.putWriteBuffer(bufferEvenI, false);
-    	queue.putWriteBuffer(bufferOddR, false);
-    	queue.putWriteBuffer(bufferOddI, false);	
-    	queue.put2DRangeKernel(Kernel, 0, 0, N, N, 0, 0);
+    	queue.put1DRangeKernel(Kernel, 0, roundUp(N,64), 64);
     	queue.putReadBuffer(bufferReal, false);
 	    queue.putReadBuffer(bufferImag, false);
     	bufferReal.getBuffer().get(real);
@@ -134,30 +88,31 @@ public class GPUFFT {
 	
 	public static void main(String[] args) {
 
-		float[] real = new float[4096];
-		float[] imag = new float[4096];
+		float[] real = new float[128];
+		float[] imag = new float[128];
 		
-		for (int n = 0; n < 4096; n++) {
-			real[n] = (float)Math.cos(2*Math.PI*(n+1)/1024);
-			imag[n] = (float)Math.sin(2*Math.PI*(n+1)/1024);
+		for (int n = 0; n < 128; n++) {
+			real[n] = (float)Math.cos(2*Math.PI*(n+1)/128)+2;
+			imag[n] = (float)Math.sin(2*Math.PI*(n+1)/128)+2;
 			//System.out.format("%.2f + i%.2f ", real[n], imag[n]);
 			//if ((n+1) % 8 == 0) System.out.format("%n");
 		}
 	 
 	    // forward fft
-		GPUFFT g = new GPUFFT(real.length, 256, 256);
-    	g.fft_simple(real, imag);
+		Stockham s = new Stockham();
+    	s.fft_simple(real, imag);
 			    	
-	    g.context.release();
+	    s.context.release();
 	    
 	    System.out.println("REAL");
-	    for (int n = 0; n < 64; n++) {
+	    for (int n = 0; n < 128; n++) {
 			System.out.format("%.2f ",real[n]);
 			if ((n+1) % 16 == 0) System.out.println();
 		}
 	    System.out.println("IMAG");
-	    for (int n = 0; n < 16; n++) {
+	    for (int n = 0; n < 128; n++) {
 			System.out.format("%.2f ",imag[n]);
+			if ((n+1) % 16 == 0) System.out.println();
 		}
 	    System.out.println();
 	    
@@ -191,5 +146,14 @@ public class GPUFFT {
             return null;
         }
     }
+
+	private static int roundUp(int groupSize, int globalSize) {
+	    int r = globalSize % groupSize;
+	    if (r == 0) {
+	        return globalSize;
+	    } else {
+	        return globalSize + groupSize - r;
+	    }
+	}
 
 }

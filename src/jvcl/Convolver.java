@@ -32,14 +32,16 @@ public class Convolver {
 	ConvolveJOCL cj;
 	GPUFFT g;
 	CPUFFT c;
+	Stockham s;
 	
 	public Convolver(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
 		cn = new ConvolveNaive(boundaryConditions);
 		cf = new ConvolveFourier();
 		cj = new ConvolveJOCL();
-		g = new GPUFFT(4096*4, 256, 256);
+		g = new GPUFFT(4096, 256, 256);
 		c = new CPUFFT();
+		s = new Stockham();
 	}
 	
 	public Convolver() {
@@ -47,8 +49,9 @@ public class Convolver {
 		cn = new ConvolveNaive(boundaryConditions);
 		cf = new ConvolveFourier();
 		cj = new ConvolveJOCL();
-		g = new GPUFFT(4096*4, 256, 256);
+		g = new GPUFFT(4096, 256, 256);
 		c = new CPUFFT();
+		s = new Stockham();
 	}
 	
 	public static void main(String[] args) {
@@ -58,8 +61,8 @@ public class Convolver {
         System.out.println(s);
 		Random rand = new Random();
 		Convolver c = new Convolver();
-		float[] testvec1d = new float[4096*4];
-		for (int n = 0; n < 4096*4; n++) {
+		float[] testvec1d = new float[4096];
+		for (int n = 0; n < 4096; n++) {
 			testvec1d[n] = (float)Math.cos(n*2*Math.PI/2048);
 		}
 		for (int n = 0; n < 24; n++) {
@@ -67,15 +70,18 @@ public class Convolver {
 		}
 		System.out.println();
 		double[] kernel1d = new double[]{1, -2, 1};
-		for (int n = 0; n < 5; n++) {
-			c.c.fft_simple(testvec1d, testvec1d);
-		}
 		long startTime = System.currentTimeMillis();
+		for (int n = 0; n < 5; n++) {
+			c.s.fft_simple(testvec1d, testvec1d);
+		}
+		long endTime = System.currentTimeMillis();
+		double runTime = (endTime-startTime)/1000.0;
+		startTime = System.currentTimeMillis();
 		for (int n = 0; n < 5; n++) {
 			c.g.fft_simple(testvec1d, testvec1d);
 		}
 		c.g.context.release();
-		long endTime = System.currentTimeMillis();
+		endTime = System.currentTimeMillis();
 		double runTime1 = (endTime-startTime)/1000.0;
 		startTime = System.currentTimeMillis();
 		for (int n = 0; n < 5; n++) {
@@ -83,12 +89,7 @@ public class Convolver {
 		}
 		endTime = System.currentTimeMillis();
 		double runTime2 = (endTime-startTime)/1000.0;
-		System.out.format("gpu %.2f cpu %.2f ratio %.2f", runTime1, runTime2, runTime1 / runTime2);
-		if (true) return;
-		for (int n = 0; n < 24; n++) {
-			//System.out.print(result1d[n]+" ");
-		}
-		System.out.println();
+		System.out.format("gpu %.2f cpu %.2f stockham %.2f", runTime1, runTime2, runTime);
 		if (true) return;
 		int vectorWidth = 64;
 		int vectorHeight = 64;
@@ -120,26 +121,33 @@ public class Convolver {
 			long time1 = System.currentTimeMillis();
 			double[][][] result;
 			try {
-				result = c.cj.convolveFTJOCL(vector, kernel, false);
-				/*
-				for (int i = 0; i < vectorWidth; i++) {
-					for (int j = 0; j < vectorHeight; j++) {
-						for (int k = 0; k < vectorDepth; k++) {
+				result = c.cj.convolveFDJOCL(vector, kernel);
+				for (int i = 2; i < 8; i++) {
+					for (int j = 2; j < 8; j++) {
+						for (int k = 2; k < 8; k++) {
 						System.out.format("%.3f ",result[i][j][k]);
 						}
 					}
 					System.out.format("%n");
 				}
-				*/
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}			
+			if (true) return;
 			long time2 = System.currentTimeMillis();
-			double runTime = (time2-time1)/1000.0;
+			runTime = (time2-time1)/1000.0;
 			if (n >= 5) {
 				System.out.print(runTime+" ");
 				if (n % 10 == 9) System.out.println();
 				avg += runTime;
+			}
+			for (int i = 0; i < vectorWidth; i++) {
+				for (int j = 0; j < vectorHeight; j++) {
+					for (int k = 0; k < vectorDepth; k++) {
+					System.out.format("%.3f ",result[i][j][k]);
+					}
+				}
+				System.out.format("%n");
 			}
 		}
 		System.out.println();
@@ -175,7 +183,7 @@ public class Convolver {
 				t.printStackTrace();
 			}			
 			long time2 = System.currentTimeMillis();
-			double runTime = (time2-time1)/1000.0;
+			runTime = (time2-time1)/1000.0;
 			if (n >= 5) {
 				System.out.print(runTime+" ");
 				if (n % 10 == 9) System.out.println();
@@ -216,7 +224,7 @@ public class Convolver {
 				t.printStackTrace();
 			}			
 			long time2 = System.currentTimeMillis();
-			double runTime = (time2-time1)/1000.0;
+			runTime = (time2-time1)/1000.0;
 			if (n >= 5) {
 				System.out.print(runTime+" ");
 				if (n % 10 == 9) System.out.println();
@@ -257,7 +265,7 @@ public class Convolver {
 				t.printStackTrace();
 			}			
 			long time2 = System.currentTimeMillis();
-			double runTime = (time2-time1)/1000.0;
+			runTime = (time2-time1)/1000.0;
 			if (n >= 5) {
 				System.out.print(runTime+" ");
 				if (n % 10 == 9) System.out.println();
