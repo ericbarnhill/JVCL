@@ -1,4 +1,6 @@
 package jvcl;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 
 
@@ -28,13 +30,16 @@ public class Convolver {
 	ConvolveNaive cn;
 	ConvolveFourier cf;
 	ConvolveJOCL cj;
+	GPUFFT g;
+	CPUFFT c;
 	
 	public Convolver(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
 		cn = new ConvolveNaive(boundaryConditions);
 		cf = new ConvolveFourier();
 		cj = new ConvolveJOCL();
-		
+		g = new GPUFFT(4096*4, 256, 256);
+		c = new CPUFFT();
 	}
 	
 	public Convolver() {
@@ -42,12 +47,49 @@ public class Convolver {
 		cn = new ConvolveNaive(boundaryConditions);
 		cf = new ConvolveFourier();
 		cj = new ConvolveJOCL();
+		g = new GPUFFT(4096*4, 256, 256);
+		c = new CPUFFT();
 	}
 	
 	public static void main(String[] args) {
 		
+        Path currentRelativePath = Paths.get("");
+        String s = currentRelativePath.toAbsolutePath().toString();
+        System.out.println(s);
 		Random rand = new Random();
 		Convolver c = new Convolver();
+		float[] testvec1d = new float[4096*4];
+		for (int n = 0; n < 4096*4; n++) {
+			testvec1d[n] = (float)Math.cos(n*2*Math.PI/2048);
+		}
+		for (int n = 0; n < 24; n++) {
+			//System.out.print(testvec1d[n]+" ");
+		}
+		System.out.println();
+		double[] kernel1d = new double[]{1, -2, 1};
+		for (int n = 0; n < 5; n++) {
+			c.c.fft_simple(testvec1d, testvec1d);
+		}
+		long startTime = System.currentTimeMillis();
+		for (int n = 0; n < 5; n++) {
+			c.g.fft_simple(testvec1d, testvec1d);
+		}
+		c.g.context.release();
+		long endTime = System.currentTimeMillis();
+		double runTime1 = (endTime-startTime)/1000.0;
+		startTime = System.currentTimeMillis();
+		for (int n = 0; n < 5; n++) {
+			c.c.fft_simple(testvec1d, testvec1d);
+		}
+		endTime = System.currentTimeMillis();
+		double runTime2 = (endTime-startTime)/1000.0;
+		System.out.format("gpu %.2f cpu %.2f ratio %.2f", runTime1, runTime2, runTime1 / runTime2);
+		if (true) return;
+		for (int n = 0; n < 24; n++) {
+			//System.out.print(result1d[n]+" ");
+		}
+		System.out.println();
+		if (true) return;
 		int vectorWidth = 64;
 		int vectorHeight = 64;
 		int vectorDepth = 64;
@@ -78,8 +120,7 @@ public class Convolver {
 			long time1 = System.currentTimeMillis();
 			double[][][] result;
 			try {
-				result = c.cj.convolveJOCL(vector, kernel);
-				//c.convolveJOCL(vector[0], kernel[0]);
+				result = c.cj.convolveFTJOCL(vector, kernel, false);
 				/*
 				for (int i = 0; i < vectorWidth; i++) {
 					for (int j = 0; j < vectorHeight; j++) {
