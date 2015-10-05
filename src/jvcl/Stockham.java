@@ -94,8 +94,6 @@ public class Stockham {
 		for (int n = 0; n < 128; n++) {
 			real[n] = (float)Math.cos(2*Math.PI*(n+1)/128)+2;
 			imag[n] = (float)Math.sin(2*Math.PI*(n+1)/128)+2;
-			//System.out.format("%.2f + i%.2f ", real[n], imag[n]);
-			//if ((n+1) % 8 == 0) System.out.format("%n");
 		}
 	 
 	    // forward fft

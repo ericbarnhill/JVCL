@@ -61,8 +61,8 @@ public class Convolver {
         System.out.println(s);
 		Random rand = new Random();
 		Convolver c = new Convolver();
-		float[] testvec1d = new float[4096];
-		for (int n = 0; n < 4096; n++) {
+		float[] testvec1d = new float[128*128*4];
+		for (int n = 0; n < 128*128*4; n++) {
 			testvec1d[n] = (float)Math.cos(n*2*Math.PI/2048);
 		}
 		for (int n = 0; n < 24; n++) {
@@ -78,18 +78,11 @@ public class Convolver {
 		double runTime = (endTime-startTime)/1000.0;
 		startTime = System.currentTimeMillis();
 		for (int n = 0; n < 5; n++) {
-			c.g.fft_simple(testvec1d, testvec1d);
-		}
-		c.g.context.release();
-		endTime = System.currentTimeMillis();
-		double runTime1 = (endTime-startTime)/1000.0;
-		startTime = System.currentTimeMillis();
-		for (int n = 0; n < 5; n++) {
 			c.c.fft_simple(testvec1d, testvec1d);
 		}
 		endTime = System.currentTimeMillis();
 		double runTime2 = (endTime-startTime)/1000.0;
-		System.out.format("gpu %.2f cpu %.2f stockham %.2f", runTime1, runTime2, runTime);
+		System.out.format("cpu %.2f stockham %.2f", runTime2, runTime);
 		if (true) return;
 		int vectorWidth = 64;
 		int vectorHeight = 64;
