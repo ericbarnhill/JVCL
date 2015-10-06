@@ -1,8 +1,8 @@
 package jvcl;
 
-public class CPUFFT {
+public class FTCPUSimple {
 	
-	public CPUFFT() {}
+	public FTCPUSimple() {}
 	 	 static int tally;
 	 
 	// Cooley–Tukey FFT (in-place, divide-and-conquer)
@@ -62,7 +62,7 @@ public class CPUFFT {
 		}
 	 
 	    // forward fft
-	    new CPUFFT().fft_simple(real, imag);
+	    new FTCPUSimple().fft_simple(real, imag);
 	    System.out.println("REAL");
 	    for (int n = 0; n < 64; n++) {
 			System.out.format("%.2f ",real[n]);

@@ -27,10 +27,10 @@ import static java.lang.System.*;
 import static com.jogamp.opencl.CLMemory.Mem.*;
 import static java.lang.Math.*;
 
-public class Stockham {
+public class StockhamGPU {
 	
 	CLFFTPlan fft;
-    DimShifter ds;
+    DimShift ds;
     CLDevice device;
     CLCommandQueue queue;
     CLProgram program;
@@ -40,7 +40,7 @@ public class Stockham {
     int local, global;
     
     
-	public Stockham() {
+	public StockhamGPU() {
 		try {
 			context = CLContext.create();
 			device = context.getMaxFlopsDevice();
@@ -49,41 +49,49 @@ public class Stockham {
 		} catch (Exception e) {}		
 		
 	}
-	 
-	// Cooley–Tukey FFT (in-place, divide-and-conquer)
-	// Higher memory requirements and redundancy although more intuitive
-	void fft_simple(float[] real, float[] imag) {
+	
+	void fft(float[] real, float[] imag, boolean isForward) {
 	    int N = real.length;
-    try{
-        String source = readFile("src/stockham.cl");
-	    program = context.createProgram(source).build();
-	    Kernel = program.createCLKernel("stockham");
-    	// combine
-    	 CLBuffer<FloatBuffer> bufferReal;
-    	 CLBuffer<FloatBuffer> bufferImag;   
-    	bufferReal = context.createFloatBuffer(N);
-    	bufferImag = context.createFloatBuffer(N);
-    	bufferReal.getBuffer().clear();
-    	bufferReal.getBuffer().put(real);
-    	bufferReal.getBuffer().rewind();
-    	bufferImag.getBuffer().clear();
-    	bufferImag.getBuffer().put(imag);
-    	bufferImag.getBuffer().rewind();
-    	Kernel.setArg(0, bufferReal)
-			.setArg(1, bufferImag)	
-			.setArg(2, -1)
-    		.setArg(3, N)
-    		.setArg(4, (int)(Math.log(N)/Math.log(2)));
-    	queue.putWriteBuffer(bufferReal, false);
-		queue.putWriteBuffer(bufferImag, false);
-    	queue.put1DRangeKernel(Kernel, 0, roundUp(N,64), 64);
-    	queue.putReadBuffer(bufferReal, false);
-	    queue.putReadBuffer(bufferImag, false);
-    	bufferReal.getBuffer().get(real);
-    	bufferImag.getBuffer().get(imag);
-	    //System.out.println(" Time: "+ (time5-time1));
-	    } finally {
-	    }
+		try{
+			int sign;
+			if (isForward) {
+				sign = 1;
+			} else {
+				sign = -1;
+			}
+		    String source = readFile("src/stockham.cl");
+			program = context.createProgram(source).build();
+			Kernel = program.createCLKernel("stockham");
+			CLBuffer<FloatBuffer> bufferReal;
+			CLBuffer<FloatBuffer> bufferImag;   
+			bufferReal = context.createFloatBuffer(N);
+			bufferImag = context.createFloatBuffer(N);
+			bufferReal.getBuffer().clear();
+			bufferReal.getBuffer().put(real);
+			bufferReal.getBuffer().rewind();
+			bufferImag.getBuffer().clear();
+			bufferImag.getBuffer().put(imag);
+			bufferImag.getBuffer().rewind();
+			Kernel.setArg(0, bufferReal)
+				.setArg(1, bufferImag)	
+				.setArg(2, -1)
+				.setArg(3, N)
+				.setArg(4, (int)(Math.log(N)/Math.log(2)));
+			queue.putWriteBuffer(bufferReal, false);
+			queue.putWriteBuffer(bufferImag, false);
+			queue.put1DRangeKernel(Kernel, 0, roundUp(N,64), 64);
+			queue.putReadBuffer(bufferReal, false);
+			queue.putReadBuffer(bufferImag, false);
+			bufferReal.getBuffer().get(real);
+			bufferImag.getBuffer().get(imag);
+			if (!isForward) {
+				for (int n = 0; n < N; n++) {
+					real[n] = real[n] / N;
+					imag[n] = imag[n] / N;
+				}
+			}
+		} finally {
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -97,8 +105,8 @@ public class Stockham {
 		}
 	 
 	    // forward fft
-		Stockham s = new Stockham();
-    	s.fft_simple(real, imag);
+		StockhamGPU s = new StockhamGPU();
+    	s.fft(real, imag, true);
 			    	
 	    s.context.release();
 	    

@@ -4,44 +4,43 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
 
-public class ConvolveFourier {
+public class FTCPU {
 	
-	DimShifter ds;
+	DimShift ds;
 	
-	public ConvolveFourier() {
-		ds = new DimShifter();
+	public FTCPU() {
+		ds = new DimShift();
 	}
 	
-	public double[] convolveFT(double[] vector, double[] kernel, boolean isComplex) {
+	public double[] convolve(double[] vector, double[] kernel, boolean isComplex) {
 		
-		int vectorHeight = vector.length;
-		int kernelHeight = kernel.length;
+		int vectorLength = vector.length;
+		int kernelLength = kernel.length;
 				
-		DoubleFFT_1D fft = new DoubleFFT_1D(vectorHeight+2*kernelHeight);
-		double[] paddedVector;
-		double[] paddedKernel;
-		
+		DoubleFFT_1D fft = new DoubleFFT_1D(vectorLength+2*kernelLength);
+		int newLength;
 		if (isComplex) {
-			paddedVector = new double[vectorHeight+2*kernelHeight];
-			paddedKernel = new double[vectorHeight+2*kernelHeight];
+			newLength = vectorLength+2*kernelLength;
 		} else {
-			paddedVector = new double[2*(vectorHeight+2*kernelHeight)];
-			paddedKernel = new double[2*(vectorHeight+2*kernelHeight)];
+			newLength =	2*(vectorLength+2*kernelLength);
 		}
+
+		double[] paddedVector = new double[newLength];
+		double[] paddedKernel = new double[newLength];
 		
-		for (int x = 0; x < vectorHeight; x++) {
+		for (int x = 0; x < vectorLength; x++) {
 			if (isComplex) {
-				paddedVector[x+kernelHeight] = vector[x];
+				paddedVector[x+kernelLength] = vector[x];
 			} else {
-				paddedVector[x*2+kernelHeight*2] = vector[x];
+				paddedVector[x*2+kernelLength*2] = vector[x];
 			}
 		}
 		
-		for (int x = 0; x < kernelHeight; x++) {
+		for (int x = 0; x < kernelLength; x++) {
 			if (isComplex) {
-				paddedKernel[x+kernelHeight] = kernel[x];
+				paddedKernel[x+kernelLength] = kernel[x];
 			} else {
-				paddedKernel[x*2+kernelHeight*2] = kernel[x];
+				paddedKernel[x*2+kernelLength*2] = kernel[x];
 			}
 		}
 		
@@ -56,24 +55,24 @@ public class ConvolveFourier {
 		
 		fft.complexInverse(paddedVector, true);
 		
-		double[] result = new double[vectorHeight];
-		for (int x = 0; x < vectorHeight; x++) {
+		double[] result = new double[vectorLength];
+		for (int x = 0; x < vectorLength; x++) {
 			if (isComplex) {
-				result[x] = paddedVector[x+kernelHeight];
+				result[x] = paddedVector[x+kernelLength];
 			} else {
-				result[x] = paddedVector[x*2+kernelHeight*2];
+				result[x] = paddedVector[x*2+kernelLength*2];
 			}
 		}		
 		return result;
 		
 	}
 	
-	public double[][] convolveFT(double[][] image, double[] kernel, boolean isComplex, int dim) {
+	public double[][] convolve(double[][] image, double[] kernel, boolean isComplex, int dim) {
 		if (dim > 1) throw new RuntimeException("Invalid dim");
 		if (dim == 0) image = ds.shiftDim(image);
 		int height = image.length;
 		for (int n = 0; n < height; n++) {
-			image[n] = convolveFT(image[n], kernel, isComplex);
+			image[n] = convolve(image[n], kernel, isComplex);
 		}
 		if (dim == 0) {
 			return ds.shiftDim(image);
@@ -82,11 +81,11 @@ public class ConvolveFourier {
 		}
 	}
 	
-	public double[][] convolveFT(double[][] image, double[] kernel, boolean isComplex) {
-		return convolveFT(image, kernel, isComplex, 0);
+	public double[][] convolve(double[][] image, double[] kernel, boolean isComplex) {
+		return convolve(image, kernel, isComplex, 0);
 	}
 	
-	public double[][][] convolveFT(double[][][] volume, double[] kernel, boolean isComplex, int dim) {
+	public double[][][] convolve(double[][][] volume, double[] kernel, boolean isComplex, int dim) {
 		if (dim == 0) volume = ds.shiftDim(volume, 2);
 		if (dim == 1) volume = ds.shiftDim(volume, 1);
 		if (dim > 2) throw new RuntimeException("Invalid dim");
@@ -96,18 +95,18 @@ public class ConvolveFourier {
 		
 		for (int x = 0; x < volumeWidth; x++) {
 			for (int y = 0; y < volumeHeight; y++) {
-				volume[x][y] = convolveFT(volume[x][y], kernel, isComplex);
+				volume[x][y] = convolve(volume[x][y], kernel, isComplex);
 			}
 		}
 		return volume;
 		
 	}
 	
-	public double[][][] convolveFT(double[][][] volume, double[] kernel, boolean isComplex) {
-		return convolveFT(volume, kernel, isComplex, 0);
+	public double[][][] convolve(double[][][] volume, double[] kernel, boolean isComplex) {
+		return convolve(volume, kernel, isComplex, 0);
 	}
 		
-	public double[][] convolveFT(double[][] image, double[][] kernel, boolean isComplex) {
+	public double[][] convolve(double[][] image, double[][] kernel, boolean isComplex) {
 		
 		int imageWidth = image.length;
 		int imageHeight = image[0].length;
@@ -116,16 +115,16 @@ public class ConvolveFourier {
 		int kernelHeight = kernel[0].length;
 				
 		DoubleFFT_2D fft = new DoubleFFT_2D(imageWidth+2*kernelWidth, imageHeight+2*kernelHeight);
-		double[][] paddedImage;
-		double[][] paddedKernel;
-		
+		int newWidth, newHeight;
 		if (isComplex) {
-			paddedImage = new double[imageWidth+2*kernelWidth][imageHeight+2*kernelHeight];
-			paddedKernel = new double[imageWidth+2*kernelWidth][imageHeight+2*kernelHeight];
+			newWidth = imageWidth+2*kernelWidth;
+			newHeight = imageHeight+2*kernelHeight;			
 		} else {
-			paddedImage = new double[2*(imageWidth+2*kernelWidth)][2*(imageHeight+2*kernelHeight)];
-			paddedKernel = new double[2*(imageWidth+2*kernelWidth)][2*(imageHeight+2*kernelHeight)];
+			newWidth = 2*(imageWidth+2*kernelWidth);
+			newHeight = 2*(imageHeight+2*kernelHeight);	
 		}
+		double[][] paddedImage = new double[newWidth][newHeight];
+		double[][] paddedKernel = new double[newWidth][newHeight];
 		
 		for (int x = 0; x < imageWidth; x++) {
 			for (int y = 0; y < imageHeight; y++) {
@@ -175,7 +174,7 @@ public class ConvolveFourier {
 		
 	}
 		
-	public double[][][] convolveFT(double[][][] volume, double[][] kernel, boolean isComplex, int dim) {
+	public double[][][] convolve(double[][][] volume, double[][] kernel, boolean isComplex, int dim) {
 		if (dim == 0) volume = ds.shiftDim(volume, 2);
 		if (dim == 1) volume = ds.shiftDim(volume, 1);
 		if (dim > 2) throw new RuntimeException("Invalid dim");
@@ -183,16 +182,16 @@ public class ConvolveFourier {
 		int volumeWidth = volume.length;
 		
 		for (int x = 0; x < volumeWidth; x++) {
-				volume[x] = convolveFT(volume[x], kernel, isComplex);
+				volume[x] = convolve(volume[x], kernel, isComplex);
 		}
 		return volume;
 	}
 	
-	public double[][][] convolveFT(double[][][] volume, double[][] kernel, boolean isComplex) {
-		return convolveFT(volume, kernel, isComplex, 0);
+	public double[][][] convolve(double[][][] volume, double[][] kernel, boolean isComplex) {
+		return convolve(volume, kernel, isComplex, 0);
 	}
 	
-	public double[][][] convolveFT(double[][][] volume, double[][][] kernel, boolean isComplex) {
+	public double[][][] convolve(double[][][] volume, double[][][] kernel, boolean isComplex) {
 		
 		int volumeWidth = volume.length;
 		int volumeHeight = volume[0].length;
@@ -205,14 +204,18 @@ public class ConvolveFourier {
 		DoubleFFT_3D fft = new DoubleFFT_3D(volumeWidth+2*kernelWidth, volumeHeight+2*kernelHeight, volumeDepth+2*kernelDepth);
 		double[][][] paddedVolume;
 		double[][][] paddedKernel;
-		
+		int newWidth, newHeight, newDepth;
 		if (isComplex) {
-			paddedVolume = new double[volumeWidth+2*kernelWidth][volumeHeight+2*kernelHeight][volumeDepth+2*kernelDepth];
-			paddedKernel = new double[volumeWidth+2*kernelWidth][volumeHeight+2*kernelHeight][volumeDepth+2*kernelDepth];
+			newWidth = volumeWidth+2*kernelWidth;
+			newHeight = volumeHeight+2*kernelHeight;
+			newDepth = volumeDepth+2*kernelDepth;
 		} else {
-			paddedVolume = new double[2*(volumeWidth+2*kernelWidth)][2*(volumeHeight+2*kernelHeight)][2*(volumeDepth+2*kernelDepth)];
-			paddedKernel = new double[2*(volumeWidth+2*kernelWidth)][2*(volumeHeight+2*kernelHeight)][2*(volumeDepth+2*kernelDepth)];
+			newWidth = 2*(volumeWidth+2*kernelWidth);
+			newHeight = 2*(volumeHeight+2*kernelHeight);
+			newDepth = 2*(volumeDepth+2*kernelDepth);
 		}
+		paddedVolume = new double[newWidth][newHeight][newDepth];
+		paddedKernel = new double[newWidth][newHeight][newDepth];
 		
 		for (int x = 0; x < volumeWidth; x++) {
 			for (int y = 0; y < volumeHeight; y++) {

@@ -34,7 +34,7 @@ public class GPUFFT_old {
 	float[] imag;
 	int N;
 	CLFFTPlan fft;
-    DimShifter ds;
+    DimShift ds;
     CLDevice device;
     CLCommandQueue queue;
     CLProgram program;

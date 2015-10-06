@@ -1,23 +1,10 @@
 package jvcl;
+/*
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
 
 
-/*
- * run part not needing attention to boundaries
- * handle boundaries with ensuing if statements
- * also adjust size of result at that time
- * 3 and 5 isotropic kernels are unrolled for speed
- * you can use the Unroller codegen class to unroll larger 
- * or custom size kernels
- * for your own fork if you wish
- * 
- * note to self: cropping for boundary conditions is measuring in terms of 
- * ORIG DIMENSION not RESULT DIMENSION
- * 
- * also, leave non-unrolled classes to take care of all boundaries
- */
 
 
 public class Convolver {
@@ -27,31 +14,31 @@ public class Convolver {
 	final int ZERO_BOUNDARY = 0;
 	final int MIRROR_BOUNDARY = 1;
 	final int PERIODIC_BOUNDARY = 2;
-	ConvolveNaive cn;
-	ConvolveFourier cf;
-	ConvolveJOCL cj;
+	FDCPUNaive cn;
+	FTCPU cf;
+	FDGPU cj;
 	GPUFFT g;
-	CPUFFT c;
-	Stockham s;
+	FTCPUSimple c;
+	StockhamGPU s;
 	
 	public Convolver(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
-		cn = new ConvolveNaive(boundaryConditions);
-		cf = new ConvolveFourier();
-		cj = new ConvolveJOCL();
+		cn = new FDCPUNaive(boundaryConditions);
+		cf = new FTCPU();
+		cj = new FDGPU();
 		g = new GPUFFT(4096, 256, 256);
-		c = new CPUFFT();
-		s = new Stockham();
+		c = new FTCPUSimple();
+		s = new StockhamGPU();
 	}
 	
 	public Convolver() {
 		this.boundaryConditions = MIRROR_BOUNDARY;
-		cn = new ConvolveNaive(boundaryConditions);
-		cf = new ConvolveFourier();
-		cj = new ConvolveJOCL();
+		cn = new FDCPUNaive(boundaryConditions);
+		cf = new FTCPU();
+		cj = new FDGPU();
 		g = new GPUFFT(4096, 256, 256);
-		c = new CPUFFT();
-		s = new Stockham();
+		c = new FTCPUSimple();
+		s = new StockhamGPU();
 	}
 	
 	public static void main(String[] args) {
@@ -72,7 +59,7 @@ public class Convolver {
 		double[] kernel1d = new double[]{1, -2, 1};
 		long startTime = System.currentTimeMillis();
 		for (int n = 0; n < 5; n++) {
-			c.s.fft_simple(testvec1d, testvec1d);
+			c.s.fft(testvec1d, testvec1d, true);
 		}
 		long endTime = System.currentTimeMillis();
 		double runTime = (endTime-startTime)/1000.0;
@@ -171,7 +158,7 @@ public class Convolver {
 					}
 					System.out.format("%n");
 				}
-				*/
+				
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}			
@@ -212,7 +199,7 @@ public class Convolver {
 					}
 					System.out.format("%n");
 				}
-				*/
+				
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}			
@@ -253,7 +240,7 @@ public class Convolver {
 					}
 					System.out.format("%n");
 				}
-				*/
+				
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}			
@@ -271,7 +258,7 @@ public class Convolver {
 		
 		
 		
-		/*
+		
 		System.out.println("UNROLL");
 		avg = 0;
 		for (int n = 0; n < trials; n++) {
@@ -365,7 +352,8 @@ public class Convolver {
 			long time2 = System.currentTimeMillis();
 			System.out.format("Trial %d: time to convolve %.3f seconds %n", n+1, (double)((time2-time1)/1000.0));
 		}
-		*/
+		
 	}
 	
 }
+*/
