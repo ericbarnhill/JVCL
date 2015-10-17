@@ -35,6 +35,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 import java.beans.*;
 import java.util.Random;
@@ -116,6 +117,8 @@ public class ProgressBar extends JPanel
         taskOutput = new JTextArea(10, 50);
         taskOutput.setMargin(new Insets(5,5,5,5));
         taskOutput.setEditable(false);
+        DefaultCaret caret = (DefaultCaret)taskOutput.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
  
         JPanel panel = new JPanel();
         panel.add(startButton);
@@ -138,8 +141,6 @@ public class ProgressBar extends JPanel
         task.addPropertyChangeListener(this);
         task.execute();
         started = true;
-        System.out.println("starting in pb");
-        System.out.println(started);
     }
     /**
      * Invoked when task's progress property changes.
@@ -154,6 +155,12 @@ public class ProgressBar extends JPanel
         }
     }
  
+    public void startProgress() {
+    	progressBar.setIndeterminate(false);
+    }
+    public void setProgress(int progress) {
+    	progressBar.setValue(progress);
+    }
     /**
      * Create the GUI and show it. As with all GUI code, this must run
      * on the event-dispatching thread.

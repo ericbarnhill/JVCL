@@ -5,11 +5,8 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
 
 public class FTCPU {
-	
-	DimShift ds;
-	
+		
 	public FTCPU() {
-		ds = new DimShift();
 	}
 	
 	public double[] convolve(double[] vector, double[] kernel, boolean isComplex) {
@@ -55,27 +52,26 @@ public class FTCPU {
 		
 		fft.complexInverse(paddedVector, true);
 		
-		double[] result = new double[vectorLength];
 		for (int x = 0; x < vectorLength; x++) {
 			if (isComplex) {
-				result[x] = paddedVector[x+kernelLength];
+				vector[x] = paddedVector[x+kernelLength];
 			} else {
-				result[x] = paddedVector[x*2+kernelLength*2];
+				vector[x] = paddedVector[x*2+kernelLength*2];
 			}
 		}		
-		return result;
+		return vector;
 		
 	}
 	
 	public double[][] convolve(double[][] image, double[] kernel, boolean isComplex, int dim) {
 		if (dim > 1) throw new RuntimeException("Invalid dim");
-		if (dim == 0) image = ds.shiftDim(image);
+		if (dim == 0) image = JVCLUtils.shiftDim(image);
 		int height = image.length;
 		for (int n = 0; n < height; n++) {
 			image[n] = convolve(image[n], kernel, isComplex);
 		}
 		if (dim == 0) {
-			return ds.shiftDim(image);
+			return JVCLUtils.shiftDim(image);
 		} else {
 			return image;
 		}
@@ -86,8 +82,8 @@ public class FTCPU {
 	}
 	
 	public double[][][] convolve(double[][][] volume, double[] kernel, boolean isComplex, int dim) {
-		if (dim == 0) volume = ds.shiftDim(volume, 2);
-		if (dim == 1) volume = ds.shiftDim(volume, 1);
+		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
+		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
 		if (dim > 2) throw new RuntimeException("Invalid dim");
 		
 		int volumeWidth = volume.length;
@@ -160,23 +156,22 @@ public class FTCPU {
 		
 		fft.complexInverse(paddedImage, true);
 		
-		double[][] result = new double[imageWidth][imageHeight];
 		for (int x = 0; x < imageWidth; x++) {
 			for (int y = 0; y < imageHeight; y++) {
 				if (isComplex) {
-					result[x][y] = paddedImage[x+kernelWidth][y+kernelHeight];
+					image[x][y] = paddedImage[x+kernelWidth][y+kernelHeight];
 				} else {
-					result[x][y] = paddedImage[x*2+kernelWidth*2][y*2+kernelHeight*2];
+					image[x][y] = paddedImage[x*2+kernelWidth*2][y*2+kernelHeight*2];
 				}
 			}
 		}		
-		return result;
+		return image;
 		
 	}
 		
 	public double[][][] convolve(double[][][] volume, double[][] kernel, boolean isComplex, int dim) {
-		if (dim == 0) volume = ds.shiftDim(volume, 2);
-		if (dim == 1) volume = ds.shiftDim(volume, 1);
+		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
+		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
 		if (dim > 2) throw new RuntimeException("Invalid dim");
 		
 		int volumeWidth = volume.length;
@@ -257,18 +252,17 @@ public class FTCPU {
 		
 		fft.complexInverse(paddedVolume, true);
 		
-		double[][][] result = new double[volumeWidth][volumeHeight][volumeDepth];
 		for (int x = 0; x < volumeWidth; x++) {
 			for (int y = 0; y < volumeHeight; y++) {
 				for (int z = 0; z < volumeDepth; z++) {
 					if (isComplex) {
-						result[x][y][z] = paddedVolume[x+kernelWidth][y+kernelHeight][z+kernelDepth];
+						volume[x][y][z] = paddedVolume[x+kernelWidth][y+kernelHeight][z+kernelDepth];
 					} else 
-						result[x][y][z] = paddedVolume[x*2+kernelWidth*2][y*2+kernelHeight*2][z*2+kernelDepth*2];
+						volume[x][y][z] = paddedVolume[x*2+kernelWidth*2][y*2+kernelHeight*2][z*2+kernelDepth*2];
 				}
 			}
 		}		
-		return result;
+		return volume;
 		
 	}
 

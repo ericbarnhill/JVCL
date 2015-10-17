@@ -1,3 +1,24 @@
+/* Copyright (c) 2015 Eric Barnhill
+*
+*Permission is hereby granted, free of charge, to any person obtaining a copy
+*of this software and associated documentation files (the "Software"), to deal
+*in the Software without restriction, including without limitation the rights
+*to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+*copies of the Software, and to permit persons to whom the Software is
+*furnished to do so, subject to the following conditions:
+*
+*The above copyright notice and this permission notice shall be included in all
+*copies or substantial portions of the Software.
+*
+*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*SOFTWARE.
+*/
+
 package jvcl;
 
 public class FDCPUNaive {
@@ -8,16 +29,21 @@ public class FDCPUNaive {
 	final int MIRROR_BOUNDARY = 1;
 	final int PERIODIC_BOUNDARY = 2;
 	
-	DimShift ds;
+	JVCLUtils ds;
 	
+	/** Constructer allows setting of boundary conditions: 
+	*	@param boundaryConditions	0=Zero boundaries and slightly faster 1=Mirror Boundaries 2=Periodic Boundaries 
+	*/
 	public FDCPUNaive(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
-		ds = new DimShift();
+		ds = new JVCLUtils();
 	}
-	
+
+	/** Default constructor sets zero boundary conditions 
+	*/
 	public FDCPUNaive() {
 		this.boundaryConditions = ZERO_BOUNDARY;
-		ds = new DimShift();
+		ds = new JVCLUtils();
 	}
 
 	public double[] convolve(double[] vector, double[] kernel) {
@@ -28,9 +54,9 @@ public class FDCPUNaive {
 		int adjN;
 		result = new double[vectorLength];
 		for (int n = 0; n < vectorLength; n++) {
-			kernelLoop:
-			if (n < halfLength || n >= vectorLength - halfLength) {
-					if (boundaryConditions == ZERO_BOUNDARY) break kernelLoop;
+			boundaryCheck:
+			if (n < halfLength || n >= vectorLength - halfLength - 1) {
+					if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
 					for (int p = 0; p < kernelLength; p++) {
 						adjN = n + (p - halfLength);
 						if (adjN < 0) {
@@ -62,6 +88,9 @@ public class FDCPUNaive {
 		return result;
 	}
 	
+	/** 1D convolution on 2D array
+	* @param dim 	if [x][y], setting to 1 runs 1D convolution on the y arrays
+	*/
 	public double[][] convolve(double[][] image, double[] kernel, int dim) {
 		if (dim > 1) throw new RuntimeException("Invalid dim");
 		if (dim == 0) image = ds.shiftDim(image);
@@ -76,10 +105,16 @@ public class FDCPUNaive {
 		}
 	}
 	
+	/** 1D convolution on 2D array
+	* Default dimension is first array (if [x][y], x)
+	*/
 	public double[][] convolve(double[][] image, double[] kernel) {
 		return convolve(image, kernel, 0);
 	}
 	
+	/** 1D convolution on 3D array
+	* @param dim 	if [x][y][z], setting dim to 1 runs 1D conv on y arrays and 2 runs on z
+	*/
 	public double[][][] convolve(double[][][] volume, double[] kernel, int dim) {
 		if (dim == 0) volume = ds.shiftDim(volume, 2);
 		if (dim == 1) volume = ds.shiftDim(volume, 1);
@@ -97,6 +132,9 @@ public class FDCPUNaive {
 		
 	}
 	
+	/** 1D convolution on 3D array
+	* Default dimension is first array (if [x][y][z], x)
+	*/
 	public double[][][] convolve(double[][][] volume, double[] kernel) {
 		return convolve(volume, kernel, 0);
 	}
@@ -115,7 +153,7 @@ public class FDCPUNaive {
 		for (int x = 0; x < imageWidth; x++) {
 			for (int y = 0; y < imageHeight; y++) {
 				boundaryCheck:
-				if (x < halfWidth || x > imageWidth - halfWidth || y < halfHeight || y > imageHeight - halfHeight) { // if boundary
+				if (x < halfWidth || x >= imageWidth - halfWidth || y < halfHeight || y >= imageHeight - halfHeight) { // if boundary
 					if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
 					for (int p = 0; p < kernelWidth; p++) {
 						for (int q = 0; q < kernelHeight; q++) {
@@ -164,6 +202,9 @@ public class FDCPUNaive {
 		return result;
 	}
 	
+	/** 2D convolution on 3D array
+	* @param dim 	if [x][y][z], setting dim to 1 runs 2D conv on [y][z]
+	*/
 	public double[][][] convolve(double[][][] volume, double[][] kernel, int dim) {
 		if (dim == 0) volume = ds.shiftDim(volume, 2);
 		if (dim == 1) volume = ds.shiftDim(volume, 1);

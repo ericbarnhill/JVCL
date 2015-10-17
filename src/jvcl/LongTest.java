@@ -40,7 +40,7 @@ import java.util.prefs.Preferences;
 
 import jvcl.ProgressBar.Task;
 
-public class Autotuner {
+public class LongTest {
 
 	FDCPUNaive naive;
 	FDCPUUnrolled unrolled;
@@ -52,16 +52,10 @@ public class Autotuner {
     CLCommandQueue queue;
     CLProgram program;
     CLContext context;
-    private final int[] arraySizes = {64, 128, 192, 256, 384, 512, 640, 768, 1024};
-    //private final int[] arraySizes = {512, 1024, 2048};
-    //private final int[] kernelSizes = {3, 5, 7, 9, 11, 13, 15};
-    private final int[] kernelSizes = {3, 5, 7};
-    private final int numArraySizes = arraySizes.length;
-    //private final int numArraySizes = 3;
-    private final int numKernelSizes = kernelSizes.length;
-    //private final int numKernelSizes = 3;
-    private final int totalTests = numArraySizes*numKernelSizes;
-    //private final int totalTests = 9;
+    private final int arrayMin = 256;
+    private final int arrayMax = 1024;
+    private final int kernelMin = 3;
+    private final int kernelMax = 1024;
     Random random;
     final int NAIVE = 0;
     final int UNROLLED = 1;
@@ -74,12 +68,12 @@ public class Autotuner {
     long[] temp;
     boolean hasOpenCL;
     int progress;
+    int arraySize, kernelSize;
     
     
-    
-	public Autotuner() {
+	public LongTest() {
 		random = new Random();
-		convolverPrefs = new byte[numArraySizes*numKernelSizes];
+		//convolverPrefs = new byte[numArraySizes*numKernelSizes];
 		temp = new long[5];
 	}
 
@@ -87,14 +81,14 @@ public class Autotuner {
 	// run all tests using: FDCPUNaive, FDGPU, FTCPU, FTGPU
 	// also small kernel tests with FDCPUUnrolled
 
-	/** runs the Autotuner */
+	/** runs the LongTest */
 	public void tune() {
 		
 		System.out.println();
 		pb = new ProgressBar();
 		progress = 0;
 		pb.createStatusBar();
-		pb.taskOutput.append(String.format("JVCL Autotuner. Press Start to Begin. \n"));
+		pb.taskOutput.append(String.format("JVCL LongTest. Press Start to Begin. \n"));
 		hasOpenCL = true;
 		try {
 			context = CLContext.create();
@@ -130,10 +124,8 @@ public class Autotuner {
 	
 	private void run1dTests() {
 		long start, end, duration;
-		for (int m = 0; m < numArraySizes; m++) {
-			for (int n = 0; n < numKernelSizes; n++) {
-				int arraySize = arraySizes[m];
-				int kernelSize = kernelSizes[n];
+		for (arraySize = arrayMin; arraySize < arrayMax; arraySize += 32) {
+			for (kernelSize = kernelMin; kernelSize < arraySize; kernelSize = kernelSize * 2 - 1) {
 				pb.taskOutput.append(String.format("Array size %d Kernel Size %d \n", arraySize, kernelSize));
 				double[] array = new double[arraySize];
 				double[] kernel = new double[kernelSize];
@@ -202,11 +194,11 @@ public class Autotuner {
 					temp[FDGPU] = Integer.MAX_VALUE;
 				} 
 				byte min = min();
-				convolverPrefs[m*numKernelSizes + n] = min;
+				//convolverPrefs[m*numKernelSizes + n] = min;
 				pb.taskOutput.append(String.format("Best Performer:  %s %n", bestNames[min]));
 				writeResults();
-				float progress = 100*(m*numKernelSizes + n) / ((float)totalTests*3.0f);
-				pb.setProgress((int)progress);
+				//float progress = 100*(m*numKernelSizes + n) / ((float)totalTests*3.0f);
+				pb.setProgress((int)(100*(arraySize/arrayMax)*(kernelSize/kernelMax) / 3.0));
 			} // for kernel size
 		} // for array size
 		
@@ -214,10 +206,8 @@ public class Autotuner {
 	
 	private void run2dTests() {
 		long start, end, duration;
-		for (int m = 0; m < numArraySizes; m++) {
-			for (int n = 0; n < numKernelSizes; n++) {
-				int arraySize = arraySizes[m];
-				int kernelSize = kernelSizes[n];
+		for (arraySize = arrayMin; arraySize < arrayMax; arraySize += 32) {
+			for (kernelSize = kernelMin; kernelSize < arraySize; kernelSize = kernelSize * 2 - 1) {
 				pb.taskOutput.append(String.format("Array size %d Kernel Size %d \n", arraySize, kernelSize));
 				double[][] array = new double[arraySize][arraySize];
 				double[][] kernel = new double[kernelSize][kernelSize];
@@ -238,6 +228,7 @@ public class Autotuner {
 				duration = end-start;
 				pb.taskOutput.append(String.format("2D Naive FD: %.3f sec %n", duration / 1000.0 ));
 				temp[NAIVE] = duration;
+				System.gc();
 				if (kernel.length <= 5) {
 					// FD Unrolled
 					start = System.currentTimeMillis();
@@ -255,6 +246,7 @@ public class Autotuner {
 				} else {
 					temp[UNROLLED] = Integer.MAX_VALUE;
 				}
+				System.gc();
 				// FTCPU
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
@@ -274,6 +266,7 @@ public class Autotuner {
 					duration = end-start;
 					pb.taskOutput.append(String.format("2D FD on GPU: %.3f sec %n", duration / 1000.0 ));
 					temp[FDGPU] = duration;
+					System.gc();
 					// FTGPU STRIDE
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
@@ -283,26 +276,25 @@ public class Autotuner {
 					duration = end-start;
 					pb.taskOutput.append(String.format("2D FT on GPU STRIDE: %.3f sec %n", duration / 1000.0 ));
 					temp[FTGPU] = duration;
+					System.gc();
 				} else {
 					temp[FTGPU] = Integer.MAX_VALUE;
 					temp[FDGPU] = Integer.MAX_VALUE;
 				} 
 				writeResults();
 				byte min = min();
-				convolverPrefs[m*numKernelSizes + n] = min;
+				//convolverPrefs[m*numKernelSizes + n] = min;
 				pb.taskOutput.append(String.format("Best Performer:  %s %n", bestNames[min]));
-				float progress = 2*100*(m*numKernelSizes + n) / ((float)totalTests*3.0f);
-				pb.setProgress((int)progress);
+				//float progress = 2*100*(m*numKernelSizes + n) / ((float)totalTests*3.0f);
+				pb.setProgress((int)(33.3 + (arraySize/arrayMax)*(kernelSize/kernelMax) / 3.0));
 			} // for kernel size
 		} // for array size
 	}
 
 	private void run3dTests() {
 		long start, end, duration;
-		for (int m = 0; m < numArraySizes-1; m++) { // 1024^3 may be too much
-			for (int n = 0; n < numKernelSizes; n++) {
-				int arraySize = arraySizes[m];
-				int kernelSize = kernelSizes[n];
+		for (int arraySize = arrayMin; arraySize < arrayMax; arraySize += 32) {
+			for (int kernelSize = kernelMin; kernelSize < kernelMax; kernelSize = kernelSize * 2 - 1) {
 				pb.taskOutput.append(String.format("Array size %d Kernel Size %d \n", arraySize, kernelSize));
 				double[][][] array = new double[arraySize][arraySize][arraySize];
 				double[][][] kernel = new double[kernelSize][kernelSize][kernelSize];
@@ -374,9 +366,12 @@ public class Autotuner {
 					temp[FTGPU] = Integer.MAX_VALUE;
 					temp[FDGPU] = Integer.MAX_VALUE;
 				}
+				writeResults();
 				byte min = min();
-				convolverPrefs[m*numKernelSizes + n] = min;
+				//convolverPrefs[m*numKernelSizes + n] = min;
 				pb.taskOutput.append(String.format("Best Performer:  %s %n", bestNames[min]));
+				//float progress = 2*100*(m*numKernelSizes + n) / ((float)totalTests*3.0f);
+				pb.setProgress((int)(66.6 + 100*(arraySize/arrayMax)*(kernelSize/kernelMax) / 3.0f));
 			} // for kernel size
 		} // for array size
 	}
@@ -403,6 +398,7 @@ public class Autotuner {
 		try {
 			br = new BufferedWriter(new FileWriter("/home/ericbarnhill/Documents/code/results.csv", true));
 			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("%d, %d ", arraySize, kernelSize));
 			for (int x = 0; x < 5; x++) {
 				if (temp[x] != Integer.MAX_VALUE) {
 					sb.append(String.format("%d, ", temp[x]));
@@ -420,9 +416,9 @@ public class Autotuner {
 	}
 	
 	
-	/** Main method for autotuner */
+	/** Main method for LongTest */
 	public static void main(String[] args) {
-		new Autotuner().tune();
+		new LongTest().tune();
 	}
 
 

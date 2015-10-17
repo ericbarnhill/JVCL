@@ -1,44 +1,48 @@
 package jvcl;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.io.*;
+import java.io.InputStreamReader;
+import java.util.Random;
 
-import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
-import com.jogamp.opencl.demos.fft.*;
-import com.jogamp.opencl.demos.fft.CLFFTPlan.InvalidContextException;
-import com.jogamp.common.nio.PointerBuffer;
-
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
-import static java.lang.System.*;
-import static com.jogamp.opencl.CLMemory.Mem.*;
-import static java.lang.Math.*;
 
 public class FTGPU {
 	
-    DimShift ds;
     CLDevice device;
     CLCommandQueue queue;
-    CLProgram program;
+    CLProgram program, programStride, program2, programMult;
     CLContext context;
+    CLKernel Kernel, KernelMult;
+    StockhamGPU s;
+    StockhamGPUStride str;
+    StockhamGPUStrideNoDS s2;
+    boolean debug;
 	
 	public FTGPU() {
-		ds = new DimShift();
+		context = CLContext.create();
+		device = context.getMaxFlopsDevice();
+		queue = device.createCommandQueue();
+	    String source = JVCLUtils.readFile("src/stockham.cl");
+	    String source2 = JVCLUtils.readFile("src/stockham2.cl");
+	    String sourceStride = JVCLUtils.readFile("src/stockhamStride.cl");
+	    String sourceMult = JVCLUtils.readFile("src/vecMult.cl");
+		program = context.createProgram(source).build();
+		programStride = context.createProgram(sourceStride).build();
+		program2 = context.createProgram(sourceStride).build();
+		//programMult = context.createProgram(sourceMult).build();
+
 	}
 
 	public double[] convolve(double[] vector, double[] kernel, boolean isComplex) {
 		
 		int vectorLength = vector.length;
 		int kernelLength = kernel.length;
-		StockhamGPU s = new StockhamGPU();
 		
 		float[] paddedReal;
 		float[] paddedImag;
@@ -46,10 +50,11 @@ public class FTGPU {
 		float[] paddedKernelImag; // only has values post-fft
 		int newLength;
 		if (isComplex) {
-			newLength = nextPwr2(vectorLength / 2 + 2 * kernelLength);
+			newLength = JVCLUtils.nextPwr2(vectorLength / 2 + 2 * kernelLength);
 		} else {
-			newLength = nextPwr2(vectorLength + 2 * kernelLength);
+			newLength = JVCLUtils.nextPwr2(vectorLength + 2 * kernelLength);
 		}
+		s = new StockhamGPU(context, device, queue, program, newLength);	
 		paddedReal = new float[newLength];
 		paddedImag = new float[newLength];
 		paddedKernel = new float[newLength];
@@ -72,6 +77,7 @@ public class FTGPU {
 
 		s.fft(paddedReal, paddedImag, true);
 		s.fft(paddedKernel, paddedKernelImag, true);
+
 		
 		for (int x = 0; x < newLength; x++) {
 			paddedReal[x] *= paddedKernel[x];
@@ -91,19 +97,20 @@ public class FTGPU {
 				result[x] = paddedReal[x+kernelLength];
 			}
 		}		
+		s.close();
 		return result;
 		
 	}
 	
 	public double[][] convolve(double[][] image, double[] kernel, boolean isComplex, int dim) {
 		if (dim > 1) throw new RuntimeException("Invalid dim");
-		if (dim == 0) image = ds.shiftDim(image);
+		if (dim == 0) image = JVCLUtils.shiftDim(image);
 		int height = image.length;
 		for (int n = 0; n < height; n++) {
 			image[n] = convolve(image[n], kernel, isComplex);
 		}
 		if (dim == 0) {
-			return ds.shiftDim(image);
+			return JVCLUtils.shiftDim(image);
 		} else {
 			return image;
 		}
@@ -115,8 +122,8 @@ public class FTGPU {
 	
 	
 	public double[][][] convolve(double[][][] volume, double[][] kernel, boolean isComplex, int dim) {
-		if (dim == 0) volume = ds.shiftDim(volume, 2);
-		if (dim == 1) volume = ds.shiftDim(volume, 1);
+		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
+		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
 		if (dim > 2) throw new RuntimeException("Invalid dim");
 		
 		int volumeWidth = volume.length;
@@ -129,21 +136,158 @@ public class FTGPU {
 
 	public double[][] convolve(double[][] image, double[][] kernel, boolean isComplex) {
 		
+		long start = 0;
+		long end = 0;
+
 		int imageWidth = image.length;
 		int imageHeight = image[0].length;
 		
 		int kernelWidth = kernel.length;
 		int kernelHeight = kernel[0].length;
 				
-		StockhamGPU s = new StockhamGPU();
 		int newWidth, newHeight;
+		newWidth = JVCLUtils.nextPwr2(imageWidth+2*kernelWidth);
+		newHeight = JVCLUtils.nextPwr2(imageHeight+2*kernelHeight);
+		s = new StockhamGPU(context, device, queue, program, newWidth);	
+
+		float[][] paddedReal = new float[newWidth][newHeight];
+		float[][] paddedImag = new float[newWidth][newHeight];
+		float[][] paddedKernel = new float[newWidth][newHeight];
+		float[][] paddedKernelImag = new float[newWidth][newHeight];
+		
 		if (isComplex) {
-			newWidth = imageWidth+2*kernelWidth;
-			newHeight = imageHeight+2*kernelHeight;			
+			for (int x = 0; x < imageWidth / 2; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					paddedReal[x+kernelWidth][y+kernelHeight] = (float)image[x*2][y];
+					paddedImag[x+kernelWidth][y+kernelHeight] = (float)image[x*2+1][y];
+				} 
+			}
 		} else {
-			newWidth = 2*(imageWidth+2*kernelWidth);
-			newHeight = 2*(imageHeight+2*kernelHeight);	
+			for (int x = 0; x < imageWidth; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					paddedReal[x+kernelWidth][y+kernelHeight] = (float)image[x][y];
+				} 
+			}
 		}
+		
+		for (int x = 0; x < kernelWidth; x++) {
+			for (int y = 0; y < kernelHeight; y++) {
+					paddedKernel[x+kernelWidth][y+kernelHeight] = (float)kernel[x][y];
+			}
+		}
+		// begin FFT
+		if (debug) {
+			System.out.println("FFTs forward");
+			start = System.currentTimeMillis();
+		}
+		for (int x = 0; x < newWidth; x++) {
+			s.fft(paddedReal[x], paddedImag[x], true);
+			s.fft(paddedKernel[x], paddedKernelImag[x], true);
+		}
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("Dim shifting");
+			start = System.currentTimeMillis();
+		}
+		paddedReal =  JVCLUtils.shiftDim(paddedReal);
+		paddedImag = JVCLUtils.shiftDim(paddedImag);
+		paddedKernel = JVCLUtils.shiftDim(paddedKernel);
+		paddedKernelImag = JVCLUtils.shiftDim(paddedKernelImag);
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("Second FFT");
+			start = System.currentTimeMillis();
+		}
+		for (int y = 0; y < newHeight; y++) {
+			s.fft(paddedReal[y], paddedImag[y], true);
+			s.fft(paddedKernel[y], paddedKernelImag[y], true);
+		}
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("Multiplying arrays");
+			start = System.currentTimeMillis();
+		}
+		for (int x = 0; x < newWidth; x++) {
+			for (int y = 0; y < newHeight; y++) {
+					paddedReal[x][y] *= paddedKernel[x][y];
+					paddedImag[x][y] *= paddedKernelImag[x][y];
+			}
+		}
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("FFT inverse");
+			start = System.currentTimeMillis();
+		}
+		for (int y = 0; y < newHeight; y++) {
+			s.fft(paddedReal[y], paddedImag[y], false);
+		}
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("Dim Shifting");
+			start = System.currentTimeMillis();
+		}
+		paddedReal =  JVCLUtils.shiftDim(paddedReal);
+		paddedImag = JVCLUtils.shiftDim(paddedImag);
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("Second FFT");
+			start = System.currentTimeMillis();
+		}
+		for (int x = 0; x < newWidth; x++) {
+			s.fft(paddedReal[x], paddedImag[x], false);
+		}
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+		}
+		
+		double[][] result = new double[imageWidth][imageHeight];
+		if (isComplex) {
+			for (int x = 0; x < imageWidth / 2; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					result[x*2][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+					result[x*2+1][y] = paddedImag[x+kernelWidth][y+kernelHeight];
+				} 
+			}
+		} else {
+			for (int x = 0; x < imageWidth; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					result[x][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+				} 
+			}
+		}
+		s.close();
+		return result;
+		
+	}
+	
+	public double[][] convolveStride(double[][] image, double[][] kernel, boolean isComplex) {
+				
+		long start = 0;
+		long end = 0;
+
+		int imageWidth = image.length;
+		int imageHeight = image[0].length;
+		
+		//if (imageWidth == 1024) debug = true;
+		
+		int kernelWidth = kernel.length;
+		int kernelHeight = kernel[0].length;
+				
+		int newWidth, newHeight;
+		newWidth = JVCLUtils.nextPwr2(imageWidth+2*kernelWidth);
+		newHeight = JVCLUtils.nextPwr2(imageHeight+2*kernelHeight);
+		int newArea = newWidth*newHeight;
+
+		//str = new StockhamGPUStride();
+		s2 = new StockhamGPUStrideNoDS(context, device, queue, programStride);	
+		//str = new StockhamGPUStride(context, device, queue, programStride);	
 
 		float[][] paddedReal = new float[newWidth][newHeight];
 		float[][] paddedImag = new float[newWidth][newHeight];
@@ -171,50 +315,50 @@ public class FTGPU {
 			}
 		}
 		
-		for (int x = 0; x < newWidth; x++) {
-			s.fft(paddedReal[x], paddedImag[x], true);
-			s.fft(paddedKernel[x], paddedKernelImag[x], true);
-		}
-		paddedReal =  ds.shiftDim(paddedReal);
-		paddedImag = ds.shiftDim(paddedImag);
-		paddedKernel = ds.shiftDim(paddedKernel);
-		paddedKernelImag = ds.shiftDim(paddedKernelImag);
-		for (int y = 0; y < newHeight; y++) {
-			s.fft(paddedReal[y], paddedImag[y], true);
-			s.fft(paddedKernel[y], paddedKernelImag[y], true);
+		float[] paddedRVec = JVCLUtils.vectorise(paddedReal);
+		float[] paddedIVec = JVCLUtils.vectorise(paddedImag);
+		float[] paddedRKern = JVCLUtils.vectorise(paddedReal);
+		float[] paddedIKern = JVCLUtils.vectorise(paddedImag);
+		s2.fft(paddedRVec, paddedIVec, true, newWidth, newHeight, true);
+		s2.fft(paddedRKern, paddedIKern, true, newWidth, newHeight, true);
+		s2.fft(paddedRVec, paddedIVec, true, newWidth, newHeight, false);
+		s2.fft(paddedRKern, paddedIKern, true, newWidth, newHeight, false);
+		
+		for (int n = 0; n < newArea; n++) {
+					paddedRVec[n] *= paddedRKern[n];
+					paddedIVec[n] *= paddedIKern[n];
 		}
 		
-		for (int x = 0; x < newWidth; x++) {
-			for (int y = 0; y < newHeight; y++) {
-					paddedReal[x][y] *= paddedKernel[x][y];
-					paddedImag[x][y] *= paddedKernelImag[x][y];
-			}
+		if (debug) {
+			end = System.currentTimeMillis();
+			System.out.format("Duration %.3f %n", (end-start)/1000.0);
+			System.out.println("FFT inverse");
+			start = System.currentTimeMillis();
 		}
+		
+		s2.fft(paddedRVec, paddedIVec, false, newWidth, newHeight, false);
+		s2.fft(paddedRVec, paddedIVec, false, newWidth, newHeight, false);
 
-		for (int y = 0; y < newHeight; y++) {
-			s.fft(paddedReal[y], paddedImag[y], false);
-		}
-		paddedReal =  ds.shiftDim(paddedReal);
-		paddedImag = ds.shiftDim(paddedImag);
-		for (int x = 0; x < newWidth; x++) {
-			s.fft(paddedReal[x], paddedImag[x], false);
-		}
-		double[][] result = new double[imageWidth][imageHeight];
+		paddedReal = JVCLUtils.devectorise(paddedRVec, newWidth);
+		paddedImag = JVCLUtils.devectorise(paddedIVec, newWidth);
+		
 		if (isComplex) {
 			for (int x = 0; x < imageWidth / 2; x++) {
 				for (int y = 0; y < imageHeight; y++) {
-					result[x*2][y] = paddedReal[x+kernelWidth][y+kernelHeight];
-					result[x*2+1][y] = paddedImag[x+kernelWidth][y+kernelHeight];
+					image[x*2][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+					image[x*2+1][y] = paddedImag[x+kernelWidth][y+kernelHeight];
 				} 
 			}
 		} else {
 			for (int x = 0; x < imageWidth; x++) {
 				for (int y = 0; y < imageHeight; y++) {
-					result[x][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+					image[x][y] = paddedReal[x+kernelWidth][y+kernelHeight];
 				} 
 			}
 		}
-		return result;
+		//str.close();
+		if (debug == true) System.exit(0);
+		return image;
 		
 	}
 		
@@ -228,17 +372,17 @@ public class FTGPU {
 		int kernelHeight = kernel[0].length;
 		int kernelDepth = kernel[0][0].length;
 				
-		StockhamGPU s = new StockhamGPU();
 		int newWidth, newHeight, newDepth;
 		if (isComplex) {
-			newWidth = volumeWidth + 2*kernelWidth;
-			newHeight = volumeHeight + 2*kernelHeight;		
-			newDepth = volumeDepth + 2*kernelDepth;
+			newWidth = JVCLUtils.nextPwr2(volumeWidth + 2*kernelWidth);
+			newHeight = JVCLUtils.nextPwr2(volumeHeight + 2*kernelHeight);		
+			newDepth = JVCLUtils.nextPwr2(volumeDepth + 2*kernelDepth);
 		} else {
-			newWidth = 2*(volumeWidth+2*kernelWidth);
-			newHeight = 2*(volumeHeight+2*kernelHeight);	
-			newDepth = 2*(volumeDepth+2*kernelDepth);
+			newWidth = JVCLUtils.nextPwr2(2*(volumeWidth+2*kernelWidth));
+			newHeight = JVCLUtils.nextPwr2(2*(volumeHeight+2*kernelHeight));	
+			newDepth = JVCLUtils.nextPwr2(2*(volumeDepth+2*kernelDepth));
 		}
+		s = new StockhamGPU(context, device, queue, program, newWidth);	
 
 		float[][][] paddedReal = new float[newWidth][newHeight][newDepth];
 		float[][][] paddedImag = new float[newWidth][newHeight][newDepth];
@@ -279,10 +423,10 @@ public class FTGPU {
 			}
 		}
 
-		paddedReal =  ds.shiftDim(paddedReal);
-		paddedImag = ds.shiftDim(paddedImag);
-		paddedKernel = ds.shiftDim(paddedKernel);
-		paddedKernelImag = ds.shiftDim(paddedKernelImag);
+		paddedReal =  JVCLUtils.shiftDim(paddedReal);
+		paddedImag = JVCLUtils.shiftDim(paddedImag);
+		paddedKernel = JVCLUtils.shiftDim(paddedKernel);
+		paddedKernelImag = JVCLUtils.shiftDim(paddedKernelImag);
 
 		for (int y = 0; y < newHeight; y++) {
 			for (int z = 0; z < newDepth; z++) {
@@ -291,10 +435,10 @@ public class FTGPU {
 			}
 		}
 
-		paddedReal =  ds.shiftDim(paddedReal);
-		paddedImag = ds.shiftDim(paddedImag);
-		paddedKernel = ds.shiftDim(paddedKernel);
-		paddedKernelImag = ds.shiftDim(paddedKernelImag);
+		paddedReal =  JVCLUtils.shiftDim(paddedReal);
+		paddedImag = JVCLUtils.shiftDim(paddedImag);
+		paddedKernel = JVCLUtils.shiftDim(paddedKernel);
+		paddedKernelImag = JVCLUtils.shiftDim(paddedKernelImag);
 
 		for (int z = 0; z < newDepth; z++) {
 			for (int x = 0; x < newWidth; x++) {
@@ -318,8 +462,8 @@ public class FTGPU {
 			}
 		}
 
-		paddedReal =  ds.shiftDim(paddedReal, 2);
-		paddedImag = ds.shiftDim(paddedImag, 2);
+		paddedReal =  JVCLUtils.shiftDim(paddedReal, 2);
+		paddedImag = JVCLUtils.shiftDim(paddedImag, 2);
 
 		for (int y = 0; y < newHeight; y++) {
 			for (int z = 0; z < newDepth; z++) {
@@ -327,8 +471,8 @@ public class FTGPU {
 			}
 		}
 
-		paddedReal =  ds.shiftDim(paddedReal, 2);
-		paddedImag = ds.shiftDim(paddedImag, 2);
+		paddedReal =  JVCLUtils.shiftDim(paddedReal, 2);
+		paddedImag = JVCLUtils.shiftDim(paddedImag, 2);
 
 		for (int x = 0; x < newWidth; x++) {
 			for (int y = 0; y < newHeight; y++) {
@@ -363,16 +507,41 @@ public class FTGPU {
 	public double[][][] convolve(double[][][] volume, double[][] kernel, boolean isComplex) {
 		return convolve(volume, kernel, isComplex, 0);
 	}
+		public void setDebug(boolean debugSet) {
+		debug = debugSet;
+	}
 	
-	int nextPwr2(int length) {
-		
-		int pwr2Length = 1;
-		do {
-			pwr2Length *= 2;
-		} while(pwr2Length < length);
-		return pwr2Length;
+	public void close() {
+		context.release();
 	}
 
+	public static void main(String[] args) {
+		Random random = new Random();
+		int arraySize = 128;
+		int kernelSize = 7;
+		long start, end, duration;
+		FTGPU ftgpu = new FTGPU();
+		System.out.format("Array size %d Kernel Size %d \n", arraySize, kernelSize);
+		double[][] array = new double[arraySize][arraySize];
+		double[][] kernel = new double[kernelSize][kernelSize];
+		for (int x = 0; x < arraySize; x++) {
+			for (int y = 0; y < arraySize; y++) {
+				if (x < kernelSize && y < kernelSize) {
+					kernel[x][y] = random.nextDouble();
+				}
+				array[x][y] = random.nextDouble();
+			}
+		}
+		start = System.currentTimeMillis();
+		for (int t = 0; t < 3; t++) {
+			ftgpu.convolve(array, kernel, false);
+			System.out.println("---");
+		}
+		end = System.currentTimeMillis();
+		duration = end-start;
+		System.out.format("2D FT on GPU: %.1f sec %n", duration / 1000.0 );
+		System.out.println("Done");
+		ftgpu.close();
+	}
 
-		
 }

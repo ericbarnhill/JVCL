@@ -21,66 +21,71 @@ import com.jogamp.opencl.CLProgram;
 
 public class FDGPU {
 	
-    DimShift ds;
     CLDevice device;
     CLCommandQueue queue;
-    CLProgram program;
+    CLProgram program1d, program2d, program3d;
     CLContext context;
+    int boundaryConditions;
+	final int ZERO_BOUNDARY = 0;
+	final int MIRROR_BOUNDARY = 1;
+	final int PERIODIC_BOUNDARY = 2;
+	
+	public FDGPU(int boundaryConditions) {
+		context = CLContext.create();
+		this.boundaryConditions = boundaryConditions;
+	}
 	
 	public FDGPU() {
-		ds = new DimShift();
+		context = CLContext.create();
+		device = context.getMaxFlopsDevice();
+        queue = device.createCommandQueue();
+        String source1d = JVCLUtils.readFile("src/Convolve1d.cl");
+        String source2d = JVCLUtils.readFile("src/Convolve2d.cl");
+        String source3d = JVCLUtils.readFile("src/Convolve3d.cl");
+        program1d = context.createProgram(source1d).build(); 
+        program2d = context.createProgram(source2d).build(); 
+        program3d = context.createProgram(source3d).build(); 
+		this.boundaryConditions = ZERO_BOUNDARY;
 	}
 
 	public double[] convolve(double[] vector, double[] kernel) {
-		context = CLContext.create();
         double[] result;
-        try{
-            device = context.getMaxFlopsDevice();
-            queue = device.createCommandQueue();
-            String source = readFile("src/Convolve1d.cl");
-            program = context.createProgram(source).build(); 
-            int vectorLength = vector.length;
-            float[] vectorFloat = new float[vectorLength];
-            for (int n = 0; n < vectorLength; n++) vectorFloat[n] = (float)vector[n];
-            int kernelLength = kernel.length;
-            float[] kernelFloat = new float[kernelLength];
-            for (int n = 0; n < kernelLength; n++) kernelFloat[n] = (float)kernel[n];
-            int halfLength = kernelLength / 2;
-        	CLBuffer<FloatBuffer> clVector = context.createFloatBuffer(vectorLength, READ_ONLY);
-            CLBuffer<FloatBuffer> clKernel = context.createFloatBuffer(kernelLength, READ_ONLY);
-            CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(vectorLength, WRITE_ONLY);
-            clVector.getBuffer().put(vectorFloat).rewind();
-            clKernel.getBuffer().put(kernelFloat).rewind();
-            CLKernel Kernel = program.createCLKernel("Convolve1d");
-            Kernel.putArg(clVector)
-            	.putArg(clKernel)
-            	.putArg(clOutput)
-            	.putArg(vectorLength)
-            	.putArg(kernelLength)
-            	.putArg(halfLength);
-            queue.putWriteBuffer(clVector, false)
-            	.putWriteBuffer(clKernel, false)
-            	.put1DRangeKernel(Kernel, 0, roundUp(vectorLength, 32),0)
-            	.putReadBuffer(clOutput, true);
-    		result = new double[vectorLength];
-    		for (int x = 0; x < vectorLength; x++) {
-    				result[x] = clOutput.getBuffer().get(x);
-    		}
-        }finally{
-            // cleanup all resources associated with this context.
-            context.release();
-        }
+        int vectorLength = vector.length;
+        float[] vectorFloat = new float[vectorLength];
+        for (int n = 0; n < vectorLength; n++) vectorFloat[n] = (float)vector[n];
+        int kernelLength = kernel.length;
+        float[] kernelFloat = new float[kernelLength];
+        for (int n = 0; n < kernelLength; n++) kernelFloat[n] = (float)kernel[n];
+        int halfLength = kernelLength / 2;
+    	CLBuffer<FloatBuffer> clVector = context.createFloatBuffer(vectorLength, READ_ONLY);
+        CLBuffer<FloatBuffer> clKernel = context.createFloatBuffer(kernelLength, READ_ONLY);
+        CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(vectorLength, WRITE_ONLY);
+        clVector.getBuffer().put(vectorFloat).rewind();
+        clKernel.getBuffer().put(kernelFloat).rewind();
+        CLKernel Kernel = program1d.createCLKernel("Convolve1d");
+        Kernel.putArg(clVector)
+        	.putArg(clKernel)
+        	.putArg(clOutput)
+        	.putArg(vectorLength)
+        	.putArg(kernelLength)
+        	.putArg(halfLength)
+        	.putArg(boundaryConditions);
+        queue.putWriteBuffer(clVector, false)
+        	.putWriteBuffer(clKernel, false)
+        	.put1DRangeKernel(Kernel, 0, JVCLUtils.roundUp(vectorLength, 32),0)
+        	.putReadBuffer(clOutput, true);
+		result = new double[vectorLength];
+		for (int x = 0; x < vectorLength; x++) {
+				result[x] = clOutput.getBuffer().get(x);
+		}
+     
         return result;    		
 	}
 	
 	public double[][] convolve(double[][] image, double[][] kernel) {
-		context = CLContext.create();
         double[][] result;
         try{
-            device = context.getMaxFlopsDevice();
-            queue = device.createCommandQueue();
-            String source = readFile("src/Convolve2d.cl");
-            program = context.createProgram(source).build(); 
+         
             int imageWidth = image.length;
             int imageHeight = image[0].length;
             int imageArea = imageWidth*imageHeight;
@@ -109,7 +114,7 @@ public class FDGPU {
             CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(imageArea, WRITE_ONLY);
             clImage.getBuffer().put(image1d).rewind();
             clKernel.getBuffer().put(kernel1d).rewind();
-            CLKernel Kernel = program.createCLKernel("Convolve2d");
+            CLKernel Kernel = program2d.createCLKernel("Convolve2d");
             Kernel.putArg(clImage)
             	.putArg(clKernel)
             	.putArg(clOutput)
@@ -118,10 +123,11 @@ public class FDGPU {
             	.putArg(kernelWidth)
             	.putArg(kernelHeight)
             	.putArg(halfWidth)
-            	.putArg(halfHeight);
+            	.putArg(halfHeight)
+            	.putArg(boundaryConditions);
             queue.putWriteBuffer(clImage, false)
             	.putWriteBuffer(clKernel, false)
-            	.put2DRangeKernel(Kernel, 0, 0, roundUp(imageWidth, 32),roundUp(imageHeight,32), 0,0)
+            	.put2DRangeKernel(Kernel, 0, 0, JVCLUtils.roundUp(imageWidth, 32),JVCLUtils.roundUp(imageHeight,32), 0,0)
             	.putReadBuffer(clOutput, true);
     		result = new double[imageWidth][imageHeight];
     		for (int x = 0; x < imageWidth; x++) {
@@ -129,22 +135,20 @@ public class FDGPU {
     				result[x][y] = clOutput.getBuffer().get(x + y*imageWidth);
     			}
     		}
+    		 clImage.release();
+             clKernel.release();
+             clOutput.release();
         } finally {
-            // cleanup all resources associated with this context.
-            context.release();
+           
         }
         return result;
 	}
 
 	public double[][][] convolve(double[][][] image, double[][][] kernel) {
-		context = CLContext.create();
         //out.println("created "+context);
         double[][][] result;
         try{
-            device = context.getMaxFlopsDevice();
-            queue = device.createCommandQueue();
-            String source = readFile("src/Convolve3d.cl");
-            program = context.createProgram(source).build(); 
+            
             int imageWidth = image.length;
             int imageHeight = image[0].length;
             int imageDepth = image[0][0].length;
@@ -178,15 +182,15 @@ public class FDGPU {
             	}
             }
         	int localWorkSize = min(device.getMaxWorkGroupSize(), 32);  // Local work size dimensions
-        	int globalX = roundUp(imageWidth, localWorkSize);
-        	int globalY = roundUp(imageHeight, localWorkSize);
-        	int globalZ = roundUp(imageDepth, localWorkSize);
+        	int globalX = JVCLUtils.roundUp(imageWidth, localWorkSize);
+        	int globalY = JVCLUtils.roundUp(imageHeight, localWorkSize);
+        	int globalZ = JVCLUtils.roundUp(imageDepth, localWorkSize);
         	CLBuffer<FloatBuffer> clImage = context.createFloatBuffer(imageVolume, READ_ONLY);
             CLBuffer<FloatBuffer> clKernel = context.createFloatBuffer(kernelVolume, READ_ONLY);
             CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(imageVolume, WRITE_ONLY);
             clImage.getBuffer().put(image1d).rewind();
             clKernel.getBuffer().put(kernel1d).rewind();
-            CLKernel Kernel = program.createCLKernel("Convolve3d");
+            CLKernel Kernel = program3d.createCLKernel("Convolve3d");
             Kernel.putArg(clImage)
             	.putArg(clKernel)
             	.putArg(clOutput)
@@ -198,7 +202,8 @@ public class FDGPU {
             	.putArg(kernelDepth)
             	.putArg(halfWidth)
             	.putArg(halfHeight)
-            	.putArg(halfDepth);
+            	.putArg(halfDepth)
+            	.putArg(boundaryConditions);
             queue.putWriteBuffer(clImage, false)
             	.putWriteBuffer(clKernel, false)
             	.put3DRangeKernel(Kernel, 0, 0, 0, globalX, globalY, globalZ, 0,0,0)
@@ -212,42 +217,11 @@ public class FDGPU {
     			}
     		}
         }finally{
-            context.release();
         }
         return result;
 	}
 
-    private static int roundUp(int groupSize, int globalSize) {
-        int r = globalSize % groupSize;
-        if (r == 0) {
-            return globalSize;
-        } else {
-            return globalSize + groupSize - r;
-        }
-    }
-    
-    private static String readFile(String fileName) {
-        try  {
-            BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(fileName)));
-            StringBuffer sb = new StringBuffer();
-            String line = null;
-            while (true) {
-                line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                sb.append(line).append("\n");
-            }
-            br.close();
-            return sb.toString();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-            return null;
-        }
-    }
-
-	
+	public void close() {
+        context.release();
+	}
 }

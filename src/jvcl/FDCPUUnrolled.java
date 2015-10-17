@@ -1,3 +1,24 @@
+/* Copyright (c) 2015 Eric Barnhill
+*
+*Permission is hereby granted, free of charge, to any person obtaining a copy
+*of this software and associated documentation files (the "Software"), to deal
+*in the Software without restriction, including without limitation the rights
+*to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+*copies of the Software, and to permit persons to whom the Software is
+*furnished to do so, subject to the following conditions:
+*
+*The above copyright notice and this permission notice shall be included in all
+*copies or substantial portions of the Software.
+*
+*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*SOFTWARE.
+*/
+
 package jvcl;
 
 public class FDCPUUnrolled {
@@ -8,13 +29,40 @@ public class FDCPUUnrolled {
 	final int MIRROR_BOUNDARY = 1;
 	final int PERIODIC_BOUNDARY = 2;
 	
+	/** Unrolled convolutions for small kernels. This produces a performance boost despite the claims that the JVM makes it unnecessary,
+	* particularly when the convolution is fast enough that the JVM is still warming up. If you used the Autotuner the root Convolve class will
+	* call these unrolled methods when they benefit you.
+	* @param boundaryConditions 0=Zero boundaries, slightly faster 1=Mirror boundaries 2=Periodic boundaries
+	*/
 	public FDCPUUnrolled(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
 	}
 	
+	/** Unrolled convolutions for small kernels, see {@link #FDCPUUnrolled(int boundaryConditions) previous constructor}. Default boundaries
+	* are zero boundaries.
+	*/
 	public FDCPUUnrolled() {
 		this.boundaryConditions = ZERO_BOUNDARY;
 	}
+	
+	public double[] convolve(double[] vector, double[] kernel) {
+		if (kernel.length == 3) {
+			return convolve3(vector, kernel);
+		} else return convolve5(vector, kernel);
+	}
+	
+	public double[][] convolve(double[][] vector, double[][] kernel) {
+		if (kernel.length == 3) {
+			return convolve3(vector, kernel);
+		} else return convolve5(vector, kernel);
+	}
+	
+	public double[][][] convolve(double[][][] vector, double[][][] kernel) {
+		if (kernel.length == 3) {
+			return convolve3(vector, kernel);
+		} else return convolve5(vector, kernel);
+	}
+	
 	
 	public double[] convolve3(double[] vector, double[] kernel) {
 		int vectorLength = vector.length;

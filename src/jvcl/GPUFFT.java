@@ -30,7 +30,7 @@ import static java.lang.Math.*;
 public class GPUFFT {
 	
 	CLFFTPlan fft;
-    DimShift ds;
+    JVCLUtils ds;
     CLDevice device;
     CLCommandQueue queue;
     CLProgram program;

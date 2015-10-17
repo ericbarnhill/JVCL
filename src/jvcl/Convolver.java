@@ -1,11 +1,31 @@
+/* Copyright (c) 2015 Eric Barnhill
+*
+*Permission is hereby granted, free of charge, to any person obtaining a copy
+*of this software and associated documentation files (the "Software"), to deal
+*in the Software without restriction, including without limitation the rights
+*to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+*copies of the Software, and to permit persons to whom the Software is
+*furnished to do so, subject to the following conditions:
+*
+*The above copyright notice and this permission notice shall be included in all
+*copies or substantial portions of the Software.
+*
+*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*SOFTWARE.
+*/
+
 package jvcl;
-/*
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
-
-
-
+import java.util.prefs.Preferences;
+import org.apache.commons.math4.complex.*;
 
 public class Convolver {
 	
@@ -14,346 +34,222 @@ public class Convolver {
 	final int ZERO_BOUNDARY = 0;
 	final int MIRROR_BOUNDARY = 1;
 	final int PERIODIC_BOUNDARY = 2;
-	FDCPUNaive cn;
-	FTCPU cf;
-	FDGPU cj;
-	GPUFFT g;
-	FTCPUSimple c;
-	StockhamGPU s;
+	FDCPUNaive naive;
+	FDCPUUnrolled unrolled;
+	FTCPU ftcpu;
+	FDGPU fdgpu;
+	FTGPU ftgpu;
+	byte[] convolverPrefs;
+	Preferences p;
 	
+	/*
+	 * Kernel Categories:
+	 * 3, 5, 7, 9, 11, 13, 21, 31, 63, 127, 255, larger
+	 * just handle with a switch statement
+	 */
+		
 	public Convolver(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
-		cn = new FDCPUNaive(boundaryConditions);
-		cf = new FTCPU();
-		cj = new FDGPU();
-		g = new GPUFFT(4096, 256, 256);
-		c = new FTCPUSimple();
-		s = new StockhamGPU();
+		naive = new FDCPUNaive(boundaryConditions);
+		unrolled = new FDCPUUnrolled(boundaryConditions);
+		ftcpu = new FTCPU();
+		fdgpu = new FDGPU(boundaryConditions);
+		ftgpu = new FTGPU();
 	}
 	
 	public Convolver() {
-		this.boundaryConditions = MIRROR_BOUNDARY;
-		cn = new FDCPUNaive(boundaryConditions);
-		cf = new FTCPU();
-		cj = new FDGPU();
-		g = new GPUFFT(4096, 256, 256);
-		c = new FTCPUSimple();
-		s = new StockhamGPU();
+		this.boundaryConditions = ZERO_BOUNDARY;
+		naive = new FDCPUNaive(boundaryConditions);
+		unrolled = new FDCPUUnrolled(boundaryConditions);
+		ftcpu = new FTCPU();
+		fdgpu = new FDGPU(boundaryConditions);
+		ftgpu = new FTGPU();
+		readPreferences();
+	}	
+	
+	public double[] convolve(double[] vector, double[] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch (pref) {
+		case 0:
+			return naive.convolve(vector, kernel);
+		case 1:
+			return unrolled.convolve(vector, kernel);
+		case 2:
+			return fdgpu.convolve(vector, kernel);
+		case 3:
+			return ftcpu.convolve(vector, kernel, false);
+		case 4:
+			return ftgpu.convolve(vector, kernel, false);
+		}
+		throw new RuntimeException("Invalid preference value");
 	}
 	
-	public static void main(String[] args) {
-		
-        Path currentRelativePath = Paths.get("");
-        String s = currentRelativePath.toAbsolutePath().toString();
-        System.out.println(s);
-		Random rand = new Random();
-		Convolver c = new Convolver();
-		float[] testvec1d = new float[128*128*4];
-		for (int n = 0; n < 128*128*4; n++) {
-			testvec1d[n] = (float)Math.cos(n*2*Math.PI/2048);
-		}
-		for (int n = 0; n < 24; n++) {
-			//System.out.print(testvec1d[n]+" ");
-		}
-		System.out.println();
-		double[] kernel1d = new double[]{1, -2, 1};
-		long startTime = System.currentTimeMillis();
-		for (int n = 0; n < 5; n++) {
-			c.s.fft(testvec1d, testvec1d, true);
-		}
-		long endTime = System.currentTimeMillis();
-		double runTime = (endTime-startTime)/1000.0;
-		startTime = System.currentTimeMillis();
-		for (int n = 0; n < 5; n++) {
-			c.c.fft_simple(testvec1d, testvec1d);
-		}
-		endTime = System.currentTimeMillis();
-		double runTime2 = (endTime-startTime)/1000.0;
-		System.out.format("cpu %.2f stockham %.2f", runTime2, runTime);
-		if (true) return;
-		int vectorWidth = 64;
-		int vectorHeight = 64;
-		int vectorDepth = 64;
-		double[][][] vector = new double[vectorWidth][vectorHeight][vectorDepth];
-		double[] kernelVals = new double[] {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, -6, 1, 0, 1, 0,
-				0, 0, 0, 0, 1, 0, 0, 0, 0};
-		int kDim = 15;
-		double[][][] kernel = new double[kDim][kDim][kDim];
-		for (int x = 0; x < kDim; x++) {
-			for (int y = 0; y < kDim; y++) {
-				for (int z = 0; z < kDim; z++) {
-					kernel[x][y][z] = 1; //kernelVals[x + y*3 + z*9];
-				}
-			}
-		}
-		System.out.println("OPENCL");
-		int trials = 15;
-		double avg = 0;
-		for (int n = 0; n < trials; n++) {
-			for (int i = 0; i < vectorWidth; i++) {
-				for (int j=0; j < vectorHeight; j++) {
-					for (int k = 0; k < vectorDepth; k++) {
-						vector[i][j][k] = i*i + j*j + k*k;
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result;
-			try {
-				result = c.cj.convolveFDJOCL(vector, kernel);
-				for (int i = 2; i < 8; i++) {
-					for (int j = 2; j < 8; j++) {
-						for (int k = 2; k < 8; k++) {
-						System.out.format("%.3f ",result[i][j][k]);
-						}
-					}
-					System.out.format("%n");
-				}
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}			
-			if (true) return;
-			long time2 = System.currentTimeMillis();
-			runTime = (time2-time1)/1000.0;
-			if (n >= 5) {
-				System.out.print(runTime+" ");
-				if (n % 10 == 9) System.out.println();
-				avg += runTime;
-			}
-			for (int i = 0; i < vectorWidth; i++) {
-				for (int j = 0; j < vectorHeight; j++) {
-					for (int k = 0; k < vectorDepth; k++) {
-					System.out.format("%.3f ",result[i][j][k]);
-					}
-				}
-				System.out.format("%n");
-			}
-		}
-		System.out.println();
-		System.out.format("Average time %.3f %n", avg / (double)(trials-5));
-		//--------------------------------
-		System.out.println("NAIVE");
-		avg = 0;
-		for (int n = 0; n < trials; n++) {
-			for (int i = 0; i < vectorWidth; i++) {
-				for (int j=0; j < vectorHeight; j++) {
-					for (int k = 0; k < vectorDepth; k++) {
-						vector[i][j][k] = i*i + j*j + k*k;
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result;
-			try {
-				result = c.cn.convolveFD(vector, kernel, true);
-				//c.convolveJOCL(vector[0], kernel[0]);
-				/*
-				for (int i = 0; i < vectorWidth; i++) {
-					for (int j = 0; j < vectorHeight; j++) {
-						for (int k = 0; k < vectorDepth; k++) {
-						System.out.format("%.3f ",result[i][j][k]);
-						}
-					}
-					System.out.format("%n");
-				}
-				
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}			
-			long time2 = System.currentTimeMillis();
-			runTime = (time2-time1)/1000.0;
-			if (n >= 5) {
-				System.out.print(runTime+" ");
-				if (n % 10 == 9) System.out.println();
-				avg += runTime;
-			}
-		}
 
-		System.out.println();
-		System.out.format("Average time %.3f %n", avg / (double)(trials-5));
-		// --------------------------------------------------
-		System.out.println("UNROLL");
-		avg = 0;
-		for (int n = 0; n < trials; n++) {
-			for (int i = 0; i < vectorWidth; i++) {
-				for (int j=0; j < vectorHeight; j++) {
-					for (int k = 0; k < vectorDepth; k++) {
-						vector[i][j][k] = i*i + j*j + k*k;
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result;
-			try {
-				result = c.cn.convolveFD(vector, kernel, false);
-				//c.convolveJOCL(vector[0], kernel[0]);
-				/*
-				for (int i = 0; i < vectorWidth; i++) {
-					for (int j = 0; j < vectorHeight; j++) {
-						for (int k = 0; k < vectorDepth; k++) {
-						System.out.format("%.3f ",result[i][j][k]);
-						}
-					}
-					System.out.format("%n");
-				}
-				
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}			
-			long time2 = System.currentTimeMillis();
-			runTime = (time2-time1)/1000.0;
-			if (n >= 5) {
-				System.out.print(runTime+" ");
-				if (n % 10 == 9) System.out.println();
-				avg += runTime;
-			}
+	public Complex[] convolve(Complex[] vector, double[] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch (pref) {
+		case 0:
+			return ComplexUtils.split2Complex(
+					naive.convolve(ComplexUtils.complex2Real(vector), kernel),
+					naive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 1:
+			return ComplexUtils.split2Complex(
+					unrolled.convolve(ComplexUtils.complex2Real(vector), kernel),
+					unrolled.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 2:
+			return ComplexUtils.split2Complex(
+					fdgpu.convolve(ComplexUtils.complex2Real(vector), kernel),
+					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 3:
+			return ftcpu.convolve(vector, kernel, true);
+		case 4:
+			return ftgpu.convolve(vector, kernel, true);
 		}
-		
-		System.out.println();
-		System.out.format("Average time %.3f %n", avg / (double)(trials-5));
-		//-------------------------------------
-		System.out.println("FFT");
-		avg = 0;
-		for (int n = 0; n < trials; n++) {
-			for (int i = 0; i < vectorWidth; i++) {
-				for (int j=0; j < vectorHeight; j++) {
-					for (int k = 0; k < vectorDepth; k++) {
-						vector[i][j][k] = i*i + j*j + k*k;
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result;
-			try {
-				result = c.cf.convolveFT(vector, kernel, false);
-				//c.convolveJOCL(vector[0], kernel[0]);
-				/*
-				for (int i = 0; i < vectorWidth; i++) {
-					for (int j = 0; j < vectorHeight; j++) {
-						for (int k = 0; k < vectorDepth; k++) {
-						System.out.format("%.3f ",result[i][j][k]);
-						}
-					}
-					System.out.format("%n");
-				}
-				
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}			
-			long time2 = System.currentTimeMillis();
-			runTime = (time2-time1)/1000.0;
-			if (n >= 5) {
-				System.out.print(runTime+" ");
-				if (n % 10 == 9) System.out.println();
-				avg += runTime;
-			}
-		}
-
-		System.out.println();
-		System.out.format("Average time %.3f %n", avg / (double)(trials-5));
-		
-		
-		
-		
-		System.out.println("UNROLL");
-		avg = 0;
-		for (int n = 0; n < trials; n++) {
-			for (int i = 0; i < vectorWidth; i++) {
-				for (int j=0; j < vectorHeight; j++) {
-					for (int k=0; k < vectorDepth; k++) {
-						if (i < 5 && j < 5 && k < 5 ) {
-							kernel[i][j][k] = rand.nextDouble();
-						}
-						vector[i][j][k]= rand.nextDouble();
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result = c.convolveFD(vector, kernel, false);
-			long time2 = System.currentTimeMillis();
-			double runTime = (time2-time1)/1000.0;
-			if (n > 1) {
-				System.out.print(runTime+" ");
-				if (n % 10 == 9) System.out.println();
-				avg += runTime;
-			}
-		}
-		System.out.println();
-		System.out.format("Average time %.3f %n", avg / (double)(trials-1));
-		/*
-		System.out.println("NAIVE");
-		avg = 0;
-		for (int n = 0; n < trials; n++) {
-			for (int i = 0; i < 128; i++) {
-				for (int j=0; j < 128; j++) {
-					for (int k=0; k < 32; k++) {
-						if (i < 5 && j < 5 && k < 5 ) {
-							kernel[i][j][k] = rand.nextDouble();
-						}
-						vector[i][j][k]= rand.nextDouble();
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result = c.convolveFT(vector, kernel, true);
-			long time2 = System.currentTimeMillis();
-			double runTime = (time2-time1)/1000.0;
-			if (n > 1) {
-				System.out.print(runTime+" ");
-				if (n % 10 == 9) System.out.println();
-				avg += runTime;
-			}
-		}
-		System.out.println();
-		System.out.format("Average time %.3f %n", avg / (double)(trials-1));
-		*/
-		
-		
-		/* FD / FT test
-		double[][][] vector = new double[128][128][32];
-		double[][][] kernel = new double[5][5][5];
-		for (int n = 0; n < 10; n++) {
-			for (int i = 0; i < 128; i++) {
-				for (int j=0; j<128; j++) {
-					for (int k=0; k<32; k++) {
-						if (i < 3 && j < 3 && k < 3) {
-							kernel[i][j][k] = rand.nextDouble();
-						}
-						vector[i][j][k] = rand.nextDouble();
-					}
-				}
-			}
-			
-			long time1 = System.currentTimeMillis();
-			double[][][] result = Convolver.convolveFD(vector, kernel);
-			long time2 = System.currentTimeMillis();
-			System.out.format("Trial %d: time to convolve %.3f seconds %n", n+1, (double)((time2-time1)/1000.0));
-		}
-		for (int n = 0; n < 10; n++) {
-			for (int i = 0; i < 128; i++) {
-				for (int j=0; j<128; j++) {
-					for (int k=0; k<32; k++) {
-						if (i < 3 && j < 3 && k < 3) {
-							kernel[i][j][k] = rand.nextDouble();
-						}
-						vector[i][j][k] = rand.nextDouble();
-					}
-				}
-			}
-			Convolver c = new Convolver();
-			long time1 = System.currentTimeMillis();
-			double[][][] result = Convolver.convolveFT(vector, kernel, false);
-			long time2 = System.currentTimeMillis();
-			System.out.format("Trial %d: time to convolve %.3f seconds %n", n+1, (double)((time2-time1)/1000.0));
-		}
-		
+		throw new RuntimeException("Invalid preference value");
 	}
 	
+	
+	public double[][] convolve(double[][] vector, double[][] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch (pref) {
+		case 0:
+			return naive.convolve(vector, kernel);
+		case 1:
+			return unrolled.convolve(vector, kernel);
+		case 2:
+			return fdgpu.convolve(vector, kernel);
+		case 3:
+			return ftcpu.convolve(vector, kernel, false);
+		case 4:
+			return ftgpu.convolve(vector, kernel, false);
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+	
+	public Complex[][] convolve(Complex[][] vector, double[][] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch (pref) {
+		case 0:
+			return ComplexUtils.split2Complex(
+					naive.convolve(ComplexUtils.complex2Real(vector), kernel),
+					naive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 1:
+			return ComplexUtils.split2Complex(
+					unrolled.convolve(ComplexUtils.complex2Real(vector), kernel),
+					unrolled.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 2:
+			return ComplexUtils.split2Complex(
+					fdgpu.convolve(ComplexUtils.complex2Real(vector), kernel),
+					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 3:
+			return ftcpu.convolve(vector, kernel, true);
+		case 4:
+			return ftgpu.convolve(vector, kernel, true);
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+
+	public double[][][] convolve(double[][][] vector, double[][][] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch (pref) {
+		case 0:
+			return naive.convolve(vector, kernel);
+		case 1:
+			return unrolled.convolve(vector, kernel);
+		case 2:
+			return fdgpu.convolve(vector, kernel);
+		case 3:
+			return ftcpu.convolve(vector, kernel, false);
+		case 4:
+			return ftgpu.convolve(vector, kernel, false);
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+	
+	public Complex[][][] convolve(Complex[][][] vector, double[][][] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch (pref) {
+		case 0:
+			return ComplexUtils.split2Complex(
+					naive.convolve(ComplexUtils.complex2Real(vector), kernel),
+					naive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 1:
+			return ComplexUtils.split2Complex(
+					unrolled.convolve(ComplexUtils.complex2Real(vector), kernel),
+					unrolled.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 2:
+			return ComplexUtils.split2Complex(
+					fdgpu.convolve(ComplexUtils.complex2Real(vector), kernel),
+					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+			);
+		case 3:
+			return ftcpu.convolve(vector, kernel, true);
+		case 4:
+			return ftgpu.convolve(vector, kernel, true);
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+	
+	public double[] convolveInterleaved(double[] vector, double[] kernel) {
+		return ComplexUtils.complex2Interleaved(
+				convolve(
+						ComplexUtils.interleaved2Complex(vector), kernel
+						)
+				);
+	}
+	
+	public double[][] convolveInterleaved(double[][] vector, double[][] kernel) {
+		return ComplexUtils.complex2Interleaved(
+				convolve(
+						ComplexUtils.interleaved2Complex(vector), kernel
+						)
+				);
+	}
+	
+	
+	
+	private int getPreferredConvolution(int vl, int kl) {
+		int row = JVCLUtils.nextPwr2(vl) - 6;
+		int col = -1;
+		if (kl <= 3) {
+			col = 0;
+		} else if (kl <= 5) {
+			col = 1;
+		} else if (kl <= 7) {
+			col = 2;
+		} else if (kl <= 9) {
+			col = 3;
+		} else if (kl <= 13) {
+			col = 4;
+		} else if (kl <= 21) {
+			col = 5;
+		} else if (kl <= 31) {
+			col = 6;
+		} else if (kl <= 63) {
+			col = 7;
+		} else if (kl <= 127) {
+			col = 8;
+		} else if (kl <= 255) {
+			col = 9;
+		} else {
+			col = 10;
+		}
+		return row*10 + col;
+	}
+	
+	private void readPreferences() {
+		p = Preferences.systemNodeForPackage(getClass());
+		convolverPrefs = p.getByteArray("preferences", new byte[60]);
+	}
+		
 }
-*/
+
+
