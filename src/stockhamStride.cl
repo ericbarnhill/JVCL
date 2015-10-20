@@ -2,17 +2,19 @@
 __kernel void stockhamStride(  __global float * real, __global float * imag, int is, int N, int powN, int blockSize) {
 
   const int bx = get_group_id(0);
+  const int by = get_group_id(1);
   const int tx = get_local_id(0);
-  const int blk = (tx / N)*N;
-  const int td = tx % N;
-  const int tid = blk + td; 
+  const int ty = get_local_id(1);
+  const int tid = by*N + tx;
+  const int blk = (tid / N)*N;
+  const int td = tid - blk;
   const float TWOPI = 2*3.14159265359;
   int l = N/2; 
   int m = 1;
  // int j = tid;
   int j = td;
   int k = 0;
-  //real[tx] = td; imag[tx] = td; return;
+  //real[tid] = td; imag[tid] = blk; return; EB TEST
   float theta;
 
   float c0_real, c0_imag, c1_real, c1_imag;

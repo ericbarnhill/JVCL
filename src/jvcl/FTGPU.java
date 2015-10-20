@@ -24,9 +24,7 @@ public class FTGPU {
     CLProgram program, programStride, program2, programMult;
     CLContext context;
     CLKernel Kernel, KernelMult;
-    StockhamSI s;
-    StockhamGPUStride_fubar str;
-    StockhamGPUStrideNoDS s2;
+    StockhamGPUStride s;
     boolean debug;
 	
 	public FTGPU() {
@@ -60,7 +58,7 @@ public class FTGPU {
 								)
 						,kernelLengthInterleaved)
 					);
-		s = new StockhamSI(context, device, queue, program);
+		s = new StockhamGPUStride(context, device, queue, program);
 		int adjLength = v.length / 2;
 		s.fft1d(v, true, adjLength);
 		s.fft1d(k, true, adjLength);

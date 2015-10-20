@@ -56,10 +56,8 @@ public class StockhamGPUStride {
 	    int blocks = len / N;
 	    int pwr2 = (int)(Math.log(N)/Math.log(2));
 		int sign;
-		if (isForward) {
-			sign = 1;
-		} else {
-			sign = -1;
+		if (!isForward) {
+			imag = ArrayMath.multiply(imag,  -1);
 		}
 		CLBufferReal = context.createFloatBuffer(len);
 		CLBufferImag = context.createFloatBuffer(len);
@@ -71,14 +69,14 @@ public class StockhamGPUStride {
 		imagBuffer.put(imag).rewind();
 		Kernel.setArg(0, CLBufferReal)
 			.setArg(1, CLBufferImag)	
-			.setArg(2, sign)
+			.setArg(2, -1)
 			.setArg(3, N)
 			//.setArg(4, pwr2)
 			.setArg(4,  pwr2)
 			.setArg(5, len);
 		queue.putWriteBuffer(CLBufferReal, true);
 		queue.putWriteBuffer(CLBufferImag, true);
-		queue.put1DRangeKernel(Kernel, 0, len, len);
+		queue.put2DRangeKernel(Kernel, 0, 0, N, blocks, N, 1);
 		queue.putReadBuffer(CLBufferReal, true);
 		queue.putReadBuffer(CLBufferImag, true);
 		realBuffer.get(real);
@@ -87,9 +85,9 @@ public class StockhamGPUStride {
 		CLBufferImag.release();
 		//testing release -
 		if (!isForward) {
-			for (int n = 0; n < N; n++) {
+			for (int n = 0; n < len; n++) {
 				real[n] = real[n] / (float)N;
-				imag[n] = imag[n] / (float)N;
+				imag[n] = - imag[n] / (float)N;
 			}
 		}
 	}
@@ -109,18 +107,29 @@ public class StockhamGPUStride {
 		
 		//System.out.println(Arrays.toString(ArrayMath.divide(ArrayMath.round(ArrayMath.multiply(testR, 100)), 100.0f)));
 		//for (int i = 0; i < 6; i++) {
-			int N = 128;
+			int N = 256;
 			float[] testR = new float[N];
 			float[] testI = new float[N];
-			for (int n = 0; n < N/2; n++) {
-				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*(n+1)/(double)(N/2.0));
-				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*(n+1)/(double)(N/2.0));
+			for (int n = 0; n < N/4; n++) {
+				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*(n+1)/(double)(N/4.0));
+				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*(n+1)/(double)(N/4.0));
 			}
-			for (int n = N/2; n < N; n++) {
-				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*((n-N/2)+1)/(double)(N/4.0));
-				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*((n-N/2)+1)/(double)(N/4.0));
+			for (int n = N/4; n < N/2; n++) {
+				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*((n-N/4)+1)/(double)(N/12.0));
+				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*((n-N/4)+1)/(double)(N/12.0));
 			}
-			s.fft(testR, testI, true, N/2, 0);
+			for (int n = N/2; n < 3*N/4; n++) {
+				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*((n-N/2)+1)/(double)(N/32.0));
+				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*((n-N/2)+1)/(double)(N/32.0));
+			}
+			for (int n = 3*N/4; n < N; n++) {
+				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*((n-3*N/4)+1)/(double)(N/16.0));
+				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*((n-3*N/4)+1)/(double)(N/16.0));
+			}
+			JVCLUtils.display(JVCLUtils.split2interleaved(testR, testI), "", 8);
+			s.fft(testR, testI, true, N/4, 0);
+			JVCLUtils.display(JVCLUtils.split2interleaved(testR, testI), "", 8);
+			s.fft(testR, testI, false, N/4, 0);
 			JVCLUtils.display(JVCLUtils.split2interleaved(testR, testI), "", 8);
 		//}
 		s.close();
