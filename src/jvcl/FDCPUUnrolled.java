@@ -63,7 +63,6 @@ public class FDCPUUnrolled {
 		} else return convolve5(vector, kernel);
 	}
 	
-	
 	public double[] convolve3(double[] vector, double[] kernel) {
 		int vectorLength = vector.length;
 		if (kernel.length != 3) {

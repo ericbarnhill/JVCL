@@ -1,6 +1,9 @@
 package jvcl;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
+
+import org.apache.commons.math4.util.FastMath;
 
 import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
@@ -10,7 +13,9 @@ import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
 import com.jogamp.opencl.demos.fft.CLFFTPlan;
 
-public class StockhamGPUStrideNoDS {
+import arrayMath.ArrayMath;
+
+public class StockhamGPUStride_fubar {
 	
 	CLFFTPlan fft;
     JVCLUtils ds;
@@ -28,7 +33,7 @@ public class StockhamGPUStrideNoDS {
 	int N;
     
     
-	public StockhamGPUStrideNoDS() {	
+	public StockhamGPUStride_fubar() {	
 		context = CLContext.create();
 		device = context.getMaxFlopsDevice();
 		queue = device.createCommandQueue();
@@ -38,23 +43,20 @@ public class StockhamGPUStrideNoDS {
 	}
 	
 	
-	public StockhamGPUStrideNoDS(CLContext context, CLDevice device, CLCommandQueue queue, CLProgram program) {
+	public StockhamGPUStride_fubar(CLContext context, CLDevice device, CLCommandQueue queue, CLProgram program) {
 		this.context = context;
 		this.device = device;
 		this.queue = queue;
 		this.program = program;
-		Kernel = program.createCLKernel("stockhamStride");
+		Kernel = program.createCLKernel("stockhamStrides");
 	}
 	
-	void fft(float[] real, float[] imag, boolean isForward, int xDim, int yDim, boolean xStyle) {
+	void fft(float[] real, float[] imag, boolean isForward, int blockSize) {
 		boolean debug = false;
 		//if (blockSize >= 2048) debug = true;
 		if (debug) System.out.println("----------------------------------");
-	    if (xStyle) {
-	    	N = xDim;
-	    } else {
-	    	N = yDim;
-	    }
+	    N = blockSize;
+	    int length = real.length;
 		int sign;
 		if (isForward) {
 			sign = 1;
@@ -64,35 +66,21 @@ public class StockhamGPUStrideNoDS {
 		int currRunCapacity;
 		long start = 0;long fillBuffers = 0; long copyData = 0; long runKernel = 0; long readOut = 0;
 		if (debug) start = System.currentTimeMillis();
-    	currRunCapacity = xDim*yDim;
+    	currRunCapacity = blockSize*blockSize;
     	CLBufferReal = context.createFloatBuffer(currRunCapacity);
     	CLBufferImag = context.createFloatBuffer(currRunCapacity);
 		realBuffer = CLBufferReal.getBuffer();
 		imagBuffer = CLBufferImag.getBuffer();
+		realBuffer.clear();
 		if (debug) {
 			fillBuffers = System.currentTimeMillis();
 			System.out.format("Create buffers %.5f %n", (fillBuffers - start)/1000.0);
 		}
-		int blockSize;
-		if (xStyle) {
-			for (int x = 0; x < xDim; x++) {
-				for (int y = 0; y < yDim; y++) {
-					realBuffer.put(real[x + xDim*y]);
-					imagBuffer.put(imag[x + xDim*y]);
-				}
-			}
-			blockSize = xDim;
-		} else {
-			for (int x = 0; x < xDim; x++) {
-				for (int y = 0; y < yDim; y++) {
-					realBuffer.put(real[x*yDim + y]);
-					imagBuffer.put(imag[x*yDim + y]);
-				}
-			}
-			blockSize = yDim;
-		}
-		realBuffer.rewind();
-		imagBuffer.rewind();
+		//System.arraycopy(real, index, tempReal, 0, currRunCapacity);
+		//System.arraycopy(real, index, tempImag, 0, currRunCapacity);
+		realBuffer.put(real).rewind();
+		imagBuffer.clear();
+		imagBuffer.put(real).rewind();
 		if (debug) {
 			copyData = System.currentTimeMillis();
 			System.out.format("Copy data %.5f %n", (copyData - fillBuffers)/1000.0);
@@ -135,21 +123,33 @@ public class StockhamGPUStrideNoDS {
 		if (debug) System.out.println("------------------------------------");
 	}
 	
+	
+	private static int roundUp(int groupSize, int globalSize) {
+	    int r = globalSize % groupSize;
+	    if (r == 0) {
+	        return globalSize;
+	    } else {
+	        return globalSize + groupSize - r;
+	    }
+	}
+
 	public void close() {
 		Kernel.release();
 	}
 
 	public static void main(String[] args) {
-		StockhamGPUStrideNoDS s = new StockhamGPUStrideNoDS();
-		int[] dims = new int[] {64,128,256,512, 1024, 2048};
-		for (int d = 0; d < dims.length; d++) {
-			int dim = dims[d]*dims[d];
-			float[] array = new float[dim];
-			System.out.println("FFT dim size " + dims[d]);
-			s.fft(array, array, true, dims[d], dims[d], true);
-			System.out.println("done dim size "+dims[d]);
+		StockhamGPUStride_fubar s = new StockhamGPUStride_fubar();
+		int N = 64;
+		float[] testR = new float[N];
+		float[] testI = new float[N];
+		for (int n = 0; n < N; n++) {
+				testR[n] = 10*(float)FastMath.cos(2*FastMath.PI*n/(double)N);
+				testI[n] = 10*(float)FastMath.cos(2*FastMath.PI*n/(double)N);
 		}
-	
+		System.out.println(Arrays.toString(ArrayMath.round(testR)));
+		s.fft(testR, testI, true, N);
+		System.out.println(Arrays.toString(ArrayMath.round(ArrayMath.multiply(testR, testI))));
+		s.close();
 	}
 	
 }

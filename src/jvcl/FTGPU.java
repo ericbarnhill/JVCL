@@ -6,11 +6,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Random;
 
+import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.math4.complex.ComplexUtils;
+
 import com.jogamp.opencl.CLCommandQueue;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
+
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 public class FTGPU {
 	
@@ -19,8 +24,8 @@ public class FTGPU {
     CLProgram program, programStride, program2, programMult;
     CLContext context;
     CLKernel Kernel, KernelMult;
-    StockhamGPU s;
-    StockhamGPUStride str;
+    StockhamSI s;
+    StockhamGPUStride_fubar str;
     StockhamGPUStrideNoDS s2;
     boolean debug;
 	
@@ -39,99 +44,32 @@ public class FTGPU {
 
 	}
 
-	public double[] convolve(double[] vector, double[] kernel, boolean isComplex) {
+	public Complex[] convolve(Complex[] vector, double[] kernel, boolean isComplex) {
 		
 		int vectorLength = vector.length;
 		int kernelLength = kernel.length;
-		
-		float[] paddedReal;
-		float[] paddedImag;
-		float[] paddedKernel;
-		float[] paddedKernelImag; // only has values post-fft
-		int newLength;
-		if (isComplex) {
-			newLength = JVCLUtils.nextPwr2(vectorLength / 2 + 2 * kernelLength);
-		} else {
-			newLength = JVCLUtils.nextPwr2(vectorLength + 2 * kernelLength);
+		int kernelLengthInterleaved = kernelLength*2;
+		float[] v = JVCLUtils.double2Float(
+						JVCLUtils.zeroPad(ComplexUtils.complex2Interleaved(vector), kernelLengthInterleaved)
+					);
+		float[] k = JVCLUtils.double2Float(
+						JVCLUtils.zeroPad(
+								JVCLUtils.real2Interleaved(
+										JVCLUtils.deepCopyToPadded(kernel, 
+												JVCLUtils.nextPwr2(vectorLength))
+								)
+						,kernelLengthInterleaved)
+					);
+		s = new StockhamSI(context, device, queue, program);
+		int adjLength = v.length / 2;
+		s.fft1d(v, true, adjLength);
+		s.fft1d(k, true, adjLength);
+		for (int n = 0; n < adjLength; n++) {
+			v[n] *= k[n];
 		}
-		s = new StockhamGPU(context, device, queue, program, newLength);	
-		paddedReal = new float[newLength];
-		paddedImag = new float[newLength];
-		paddedKernel = new float[newLength];
-		paddedKernelImag = new float[newLength];
-
-		if (isComplex) {
-			for (int x = 0; x < vectorLength/2; x++) {
-					paddedReal[x+kernelLength] = (float)vector[x*2];
-					paddedImag[x+kernelLength] = (float)vector[x*2+1];
-			}
-		} else {
-			for (int x = 0; x < vectorLength; x++) {
-				paddedReal[x+kernelLength] = (float)vector[x];
-			}
-		}
-		
-		for (int x = 0; x < kernelLength; x++) {
-			paddedKernel[x+kernelLength] = (float)kernel[x];
-		}
-
-		s.fft(paddedReal, paddedImag, true);
-		s.fft(paddedKernel, paddedKernelImag, true);
-
-		
-		for (int x = 0; x < newLength; x++) {
-			paddedReal[x] *= paddedKernel[x];
-			paddedImag[x] *= paddedKernelImag[x];
-		}
-		
-		s.fft(paddedReal, paddedImag, false);
-		// RE-INTERLEAVE
-		double[] result = new double[vectorLength];
-		if (isComplex) {
-			for (int x = 0; x < vectorLength / 2; x++) {
-				result[x*2] = paddedReal[x+kernelLength];
-				result[x*2+1] = paddedImag[x+kernelLength];
-			}
-		} else {
-			for (int x = 0; x < vectorLength; x++) {
-				result[x] = paddedReal[x+kernelLength];
-			}
-		}		
+		s.fft1d(v, false, adjLength);
 		s.close();
-		return result;
-		
-	}
-	
-	public double[][] convolve(double[][] image, double[] kernel, boolean isComplex, int dim) {
-		if (dim > 1) throw new RuntimeException("Invalid dim");
-		if (dim == 0) image = JVCLUtils.shiftDim(image);
-		int height = image.length;
-		for (int n = 0; n < height; n++) {
-			image[n] = convolve(image[n], kernel, isComplex);
-		}
-		if (dim == 0) {
-			return JVCLUtils.shiftDim(image);
-		} else {
-			return image;
-		}
-	}
-	
-	public double[][] convolve(double[][] image, double[] kernel, boolean isComplex) {
-		return convolve(image, kernel, isComplex, 0);
-	}
-	
-	
-	public double[][][] convolve(double[][][] volume, double[][] kernel, boolean isComplex, int dim) {
-		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
-		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
-		if (dim > 2) throw new RuntimeException("Invalid dim");
-		
-		int volumeWidth = volume.length;
-		
-		for (int x = 0; x < volumeWidth; x++) {
-				volume[x] = convolve(volume[x], kernel, isComplex);
-		}
-		return volume;
+		return ComplexUtils.interleaved2Complex(JVCLUtils.stripPadding(JVCLUtils.float2Double(v), kernelLengthInterleaved));		
 	}
 
 	public double[][] convolve(double[][] image, double[][] kernel, boolean isComplex) {

@@ -84,7 +84,44 @@ public class Convolver {
 		throw new RuntimeException("Invalid preference value");
 	}
 	
+	public double[][] convolve(double[][] image, double[] kernel, int dim) {
+		if (dim > 1) throw new RuntimeException("2D image, 1D kernel: Invalid dim specification");
+		if (dim == 0) image = JVCLUtils.shiftDim(image);
+		int height = image.length;
+		for (int n = 0; n < height; n++) {
+			image[n] = convolve(image[n], kernel);
+		}
+		if (dim == 0) {
+			return JVCLUtils.shiftDim(image);
+		} else {
+			return image;
+		}
+	}
+	
+	public double[][] convolve(double[][] image, double[] kernel) {
+		return convolve(image, kernel, 0);
+	}
 
+	public double[][][] convolve(double[][][] volume, double[] kernel, int dim) {
+		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
+		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
+		if (dim > 2) throw new RuntimeException("Invalid dim");
+		
+		int volumeWidth = volume.length;
+		int volumeHeight = volume[0].length;
+		
+		for (int x = 0; x < volumeWidth; x++) {
+			for (int y = 0; y < volumeHeight; y++) {
+				volume[x][y] = convolve(volume[x][y], kernel);
+			}
+		}
+		return volume;
+	}
+	
+	public double[][][] convolve(double[][][] volume, double[] kernel) {
+		return convolve(volume, kernel, 0);
+	}
+	
 	public Complex[] convolve(Complex[] vector, double[] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
 		switch (pref) {
@@ -104,13 +141,50 @@ public class Convolver {
 					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 3:
-			return ftcpu.convolve(vector, kernel, true);
+			return ftcpu.convolve(vector, kernel);
 		case 4:
-			return ftgpu.convolve(vector, kernel, true);
+			return ftgpu.convolve(vector, kernel);
 		}
 		throw new RuntimeException("Invalid preference value");
 	}
 	
+	public Complex[][] convolve(Complex[][] image, double[] kernel, int dim) {
+		if (dim > 1) throw new RuntimeException("2D image, 1D kernel: Invalid dim specification");
+		if (dim == 0) image = JVCLUtils.shiftDim(image);
+		int height = image.length;
+		for (int n = 0; n < height; n++) {
+			image[n] = convolve(image[n], kernel);
+		}
+		if (dim == 0) {
+			return JVCLUtils.shiftDim(image);
+		} else {
+			return image;
+		}
+	}
+	
+	public Complex[][] convolve(Complex[][] image, double[] kernel) {
+		return convolve(image, kernel, 0);
+	}
+	
+	public Complex[][][] convolve(Complex[][][] volume, double[] kernel, int dim) {
+		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
+		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
+		if (dim > 2) throw new RuntimeException("Invalid dim");
+		
+		int volumeWidth = volume.length;
+		int volumeHeight = volume[0].length;
+		
+		for (int x = 0; x < volumeWidth; x++) {
+			for (int y = 0; y < volumeHeight; y++) {
+				volume[x][y] = convolve(volume[x][y], kernel);
+			}
+		}
+		return volume;
+	}
+	
+	public Complex[][][] convolve(Complex[][][] volume, double[] kernel) {
+		return convolve(volume, kernel, 0);
+	}
 	
 	public double[][] convolve(double[][] vector, double[][] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
@@ -122,7 +196,7 @@ public class Convolver {
 		case 2:
 			return fdgpu.convolve(vector, kernel);
 		case 3:
-			return ftcpu.convolve(vector, kernel, false);
+			return ftcpu.convolve(vector, kernel);
 		case 4:
 			return ftgpu.convolve(vector, kernel, false);
 		}
@@ -148,9 +222,9 @@ public class Convolver {
 					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 3:
-			return ftcpu.convolve(vector, kernel, true);
+			return ftcpu.convolve(vector, kernel);
 		case 4:
-			return ftgpu.convolve(vector, kernel, true);
+			return ftgpu.convolve(vector, kernel);
 		}
 		throw new RuntimeException("Invalid preference value");
 	}

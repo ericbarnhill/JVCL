@@ -88,57 +88,6 @@ public class FDCPUNaive {
 		return result;
 	}
 	
-	/** 1D convolution on 2D array
-	* @param dim 	if [x][y], setting to 1 runs 1D convolution on the y arrays
-	*/
-	public double[][] convolve(double[][] image, double[] kernel, int dim) {
-		if (dim > 1) throw new RuntimeException("Invalid dim");
-		if (dim == 0) image = ds.shiftDim(image);
-		int height = image.length;
-		for (int n = 0; n < height; n++) {
-			image[n] = convolve(image[n], kernel);
-		}
-		if (dim == 0) {
-			return ds.shiftDim(image);
-		} else {
-			return image;
-		}
-	}
-	
-	/** 1D convolution on 2D array
-	* Default dimension is first array (if [x][y], x)
-	*/
-	public double[][] convolve(double[][] image, double[] kernel) {
-		return convolve(image, kernel, 0);
-	}
-	
-	/** 1D convolution on 3D array
-	* @param dim 	if [x][y][z], setting dim to 1 runs 1D conv on y arrays and 2 runs on z
-	*/
-	public double[][][] convolve(double[][][] volume, double[] kernel, int dim) {
-		if (dim == 0) volume = ds.shiftDim(volume, 2);
-		if (dim == 1) volume = ds.shiftDim(volume, 1);
-		if (dim > 2) throw new RuntimeException("Invalid dim");
-		
-		int volumeWidth = volume.length;
-		int volumeHeight = volume[0].length;
-		
-		for (int x = 0; x < volumeWidth; x++) {
-			for (int y = 0; y < volumeHeight; y++) {
-				volume[x][y] = convolve(volume[x][y], kernel);
-			}
-		}
-		return volume;
-		
-	}
-	
-	/** 1D convolution on 3D array
-	* Default dimension is first array (if [x][y][z], x)
-	*/
-	public double[][][] convolve(double[][][] volume, double[] kernel) {
-		return convolve(volume, kernel, 0);
-	}
-	
 	public double[][] convolve(double[][] image, double[][] kernel) { 
 		int imageWidth = image.length;
 		int imageHeight = image[0].length;
@@ -200,26 +149,6 @@ public class FDCPUNaive {
 			} // for y
 		} // for x
 		return result;
-	}
-	
-	/** 2D convolution on 3D array
-	* @param dim 	if [x][y][z], setting dim to 1 runs 2D conv on [y][z]
-	*/
-	public double[][][] convolve(double[][][] volume, double[][] kernel, int dim) {
-		if (dim == 0) volume = ds.shiftDim(volume, 2);
-		if (dim == 1) volume = ds.shiftDim(volume, 1);
-		if (dim > 2) throw new RuntimeException("Invalid dim");
-		
-		int volumeWidth = volume.length;
-		
-		for (int x = 0; x < volumeWidth; x++) {
-				volume[x] = convolve(volume[x], kernel);
-		}
-		return volume;
-	}
-	
-	public double[][][] convolve(double[][][] volume, double[][] kernel) {
-		return convolve(volume, kernel, 0);
 	}
 	
 	public double[][][] convolve(double[][][] volume, double[][][] kernel) {
