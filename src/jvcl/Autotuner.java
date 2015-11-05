@@ -31,6 +31,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.apache.commons.math4.complex.ComplexUtils;
+
 import java.beans.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -172,7 +174,7 @@ public class Autotuner {
 				// FTCPU
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					ftcpu.convolve(array, kernel, false);
+					ftcpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
@@ -191,7 +193,7 @@ public class Autotuner {
 					// FTGPU
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						ftgpu.convolve(array, kernel, false);
+						ftgpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;
@@ -258,7 +260,7 @@ public class Autotuner {
 				// FTCPU
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					ftcpu.convolve(array, kernel, false);
+					ftcpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
@@ -277,7 +279,7 @@ public class Autotuner {
 					// FTGPU STRIDE
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						ftgpu.convolveStride(array, kernel, false);
+						ftgpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;
@@ -345,7 +347,7 @@ public class Autotuner {
 				// FTCPU
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					ftcpu.convolve(array, kernel, false);
+					ftcpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
@@ -364,7 +366,7 @@ public class Autotuner {
 					// FTGPU
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						ftgpu.convolve(array, kernel, false);
+						ftgpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;

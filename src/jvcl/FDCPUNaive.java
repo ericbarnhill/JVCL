@@ -21,223 +21,261 @@
 
 package jvcl;
 
-public class FDCPUNaive {
+import java.util.Arrays;
 
-	int boundaryConditions;
-	
-	final int ZERO_BOUNDARY = 0;
-	final int MIRROR_BOUNDARY = 1;
-	final int PERIODIC_BOUNDARY = 2;
-	
-	JVCLUtils ds;
-	
-	/** Constructer allows setting of boundary conditions: 
-	*	@param boundaryConditions	0=Zero boundaries and slightly faster 1=Mirror Boundaries 2=Periodic Boundaries 
-	*/
-	public FDCPUNaive(int boundaryConditions) {
-		this.boundaryConditions = boundaryConditions;
-		ds = new JVCLUtils();
-	}
+import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.math4.complex.ComplexUtils;
+
+public class FDCPUNaive {
 
 	/** Default constructor sets zero boundary conditions 
 	*/
 	public FDCPUNaive() {
-		this.boundaryConditions = ZERO_BOUNDARY;
-		ds = new JVCLUtils();
+	}
+	
+	/*
+	 * A glossary of variables
+	 * f: array
+	 * g: kernel
+	 * r: result
+	 * fi, fj, fk: array dimension
+	 * gi, gj, gk: kernel dimension
+	 * hgi, hgj, hgk = kernel half dimension
+	 * ai, aj, ak = adjusted dimension
+	 * i, j, k: array loops
+	 * p, q, s: kernel loops
+	 */
+
+	public static double[] convolve(double[] f, double[] g) {
+		
+		final int fi = f.length;
+		final int gi = g.length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		double[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
+		double[] r = JVCLUtils.zeroPadBoundaries(new double[fi], hgi, hgie);
+		final int ri = r.length;
+		int ai;
+		for (int i = 0; i < ri; i++) {
+			for (int p =  0; p < gi; p++) {
+				ai = i + p - hgie;
+				if (ai >= 0 && ai < ri) {
+					r[i] += fPad[ai]*g[gi-1-p];
+				}
+			}
+		}
+		return r;
+	}
+	
+	public static Complex[] convolve(Complex[] f, Complex[] g) {
+
+		final int fi = f.length;
+		final int gi = g.length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		Complex[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
+		Complex[] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi]), hgi, hgie);
+		final int ri = r.length;
+		int ai;
+		for (int i = 0; i < ri; i++) {
+			for (int p =  0; p < gi; p++) {
+				ai = i + p - hgie;
+				if (ai >= 0 && ai < ri) {
+					r[i] = r[i].add(fPad[ai].multiply(g[gi-1-p]));
+				}
+			}
+		}
+		return r;
+	}
+	
+	public static double[][] convolve(double[][] f, double[][] g) {
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgj = (int)( (gj - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+		double[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+		double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
+		final int ri = r.length;
+		final int rj = r[0].length;
+		int ai, aj;
+		for (int i = 0; i < ri; i++) {
+			for (int j = 0; j < rj; j++) {
+				for (int p = 0; p < gi; p++) {
+					for (int q = 0; q < gj; q++) {
+						ai = i + (p - hgie);
+						aj = j + (q - hgje);
+						if (ai >= 0 && ai < ri) {
+							if (aj >= 0 && aj < rj) {
+								r[i][j] += fPad[ai][aj]*g[gi-1-p][gj-1-q];
+							}
+						}
+					}
+				}
+			}
+		}
+		return r;
+	}
+	
+	public static Complex[][] convolve(Complex[][] f, Complex[][] g) {
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgj = (int)( (gj - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+		Complex[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+		Complex[][] r = JVCLUtils.zeroPadBoundaries(
+							ComplexUtils.initialize(new Complex[fi][fj]),
+						hgi, hgie, hgj, hgje);
+		final int ri = r.length;
+		final int rj = r[0].length;
+		int ai, aj;
+		for (int i = 0; i < ri; i++) {
+			for (int j = 0; j < rj; j++) {
+				for (int p = 0; p < gi; p++) {
+					for (int q = 0; q < gj; q++) {
+						ai = i + (p - hgie);
+						aj = j + (q - hgje);
+						if (ai >= 0 && ai < ri) {
+							if (aj >= 0 && aj < rj) {
+								r[i][j] = r[i][j].add(fPad[ai][aj].multiply(g[gi-1-p][gj-1-q]));
+							}
+						}
+					}
+				}
+			}
+		}
+		return r;
+	}
+	
+	public static double[][][] convolve(double[][][] f, double[][][] g) {
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int fk = f[0][0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int gk = g[0][0].length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgj = (int)( (gj - 1) / 2.0);
+		final int hgk = (int)( (gk - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
+		double[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+		double[][][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
+		final int ri = r.length;
+		final int rj = r[0].length;
+		final int rk = r[0][0].length;
+		int ai, aj, ak;
+		for (int i = 0; i < ri; i++) {
+			for (int j = 0; j < rj; j++) {
+				for (int k = 0; k < rk; k++) {
+					for (int p = 0; p < gi; p++) {
+						for (int q = 0; q < gj; q++) {
+							for (int s = 0; s < gk; s++) {
+								ai = i + (p - hgie);
+								aj = j + (q - hgje);
+								ak = k + (s - hgke);
+								if (ai >= 0 && ai < ri) {
+									if (aj >= 0 && aj < rj) {
+										if (ak >= 0 && ak < rk) {
+											r[i][j][k] += fPad[ai][aj][ak]*g[gi-1-p][gj-1-q][gk-1-s];
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return r;
+	}
+	
+	public static Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int fk = f[0][0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int gk = g[0][0].length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgj = (int)( (gj - 1) / 2.0);
+		final int hgk = (int)( (gk - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
+		Complex[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+		Complex[][][] r = JVCLUtils.zeroPadBoundaries(
+								ComplexUtils.initialize(new Complex[fi][fj][fk]),
+							hgi, hgie, hgj, hgje, hgk, hgke);
+		final int ri = r.length;
+		final int rj = r[0].length;
+		final int rk = r[0][0].length;
+		int ai, aj, ak;
+		for (int i = 0; i < ri; i++) {
+			for (int j = 0; j < rj; j++) {
+				for (int k = 0; k < rk; k++) {
+					for (int p = 0; p < gi; p++) {
+						for (int q = 0; q < gj; q++) {
+							for (int s = 0; s < gk; s++) {
+								ai = i + (p - hgie);
+								aj = j + (q - hgje);
+								ak = k + (s - hgke);
+								if (ai >= 0 && ai < ri) {
+									if (aj >= 0 && aj < rj) {
+										if (ak >= 0 && ak < rk) {
+											r[i][j][k] = r[i][j][k].add(
+													fPad[ai][aj][ak].multiply(g[gi-1-p][gj-1-q][gk-1-s])
+												);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return r;
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		double[] f1 = JVCLUtils.fillWithSecondOrder(16);
+		double[] g1 = new double[] {1, -2, 1};
+		JVCLUtils.display(convolve(f1, g1), "1D Double", 16);
+		Complex[] f2 = JVCLUtils.fillWithSecondOrderComplex(16);
+		Complex[] g2 = ComplexUtils.real2Complex(g1);
+		JVCLUtils.display(convolve(f2, g2), "1D Complex", 16);
+		double[][] f3 = JVCLUtils.fillWithSecondOrder(16, 16);
+		JVCLUtils.display(JVCLUtils.vectorise(f3), "Second Order", f3.length);
+		double[][] g3 = JVCLUtils.devectorise(new double[] {0,1,0, 0, 1,-4,1, 0, 0,1,0, 0}, 4);
+		JVCLUtils.display(JVCLUtils.vectorise(g3), "Second Order Kernel", g3.length);
+		double[][] r3 = convolve(f3, g3);
+		JVCLUtils.display(JVCLUtils.vectorise(r3), "2D Double", r3.length);
+		Complex[][] f4 = JVCLUtils.fillWithSecondOrderComplex(16, 16);
+		Complex[][] g4 = ComplexUtils.real2Complex(g3);
+		Complex[][] r4 = convolve(f4, g4);
+		JVCLUtils.display(JVCLUtils.vectorise(r4), "2D Complex", r4.length);
+		double[][][] f5 = JVCLUtils.fillWithSecondOrder(8, 8, 8);
+		double[][][] g5 = JVCLUtils.devectorise(new double[] {
+				0,0,0,0,1,0,0,0,0,0,1,0,1,-6,1,0,1,0,0,0,0,0,1,0,0,0,0}, 3, 3);
+		JVCLUtils.display(JVCLUtils.vectorise(g5), "Third Order Kernel", g5.length);
+		double[][][] r5 = convolve(f5, g5);
+		JVCLUtils.display(JVCLUtils.vectorise(r5), "3D Double", r5.length);
+		Complex[][][] f6 = JVCLUtils.fillWithSecondOrderComplex(8, 8, 8);
+		Complex[][][] g6 = ComplexUtils.real2Complex(g5);
+		Complex[][][] r6 = convolve(f6, g6);
+		JVCLUtils.display(JVCLUtils.vectorise(r6), "3D Complex", r6.length);
 	}
 
-	public double[] convolve(double[] vector, double[] kernel) {
-		int vectorLength = vector.length;
-		int kernelLength = kernel.length;
-		int halfLength = (int)( (kernelLength - 1) / 2.0);
-		double[] result;
-		int adjN;
-		result = new double[vectorLength];
-		for (int n = 0; n < vectorLength; n++) {
-			boundaryCheck:
-			if (n < halfLength || n >= vectorLength - halfLength - 1) {
-					if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
-					for (int p = 0; p < kernelLength; p++) {
-						adjN = n + (p - halfLength);
-						if (adjN < 0) {
-							if (boundaryConditions == MIRROR_BOUNDARY) {
-								adjN = Math.abs(adjN);
-								result[n] += vector[adjN]*kernel[p];
-							} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-								adjN = vectorLength + adjN;
-								result[n] += vector[adjN]*kernel[p];
-							} else throw new RuntimeException("Exception in FD beginning boundaries");// BCs
-						} // if outside boundary
-						if (adjN >= vectorLength) {
-							if (boundaryConditions == MIRROR_BOUNDARY) {
-								adjN = 2*vectorLength - adjN - 1;
-								result[n] += vector[adjN]*kernel[p];
-							} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-								adjN = adjN - vectorLength;
-								result[n] += vector[adjN]*kernel[p];
-							} else throw new RuntimeException("Exception in FD ending boundaries");// BCs
-						} // if outside boundary
-					} // for p
-				} else { // if boundary
-					for (int p = 0; p < kernelLength; p++) {
-						adjN = n + (p - halfLength);
-						result[n+halfLength]  += vector[adjN]*kernel[p];
-					}
-				} 
-			} // for n
-		return result;
-	}
-	
-	public double[][] convolve(double[][] image, double[][] kernel) { 
-		int imageWidth = image.length;
-		int imageHeight = image[0].length;
-		int kernelWidth = kernel.length;
-		int kernelHeight = kernel[0].length;
-		int halfWidth = (int)( (kernelWidth - 1) / 2.0);
-		int halfHeight = (int)( (kernelHeight - 1) / 2.0);
-		double[][] result;
-		int adjX;
-		int adjY;
-		result = new double[imageWidth][imageHeight];
-		for (int x = 0; x < imageWidth; x++) {
-			for (int y = 0; y < imageHeight; y++) {
-				boundaryCheck:
-				if (x < halfWidth || x >= imageWidth - halfWidth || y < halfHeight || y >= imageHeight - halfHeight) { // if boundary
-					if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
-					for (int p = 0; p < kernelWidth; p++) {
-						for (int q = 0; q < kernelHeight; q++) {
-							adjX = x + (p - halfWidth);
-							adjY = y + (q - halfHeight);
-							if (adjX < 0) {
-								if (boundaryConditions == MIRROR_BOUNDARY) {
-									adjX = Math.abs(adjX);
-								} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-									adjX = imageWidth + adjX;
-								} else throw new RuntimeException("Exception in FD boundaries");// BCs
-							} else if (adjX >= imageWidth) {
-								if (boundaryConditions == MIRROR_BOUNDARY) {
-									adjX = 2*imageWidth - adjX - 1;
-								} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-									adjX = adjX - imageWidth;
-								} else throw new RuntimeException("Exception in FD boundaries");// BCs
-							}
-							if (adjY < 0) {
-								if (boundaryConditions == MIRROR_BOUNDARY) {
-									adjY = Math.abs(adjY);
-								} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-									adjY = imageWidth + adjY;
-								} else throw new RuntimeException("Exception in FD boundaries");// BCs
-							} else if (adjY >= imageHeight) {
-								if (boundaryConditions == MIRROR_BOUNDARY) {
-									adjY = 2*imageHeight - adjY - 1;
-								} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-									adjY = adjY - imageHeight;
-								} else throw new RuntimeException("Exception in FD boundaries");// BCs
-							}
-							result[x][y] += image[adjX][adjY]*kernel[p][q];
-						} // for q
-					} // for p
-				} else { // if NOT boundary
-					for (int p = 0; p < kernelWidth; p++) {
-						for (int q = 0; q < kernelHeight; q++) {
-							adjX = x + (p - halfWidth);
-							adjY = y + (q - halfHeight);
-							result[x][y] += image[adjX][adjY]*kernel[p][q];
-						} // for q
-					} // for p
-				} // if boundary
-			} // for y
-		} // for x
-		return result;
-	}
-	
-	public double[][][] convolve(double[][][] volume, double[][][] kernel) {
-		int kernelWidth = kernel.length;
-		int kernelHeight = kernel[0].length;
-		int kernelDepth = kernel[0][0].length;
-		int volumeWidth = volume.length;
-		int volumeHeight = volume[0].length;
-		int volumeDepth = volume[0][0].length;
-		int halfWidth = (int)( (kernelWidth - 1) / 2.0 );
-		int halfHeight = (int)( (kernelHeight - 1) / 2.0);
-		int halfDepth = (int)( (kernelDepth - 1) / 2.0 );
-		double[][][] result;
-		int adjX, adjY, adjZ;
-		result = new double[volumeWidth][volumeHeight][volumeDepth];
-		for (int x = 0; x < volumeWidth; x++) {
-			for (int y = 0; y < volumeHeight; y++) {
-				for (int z = 0; z < volumeDepth; z++) {
-					boundaryCheck:
-					if (  x < halfWidth || x >= volumeWidth - halfWidth || y < halfHeight || y >= volumeHeight - halfHeight || 
-							z < halfDepth || z >= volumeDepth - halfDepth ) {
-						if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
-						for (int p = 0; p < kernelWidth; p++) {
-							for (int q = 0; q < kernelHeight; q++) {
-								for (int r = 0; r < kernelDepth; r++) {
-									adjX = x + (p - halfWidth);
-									adjY = y + (q - halfHeight);
-									adjZ = z + (r - halfDepth);
-									if (adjX < 0) {
-										if (boundaryConditions == MIRROR_BOUNDARY) {
-											adjX = Math.abs(adjX);
-										} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-											adjX = volumeWidth + adjX;
-										} else throw new RuntimeException("Exception in FD boundaries");// BCs
-									} else if (adjX >= volumeWidth) {
-										if (boundaryConditions == MIRROR_BOUNDARY) {
-											adjX = 2*volumeWidth - adjX - 1;
-										} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-											adjX = adjX - volumeWidth;
-										} else throw new RuntimeException("Exception in FD boundaries");// BCs
-									}
-									if (adjY < 0) {
-										if (boundaryConditions == MIRROR_BOUNDARY) {
-											adjY = Math.abs(adjY);
-										} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-											adjY = volumeWidth + adjY;
-										} else throw new RuntimeException("Exception in FD boundaries");// BCs
-									} else if (adjY >= volumeHeight) {
-										if (boundaryConditions == MIRROR_BOUNDARY) {
-											adjY = 2*volumeHeight - adjY - 1;
-										} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-											adjY = adjY - volumeHeight;
-										} else throw new RuntimeException("Exception in FD boundaries");// BCs
-									}
-									if (adjZ < 0) {
-										if (boundaryConditions == MIRROR_BOUNDARY) {
-											adjZ = Math.abs(adjZ);
-										} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-											adjZ = volumeDepth + adjZ;
-										} else throw new RuntimeException("Exception in FD boundaries");// BCs
-									} else if (adjZ >= volumeDepth) {
-										if (boundaryConditions == MIRROR_BOUNDARY) {
-											adjZ = 2*volumeDepth - adjZ - 1;
-										} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-											adjZ= adjZ - volumeDepth;
-										} else throw new RuntimeException("Exception in FD boundaries");// BCs
-									}
-									result[x][y][z] += volume[adjX][adjY][adjZ]*kernel[p][q][r];
-								} // for r
-							} // for q
-						} // for p
-					} else {
-						for (int p = 0; p < kernelHeight; p++) {
-							for (int q = 0; q < kernelWidth; q++) {
-								for (int r = 0; r < kernelDepth; r++) {
-									adjX = x + (p-halfHeight);
-									adjY = y + (q-halfWidth);
-									adjZ = z + (r-halfDepth);
-									result[x][y][z] += volume[adjX][adjY][adjZ] * kernel[p][q][r];
-								} // for r
-							} // for q
-						} // for p
-					} // else 
-				} // for z
-			} // for y
-		} // for x
-		return result;
-	}
-	
-	
 	
 }

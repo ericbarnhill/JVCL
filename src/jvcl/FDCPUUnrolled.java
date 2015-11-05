@@ -21,6 +21,8 @@
 
 package jvcl;
 
+import org.apache.commons.math4.complex.Complex;
+
 public class FDCPUUnrolled {
 
 	int boundaryConditions;
@@ -578,10 +580,570 @@ public class FDCPUUnrolled {
 		
 	}
 
+	public Complex[] convolve3(Complex[] vector, Complex[] kernel) {
+		int vectorLength = vector.length;
+		if (kernel.length != 3) {
+			throw new RuntimeException("Incorrect call to convolve3");
+		}
+		Complex[] result = new Complex[vectorLength];
+		for (int n = 1; n < vectorLength - 1; n++) {
+			result[n+1]
+			.add(vector[n-1].multiply(kernel[0]))
+			.add(vector[n].multiply(kernel[1]))
+			.add(vector[n+1].multiply(kernel[2]));
+		}
+		if (boundaryConditions == MIRROR_BOUNDARY) {
+			result[0]
+					.add(vector[1].multiply(kernel[0]))
+					.add(vector[0].multiply(kernel[1]))
+					.add(vector[1].multiply(kernel[2]));
+			result[vectorLength-1]
+					.add(vector[vectorLength-2].multiply(kernel[0]))
+					.add(vector[vectorLength-1].multiply(kernel[1]))
+					.add(vector[vectorLength-2].multiply(kernel[2]));
+		} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+			result[0]
+					.add(vector[vectorLength-1].multiply(kernel[0]))
+					.add(vector[0].multiply(kernel[1]))
+					.add(vector[1].multiply(kernel[2]));
+			result[vectorLength-1]
+					.add(vector[vectorLength-2].multiply(kernel[0]))
+					.add(vector[vectorLength-1].multiply(kernel[1]))
+					.add(vector[0].multiply(kernel[2]));
+		}
+		return result;
+	}
 	
+	public Complex[][] convolve3(Complex[][] image, Complex[][] kernel) {
+		int imageWidth = image.length;
+		int imageHeight = image[0].length;
+		int imageArea = imageWidth*imageHeight;
+		int kernelHeight = kernel.length;
+		int kernelWidth = kernel[0].length;
+		if (kernelHeight != 3 || kernelWidth != 3) {
+			throw new RuntimeException("Incorrect Call To Convolve3");
+		}
+		Complex[][] result = new Complex[imageWidth][imageHeight];
+		int x, y, p, q, pq, adjX, adjY;
+		for (int xy = 0; xy < imageArea; xy++) {
+			x = imageArea % imageWidth;
+			y = xy / imageWidth;
+			boundaryCheck:
+			if (x < 1 || x >= imageWidth - 1 || y < 1 || y >= imageHeight - 1) {
+				if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
+				for (pq = 0; pq < 9; pq++) {
+					p = pq % 3;
+					q = pq / 3;
+					adjX = x + (p - 2);
+					adjY = y + (q - 2);
+					if (adjX < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = Math.abs(adjX);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = imageWidth + adjX;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjX >= imageWidth) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = 2*imageWidth - adjX - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = adjX - imageWidth;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					if (adjY < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = Math.abs(adjY);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = imageWidth + adjY;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjY >= imageHeight) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = 2*imageHeight - adjY - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = adjY - imageHeight;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					result[x][y].add(image[adjX][adjY].multiply(kernel[p][q]));
+				} // for pq
+			} else {
+				result[x][y]
+					.add(image[x-1][y-1].multiply(kernel[-1][-1]))
+					.add(image[x-1][y+0].multiply(kernel[-1][0]))
+					.add(image[x-1][y+1].multiply(kernel[-1][1]))
+					.add(image[x+0][y-1].multiply(kernel[0][-1]))
+					.add(image[x+0][y+0].multiply(kernel[0][0]))
+					.add(image[x+0][y+1].multiply(kernel[0][1]))
+					.add(image[x+1][y-1].multiply(kernel[1][-1]))
+					.add(image[x+1][y+0].multiply(kernel[1][0]))
+					.add(image[x+1][y+1].multiply(kernel[1][1]));
+			} // if boundary
+		} // for xy
+		return result;
+	}
+
+	public Complex[][][] convolve3(Complex[][][] volume, Complex[][][] kernel) {
+		
+		int volumeWidth = volume[0].length;
+		int volumeHeight = volume.length;
+		int volumeDepth = volume[0][0].length;
+		int totalArea = volumeWidth*volumeHeight;
+		int totalVolume = totalArea*volumeDepth;
+		int kernelWidth = kernel[0].length;
+		int kernelHeight = kernel.length;
+		int kernelDepth = kernel[0][0].length;
+		int kernelArea = kernelWidth*kernelHeight;
+		if (kernelHeight != 3 || kernelWidth != 3 || kernelDepth != 3) {
+			throw new RuntimeException("Incorrect Call To Convolve3");
+		}
+		Complex[][][] result = new Complex[volumeWidth][volumeHeight][volumeDepth];
+		int x, y, z, p, q, r, pqr, adjX, adjY, adjZ;
+		for (int xyz = 0; xyz < totalVolume; xyz++) {
+			z = xyz / totalArea;
+			y = (xyz - z*totalArea) / volumeWidth;
+			x = xyz % volumeWidth;
+			boundaryCheck:
+			if ( x < 1 || x >= volumeWidth-1 || y < 1 || y >= volumeHeight-1 || 
+					z < 1 || z >= volumeHeight-1 ) {
+				if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
+				for (pqr = 0; pqr < 27; pqr++) {
+					r = pqr / 9;
+					q = (pqr - r*9) / 3;
+					p = pqr % 3;
+					adjX = x + (p - 1);
+					adjY = y + (q - 1);
+					adjZ = z + (r - 1);
+					if (adjX < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = Math.abs(adjX);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = volumeWidth + adjX;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjX >= volumeWidth) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = 2*volumeWidth - adjX - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = adjX - volumeWidth;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					if (adjY < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = Math.abs(adjY);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = volumeWidth + adjY;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjY >= volumeHeight) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = 2*volumeHeight - adjY - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = adjY - volumeHeight;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					if (adjZ < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjZ = Math.abs(adjZ);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjZ = volumeDepth + adjZ;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjZ >= volumeDepth) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjZ = 2*volumeDepth - adjZ - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjZ = adjZ - volumeDepth;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					result[x][y][z].add(volume[adjX][adjY][adjZ].multiply(kernel[p][q][r]));
+				} // for pqr
+			} else { // if not boundary
+					result[x][y][z]
+						.add(volume[x-1][y-1][z-1].multiply(kernel[-1][-1][-1]))
+						.add(volume[x-1][y-1][z+0].multiply(kernel[-1][-1][0]))
+						.add(volume[x-1][y-1][z+1].multiply(kernel[-1][-1][1]))
+						.add(volume[x-1][y+0][z-1].multiply(kernel[-1][0][-1]))
+						.add(volume[x-1][y+0][z+0].multiply(kernel[-1][0][0]))
+						.add(volume[x-1][y+0][z+1].multiply(kernel[-1][0][1]))
+						.add(volume[x-1][y+1][z-1].multiply(kernel[-1][1][-1]))
+						.add(volume[x-1][y+1][z+0].multiply(kernel[-1][1][0]))
+						.add(volume[x-1][y+1][z+1].multiply(kernel[-1][1][1]))
+						.add(volume[x+0][y-1][z-1].multiply(kernel[0][-1][-1]))
+						.add(volume[x+0][y-1][z+0].multiply(kernel[0][-1][0]))
+						.add(volume[x+0][y-1][z+1].multiply(kernel[0][-1][1]))
+						.add(volume[x+0][y+0][z-1].multiply(kernel[0][0][-1]))
+						.add(volume[x+0][y+0][z+0].multiply(kernel[0][0][0]))
+						.add(volume[x+0][y+0][z+1].multiply(kernel[0][0][1]))
+						.add(volume[x+0][y+1][z-1].multiply(kernel[0][1][-1]))
+						.add(volume[x+0][y+1][z+0].multiply(kernel[0][1][0]))
+						.add(volume[x+0][y+1][z+1].multiply(kernel[0][1][1]))
+						.add(volume[x+1][y-1][z-1].multiply(kernel[1][-1][-1]))
+						.add(volume[x+1][y-1][z+0].multiply(kernel[1][-1][0]))
+						.add(volume[x+1][y-1][z+1].multiply(kernel[1][-1][1]))
+						.add(volume[x+1][y+0][z-1].multiply(kernel[1][0][-1]))
+						.add(volume[x+1][y+0][z+0].multiply(kernel[1][0][0]))
+						.add(volume[x+1][y+0][z+1].multiply(kernel[1][0][1]))
+						.add(volume[x+1][y+1][z-1].multiply(kernel[1][1][-1]))
+						.add(volume[x+1][y+1][z+0].multiply(kernel[1][1][0]))
+						.add(volume[x+1][y+1][z+1].multiply(kernel[1][1][1]));
+			} // if not boundary
+		} // for xyz
+		return result;
+	}
 	
+	public Complex[] convolve5(Complex[] vector, Complex[] kernel) {
+		int vectorLength = vector.length;
+		if (kernel.length != 5) {
+			throw new RuntimeException("Incorrect call to convolve5");
+		}
+		Complex[] result = new Complex[vectorLength];
+		for (int n = 2; n < vectorLength - 2; n++) {
+			result[n+2]
+					.add(vector[n-2].multiply(kernel[0]))
+					.add(vector[n-1].multiply(kernel[1]))
+					.add(vector[n].multiply(kernel[2]))
+					.add(vector[n+1].multiply(kernel[3]))
+					.add(vector[n+2].multiply(kernel[4]));
+		}
+		if (boundaryConditions == MIRROR_BOUNDARY) {
+			result[0]
+					.add(vector[2].multiply(kernel[0]))
+					.add(vector[1].multiply(kernel[1]))
+					.add(vector[0].multiply(kernel[2]))
+					.add(vector[1].multiply(kernel[3]))
+					.add(vector[2].multiply(kernel[4]));
+			result[1]
+					.add(vector[3].multiply(kernel[0]))
+					.add(vector[2].multiply(kernel[1]))
+					.add(vector[1].multiply(kernel[2]))
+					.add(vector[0].multiply(kernel[3]))
+					.add(vector[1].multiply(kernel[4]));
+			result[vectorLength-1]
+					.add(vector[vectorLength-3].multiply(kernel[0]))
+					.add(vector[vectorLength-2].multiply(kernel[1]))
+					.add(vector[vectorLength-1].multiply(kernel[2]))
+					.add(vector[vectorLength-2].multiply(kernel[3]))
+					.add(vector[vectorLength-3].multiply(kernel[4]));
+			result[vectorLength-2]
+					.add(vector[vectorLength-4].multiply(kernel[0]))
+					.add(vector[vectorLength-3].multiply(kernel[1]))
+					.add(vector[vectorLength-2].multiply(kernel[2]))
+					.add(vector[vectorLength-1].multiply(kernel[3]))
+					.add(vector[vectorLength-2].multiply(kernel[4]));
+		} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+			result[0]
+					.add(vector[2].multiply(kernel[0]))
+					.add(vector[1].multiply(kernel[1]))
+					.add(vector[0].multiply(kernel[2]))
+					.add(vector[vectorLength-1].multiply(kernel[3]))
+					.add(vector[vectorLength-2].multiply(kernel[4]));
+			result[1]
+					.add(vector[3].multiply(kernel[0]))
+					.add(vector[2].multiply(kernel[1]))
+					.add(vector[1].multiply(kernel[2]))
+					.add(vector[0].multiply(kernel[3]))
+					.add(vector[vectorLength-1].multiply(kernel[4]));
+			result[vectorLength-1]
+					.add(vector[vectorLength-3].multiply(kernel[0]))
+					.add( vector[vectorLength-2].multiply(kernel[1]))
+					.add(vector[vectorLength-1].multiply(kernel[2]))
+					.add(vector[0].multiply(kernel[3]))
+					.add(vector[1].multiply(kernel[4]));
+			result[vectorLength-2]
+					.add(vector[vectorLength-4].multiply(kernel[0]))
+					.add( vector[vectorLength-3].multiply(kernel[1]))
+					.add(vector[vectorLength-2].multiply(kernel[2]))
+					.add(vector[vectorLength-1].multiply(kernel[3]))
+					.add(vector[0].multiply(kernel[4]));
+		}
+		return result;
+	}
+
+	public Complex[][] convolve5(Complex[][] image, Complex[][] kernel) {
+		int imageWidth = image.length;
+		int imageHeight = image[0].length;
+		int imageArea = imageWidth*imageHeight;
+		int kernelHeight = kernel.length;
+		int kernelWidth = kernel[0].length;
+		if (kernelHeight != 5 || kernelWidth != 5) {
+			throw new RuntimeException("Incorrect Call To Convolve5");
+		}
+		Complex[][] result = new Complex[imageWidth][imageHeight];
+		int x, y, p, q, pq, adjX, adjY;
+		for (int xy = 0; xy < imageArea; xy++) {
+			x = imageArea % imageWidth;
+			y = xy / imageWidth;
+			boundaryCheck:
+			if (x < 2 || x >= imageWidth || y < 2 || y >= imageHeight) {
+				if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
+				for (pq = 0; pq < 25; pq++) {
+					p = pq % 5;
+					q = pq / 5;
+					adjX = x + (p - 2);
+					adjY = y + (q - 2);
+					if (adjX < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = Math.abs(adjX);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = imageWidth + adjX;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjX > imageWidth) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = 2*imageWidth - adjX - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = adjX - imageWidth;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					if (adjY < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = Math.abs(adjY);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = imageWidth + adjY;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjY > imageHeight) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = 2*imageHeight - adjY - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = adjY - imageHeight;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					result[x][y].add(image[adjX][adjY].multiply(kernel[p][q]));
+				} // for pa
+			} else {
+					result[x][y]
+						.add(image[x-2][y-2].multiply(kernel[-2][-2]))
+						.add(image[x-2][y-1].multiply(kernel[-2][-1]))
+						.add(image[x-2][y+0].multiply(kernel[-2][0]))
+						.add(image[x-2][y+1].multiply(kernel[-2][1]))
+						.add(image[x-2][y+2].multiply(kernel[-2][2]))
+						.add(image[x-1][y-2].multiply(kernel[-1][-2]))
+						.add(image[x-1][y-1].multiply(kernel[-1][-1]))
+						.add(image[x-1][y+0].multiply(kernel[-1][0]))
+						.add(image[x-1][y+1].multiply(kernel[-1][1]))
+						.add(image[x-1][y+2].multiply(kernel[-1][2]))
+						.add(image[x+0][y-2].multiply(kernel[0][-2]))
+						.add(image[x+0][y-1].multiply(kernel[0][-1]))
+						.add(image[x+0][y+0].multiply(kernel[0][0]))
+						.add(image[x+0][y+1].multiply(kernel[0][1]))
+						.add(image[x+0][y+2].multiply(kernel[0][2]))
+						.add(image[x+1][y-2].multiply(kernel[1][-2]))
+						.add(image[x+1][y-1].multiply(kernel[1][-1]))
+						.add(image[x+1][y+0].multiply(kernel[1][0]))
+						.add(image[x+1][y+1].multiply(kernel[1][1]))
+						.add(image[x+1][y+2].multiply(kernel[1][2]))
+						.add(image[x+2][y-2].multiply(kernel[2][-2]))
+						.add(image[x+2][y-1].multiply(kernel[2][-1]))
+						.add(image[x+2][y+0].multiply(kernel[2][0]))
+						.add(image[x+2][y+1].multiply(kernel[2][1]))
+						.add(image[x+2][y+2].multiply(kernel[2][2]));
+			} // if boundary
+		} // for xy
+		return result;
+	}
 	
-	
-	
+	public Complex[][][] convolve5(Complex[][][] volume, Complex[][][] kernel) {
+
+		int volumeWidth = volume[0].length;
+		int volumeHeight = volume.length;
+		int volumeDepth = volume[0][0].length;
+		int totalArea = volumeWidth*volumeHeight;
+		int totalVolume = totalArea*volumeDepth;
+		int kernelWidth = kernel.length;
+		int kernelHeight = kernel[0].length;
+		int kernelDepth = kernel[0][0].length;
+		int resultWidth = volumeWidth;
+		int resultHeight = volumeHeight;
+		int resultDepth = volumeDepth;
+		
+		if (kernelHeight != 5 || kernelWidth != 5 || kernelDepth != 5) {
+			throw new RuntimeException("Incorrect Call To Convolve5");
+		}
+
+		Complex[][][] result = new Complex[resultWidth][resultHeight][resultDepth];
+		int x, y, z, p, q, r, pqr, adjX, adjY, adjZ;
+		for (int xyz = 0; xyz < totalVolume; xyz++) {
+			z = xyz / totalArea;
+			y = (xyz - z*totalArea) / volumeWidth;
+			x = xyz % volumeWidth;
+			boundaryCheck:
+			if ( x < 2 || x >= volumeWidth - 2 || y < 2 || y >= volumeHeight - 2 || 
+					z < 2 || z >= volumeDepth - 2) {
+				if (boundaryConditions == ZERO_BOUNDARY) break boundaryCheck;
+				for (pqr = 0; pqr < 125; pqr++) {
+					r = pqr / 25;
+					q = (pqr - r*25) / 5;
+					p = pqr % 5;
+					adjX = x + (p - 1);
+					adjY = y + (q - 1);
+					adjZ = z + (r - 1);
+					if (adjX < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = Math.abs(adjX);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = volumeWidth + adjX;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjX >= volumeWidth) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjX = 2*volumeWidth - adjX - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjX = adjX - volumeWidth;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					if (adjY < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = Math.abs(adjY);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = volumeWidth + adjY;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjY >= volumeHeight) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjY = 2*volumeHeight - adjY - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjY = adjY - volumeHeight;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					if (adjZ < 0) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjZ = Math.abs(adjZ);
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjZ = volumeDepth + adjZ;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					} else if (adjZ >= volumeDepth) {
+						if (boundaryConditions == MIRROR_BOUNDARY) {
+							adjZ = 2*volumeDepth - adjZ - 1;
+						} else if (boundaryConditions == PERIODIC_BOUNDARY) {
+							adjZ = adjZ - volumeDepth;
+						} else throw new RuntimeException("Exception in FD boundaries");// BCs
+					}
+					result[x][y][z].add(volume[adjX][adjY][adjZ].multiply(kernel[p][q][r]));
+				} // for pqr
+			} else { // if not boundary
+				result[x][y][z]
+					.add(volume[x-2][y-2][z-2].multiply(kernel[-2][-2][-2]))
+					.add(volume[x-2][y-2][z-1].multiply(kernel[-2][-2][-1]))
+					.add(volume[x-2][y-2][z+0].multiply(kernel[-2][-2][0]))
+					.add(volume[x-2][y-2][z+1].multiply(kernel[-2][-2][1]))
+					.add(volume[x-2][y-2][z+2].multiply(kernel[-2][-2][2]))
+					.add(volume[x-2][y-1][z-2].multiply(kernel[-2][-1][-2]))
+					.add(volume[x-2][y-1][z-1].multiply(kernel[-2][-1][-1]))
+					.add(volume[x-2][y-1][z+0].multiply(kernel[-2][-1][0]))
+					.add(volume[x-2][y-1][z+1].multiply(kernel[-2][-1][1]))
+					.add(volume[x-2][y-1][z+2].multiply(kernel[-2][-1][2]))
+					.add(volume[x-2][y+0][z-2].multiply(kernel[-2][0][-2]))
+					.add(volume[x-2][y+0][z-1].multiply(kernel[-2][0][-1]))
+					.add(volume[x-2][y+0][z+0].multiply(kernel[-2][0][0]))
+					.add(volume[x-2][y+0][z+1].multiply(kernel[-2][0][1]))
+					.add(volume[x-2][y+0][z+2].multiply(kernel[-2][0][2]))
+					.add(volume[x-2][y+1][z-2].multiply(kernel[-2][1][-2]))
+					.add(volume[x-2][y+1][z-1].multiply(kernel[-2][1][-1]))
+					.add(volume[x-2][y+1][z+0].multiply(kernel[-2][1][0]))
+					.add(volume[x-2][y+1][z+1].multiply(kernel[-2][1][1]))
+					.add(volume[x-2][y+1][z+2].multiply(kernel[-2][1][2]))
+					.add(volume[x-2][y+2][z-2].multiply(kernel[-2][2][-2]))
+					.add(volume[x-2][y+2][z-1].multiply(kernel[-2][2][-1]))
+					.add(volume[x-2][y+2][z+0].multiply(kernel[-2][2][0]))
+					.add(volume[x-2][y+2][z+1].multiply(kernel[-2][2][1]))
+					.add(volume[x-2][y+2][z+2].multiply(kernel[-2][2][2]))
+					.add(volume[x-1][y-2][z-2].multiply(kernel[-1][-2][-2]))
+					.add(volume[x-1][y-2][z-1].multiply(kernel[-1][-2][-1]))
+					.add(volume[x-1][y-2][z+0].multiply(kernel[-1][-2][0]))
+					.add(volume[x-1][y-2][z+1].multiply(kernel[-1][-2][1]))
+					.add(volume[x-1][y-2][z+2].multiply(kernel[-1][-2][2]))
+					.add(volume[x-1][y-1][z-2].multiply(kernel[-1][-1][-2]))
+					.add(volume[x-1][y-1][z-1].multiply(kernel[-1][-1][-1]))
+					.add(volume[x-1][y-1][z+0].multiply(kernel[-1][-1][0]))
+					.add(volume[x-1][y-1][z+1].multiply(kernel[-1][-1][1]))
+					.add(volume[x-1][y-1][z+2].multiply(kernel[-1][-1][2]))
+					.add(volume[x-1][y+0][z-2].multiply(kernel[-1][0][-2]))
+					.add(volume[x-1][y+0][z-1].multiply(kernel[-1][0][-1]))
+					.add(volume[x-1][y+0][z+0].multiply(kernel[-1][0][0]))
+					.add(volume[x-1][y+0][z+1].multiply(kernel[-1][0][1]))
+					.add(volume[x-1][y+0][z+2].multiply(kernel[-1][0][2]))
+					.add(volume[x-1][y+1][z-2].multiply(kernel[-1][1][-2]))
+					.add(volume[x-1][y+1][z-1].multiply(kernel[-1][1][-1]))
+					.add(volume[x-1][y+1][z+0].multiply(kernel[-1][1][0]))
+					.add(volume[x-1][y+1][z+1].multiply(kernel[-1][1][1]))
+					.add(volume[x-1][y+1][z+2].multiply(kernel[-1][1][2]))
+					.add(volume[x-1][y+2][z-2].multiply(kernel[-1][2][-2]))
+					.add(volume[x-1][y+2][z-1].multiply(kernel[-1][2][-1]))
+					.add(volume[x-1][y+2][z+0].multiply(kernel[-1][2][0]))
+					.add(volume[x-1][y+2][z+1].multiply(kernel[-1][2][1]))
+					.add(volume[x-1][y+2][z+2].multiply(kernel[-1][2][2]))
+					.add(volume[x+0][y-2][z-2].multiply(kernel[0][-2][-2]))
+					.add(volume[x+0][y-2][z-1].multiply(kernel[0][-2][-1]))
+					.add(volume[x+0][y-2][z+0].multiply(kernel[0][-2][0]))
+					.add(volume[x+0][y-2][z+1].multiply(kernel[0][-2][1]))
+					.add(volume[x+0][y-2][z+2].multiply(kernel[0][-2][2]))
+					.add(volume[x+0][y-1][z-2].multiply(kernel[0][-1][-2]))
+					.add(volume[x+0][y-1][z-1].multiply(kernel[0][-1][-1]))
+					.add(volume[x+0][y-1][z+0].multiply(kernel[0][-1][0]))
+					.add(volume[x+0][y-1][z+1].multiply(kernel[0][-1][1]))
+					.add(volume[x+0][y-1][z+2].multiply(kernel[0][-1][2]))
+					.add(volume[x+0][y+0][z-2].multiply(kernel[0][0][-2]))
+					.add(volume[x+0][y+0][z-1].multiply(kernel[0][0][-1]))
+					.add(volume[x+0][y+0][z+0].multiply(kernel[0][0][0]))
+					.add(volume[x+0][y+0][z+1].multiply(kernel[0][0][1]))
+					.add(volume[x+0][y+0][z+2].multiply(kernel[0][0][2]))
+					.add(volume[x+0][y+1][z-2].multiply(kernel[0][1][-2]))
+					.add(volume[x+0][y+1][z-1].multiply(kernel[0][1][-1]))
+					.add(volume[x+0][y+1][z+0].multiply(kernel[0][1][0]))
+					.add(volume[x+0][y+1][z+1].multiply(kernel[0][1][1]))
+					.add(volume[x+0][y+1][z+2].multiply(kernel[0][1][2]))
+					.add(volume[x+0][y+2][z-2].multiply(kernel[0][2][-2]))
+					.add(volume[x+0][y+2][z-1].multiply(kernel[0][2][-1]))
+					.add(volume[x+0][y+2][z+0].multiply(kernel[0][2][0]))
+					.add(volume[x+0][y+2][z+1].multiply(kernel[0][2][1]))
+					.add(volume[x+0][y+2][z+2].multiply(kernel[0][2][2]))
+					.add(volume[x+1][y-2][z-2].multiply(kernel[1][-2][-2]))
+					.add(volume[x+1][y-2][z-1].multiply(kernel[1][-2][-1]))
+					.add(volume[x+1][y-2][z+0].multiply(kernel[1][-2][0]))
+					.add(volume[x+1][y-2][z+1].multiply(kernel[1][-2][1]))
+					.add(volume[x+1][y-2][z+2].multiply(kernel[1][-2][2]))
+					.add(volume[x+1][y-1][z-2].multiply(kernel[1][-1][-2]))
+					.add(volume[x+1][y-1][z-1].multiply(kernel[1][-1][-1]))
+					.add(volume[x+1][y-1][z+0].multiply(kernel[1][-1][0]))
+					.add(volume[x+1][y-1][z+1].multiply(kernel[1][-1][1]))
+					.add(volume[x+1][y-1][z+2].multiply(kernel[1][-1][2]))
+					.add(volume[x+1][y+0][z-2].multiply(kernel[1][0][-2]))
+					.add(volume[x+1][y+0][z-1].multiply(kernel[1][0][-1]))
+					.add(volume[x+1][y+0][z+0].multiply(kernel[1][0][0]))
+					.add(volume[x+1][y+0][z+1].multiply(kernel[1][0][1]))
+					.add(volume[x+1][y+0][z+2].multiply(kernel[1][0][2]))
+					.add(volume[x+1][y+1][z-2].multiply(kernel[1][1][-2]))
+					.add(volume[x+1][y+1][z-1].multiply(kernel[1][1][-1]))
+					.add(volume[x+1][y+1][z+0].multiply(kernel[1][1][0]))
+					.add(volume[x+1][y+1][z+1].multiply(kernel[1][1][1]))
+					.add(volume[x+1][y+1][z+2].multiply(kernel[1][1][2]))
+					.add(volume[x+1][y+2][z-2].multiply(kernel[1][2][-2]))
+					.add(volume[x+1][y+2][z-1].multiply(kernel[1][2][-1]))
+					.add(volume[x+1][y+2][z+0].multiply(kernel[1][2][0]))
+					.add(volume[x+1][y+2][z+1].multiply(kernel[1][2][1]))
+					.add(volume[x+1][y+2][z+2].multiply(kernel[1][2][2]))
+					.add(volume[x+2][y-2][z-2].multiply(kernel[2][-2][-2]))
+					.add(volume[x+2][y-2][z-1].multiply(kernel[2][-2][-1]))
+					.add(volume[x+2][y-2][z+0].multiply(kernel[2][-2][0]))
+					.add(volume[x+2][y-2][z+1].multiply(kernel[2][-2][1]))
+					.add(volume[x+2][y-2][z+2].multiply(kernel[2][-2][2]))
+					.add(volume[x+2][y-1][z-2].multiply(kernel[2][-1][-2]))
+					.add(volume[x+2][y-1][z-1].multiply(kernel[2][-1][-1]))
+					.add(volume[x+2][y-1][z+0].multiply(kernel[2][-1][0]))
+					.add(volume[x+2][y-1][z+1].multiply(kernel[2][-1][1]))
+					.add(volume[x+2][y-1][z+2].multiply(kernel[2][-1][2]))
+					.add(volume[x+2][y+0][z-2].multiply(kernel[2][0][-2]))
+					.add(volume[x+2][y+0][z-1].multiply(kernel[2][0][-1]))
+					.add(volume[x+2][y+0][z+0].multiply(kernel[2][0][0]))
+					.add(volume[x+2][y+0][z+1].multiply(kernel[2][0][1]))
+					.add(volume[x+2][y+0][z+2].multiply(kernel[2][0][2]))
+					.add(volume[x+2][y+1][z-2].multiply(kernel[2][1][-2]))
+					.add(volume[x+2][y+1][z-1].multiply(kernel[2][1][-1]))
+					.add(volume[x+2][y+1][z+0].multiply(kernel[2][1][0]))
+					.add(volume[x+2][y+1][z+1].multiply(kernel[2][1][1]))
+					.add(volume[x+2][y+1][z+2].multiply(kernel[2][1][2]))
+					.add(volume[x+2][y+2][z-2].multiply(kernel[2][2][-2]))
+					.add(volume[x+2][y+2][z-1].multiply(kernel[2][2][-1]))
+					.add(volume[x+2][y+2][z+0].multiply(kernel[2][2][0]))
+					.add(volume[x+2][y+2][z+1].multiply(kernel[2][2][1]))
+					.add(volume[x+2][y+2][z+2].multiply(kernel[2][2][2]));
+
+			} // if not boundary
+		} // for xyz
+		return result;
+		
+	}
 	
 }

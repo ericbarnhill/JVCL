@@ -3,6 +3,8 @@ package jvcl;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
+import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.math4.complex.ComplexUtils;
 import org.apache.commons.math4.util.FastMath;
 
 import com.jogamp.opencl.CLBuffer;
@@ -51,7 +53,7 @@ public class StockhamGPUStride {
 		Kernel = program.createCLKernel("stockhamStride");
 	}
 	
-	void fft(float[] real, float[] imag, boolean isForward, int N, int iter) {
+	void fft(float[] real, float[] imag, boolean isForward, int N) {
 	    int len = real.length;
 	    int blocks = len / N;
 	    int pwr2 = (int)(Math.log(N)/Math.log(2));
@@ -71,7 +73,6 @@ public class StockhamGPUStride {
 			.setArg(1, CLBufferImag)	
 			.setArg(2, -1)
 			.setArg(3, N)
-			//.setArg(4, pwr2)
 			.setArg(4,  pwr2)
 			.setArg(5, len);
 		queue.putWriteBuffer(CLBufferReal, true);
@@ -83,13 +84,27 @@ public class StockhamGPUStride {
 		imagBuffer.get(imag);
 		CLBufferReal.release();
 		CLBufferImag.release();
-		//testing release -
+		final double scaling = 1 / (float)N;
 		if (!isForward) {
 			for (int n = 0; n < len; n++) {
-				real[n] = real[n] / (float)N;
-				imag[n] = - imag[n] / (float)N;
+				real[n] *= scaling;
+				imag[n] *= -scaling;
 			}
 		}
+	}
+	
+	void fft(float[] interleaved, boolean isForward, int N) {
+		Complex[] c = ComplexUtils.interleaved2Complex(interleaved);
+		fft(ComplexUtils.complex2RealFloat(c), ComplexUtils.complex2ImaginaryFloat(c), isForward, N);
+	}
+
+	void fft(Complex[] c, boolean isForward, int N) {
+		fft(ComplexUtils.complex2RealFloat(c), ComplexUtils.complex2ImaginaryFloat(c), isForward, N);
+	}
+	
+	void fft(Complex[][] c, boolean isForward, int N) {
+		fft(ComplexUtils.complex2RealFloat(JVCLUtils.vectorise(c)),
+				ComplexUtils.complex2ImaginaryFloat(JVCLUtils.vectorise(c)), isForward, N);
 	}
 	
 	public void close() {
@@ -127,9 +142,9 @@ public class StockhamGPUStride {
 				testI[n] = 10*(float)FastMath.sin(2*FastMath.PI*((n-3*N/4)+1)/(double)(N/16.0));
 			}
 			JVCLUtils.display(JVCLUtils.split2interleaved(testR, testI), "", 8);
-			s.fft(testR, testI, true, N/4, 0);
+			s.fft(testR, testI, true, N/4);
 			JVCLUtils.display(JVCLUtils.split2interleaved(testR, testI), "", 8);
-			s.fft(testR, testI, false, N/4, 0);
+			s.fft(testR, testI, false, N/4);
 			JVCLUtils.display(JVCLUtils.split2interleaved(testR, testI), "", 8);
 		//}
 		s.close();

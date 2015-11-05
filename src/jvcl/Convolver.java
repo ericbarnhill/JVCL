@@ -21,25 +21,26 @@
 
 package jvcl;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Random;
 import java.util.prefs.Preferences;
-import org.apache.commons.math4.complex.*;
+
+import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.math4.complex.ComplexUtils;
+import org.apache.commons.math4.util.FastMath;
 
 public class Convolver {
 	
 	int boundaryConditions;
 	
-	final int ZERO_BOUNDARY = 0;
-	final int MIRROR_BOUNDARY = 1;
-	final int PERIODIC_BOUNDARY = 2;
+	static final int FULL = 0;
+	static final int SAME = 1;
+	static final int VALID = 2;
 	FDCPUNaive naive;
 	FDCPUUnrolled unrolled;
 	FTCPU ftcpu;
 	FDGPU fdgpu;
 	FTGPU ftgpu;
 	byte[] convolverPrefs;
+	boolean hasgpu;
 	Preferences p;
 	
 	/*
@@ -47,41 +48,37 @@ public class Convolver {
 	 * 3, 5, 7, 9, 11, 13, 21, 31, 63, 127, 255, larger
 	 * just handle with a switch statement
 	 */
-		
-	public Convolver(int boundaryConditions) {
-		this.boundaryConditions = boundaryConditions;
-		naive = new FDCPUNaive(boundaryConditions);
-		unrolled = new FDCPUUnrolled(boundaryConditions);
-		ftcpu = new FTCPU();
-		fdgpu = new FDGPU(boundaryConditions);
-		ftgpu = new FTGPU();
-	}
-	
+
 	public Convolver() {
-		this.boundaryConditions = ZERO_BOUNDARY;
-		naive = new FDCPUNaive(boundaryConditions);
-		unrolled = new FDCPUUnrolled(boundaryConditions);
+		naive = new FDCPUNaive();
+		unrolled = new FDCPUUnrolled();
+		hasgpu = true;
 		ftcpu = new FTCPU();
-		fdgpu = new FDGPU(boundaryConditions);
-		ftgpu = new FTGPU();
+		try {
+			fdgpu = new FDGPU();
+			ftgpu = new FTGPU();
+		} catch (Exception e) {
+			System.out.println("OpenCL not detected, using GPU methods");
+			hasgpu = false;
+		}
 		readPreferences();
-	}	
+	}		
 	
 	public double[] convolve(double[] vector, double[] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
-		switch (pref) {
+		switch(convolverPrefs[pref]) {
 		case 0:
-			return naive.convolve(vector, kernel);
+			return FDCPUNaive.convolve(vector, kernel);
 		case 1:
 			return unrolled.convolve(vector, kernel);
 		case 2:
 			return fdgpu.convolve(vector, kernel);
 		case 3:
-			return ftcpu.convolve(vector, kernel, false);
+			return ComplexUtils.complex2Real(ftcpu.convolve(ComplexUtils.real2Complex(vector), ComplexUtils.real2Complex(kernel)));
 		case 4:
-			return ftgpu.convolve(vector, kernel, false);
+			return ComplexUtils.complex2Real(ftgpu.convolve(ComplexUtils.real2Complex(vector), ComplexUtils.real2Complex(kernel)));
 		}
-		throw new RuntimeException("Invalid preference value");
+		throw new RuntimeException("Invalid preference value :"+pref);
 	}
 	
 	public double[][] convolve(double[][] image, double[] kernel, int dim) {
@@ -124,11 +121,11 @@ public class Convolver {
 	
 	public Complex[] convolve(Complex[] vector, double[] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
-		switch (pref) {
+		switch(convolverPrefs[pref]) {
 		case 0:
 			return ComplexUtils.split2Complex(
-					naive.convolve(ComplexUtils.complex2Real(vector), kernel),
-					naive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+					FDCPUNaive.convolve(ComplexUtils.complex2Real(vector), kernel),
+					FDCPUNaive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 1:
 			return ComplexUtils.split2Complex(
@@ -141,9 +138,9 @@ public class Convolver {
 					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 3:
-			return ftcpu.convolve(vector, kernel);
+			return ftcpu.convolve(vector, ComplexUtils.real2Complex(kernel));
 		case 4:
-			return ftgpu.convolve(vector, kernel);
+			return ftgpu.convolve(vector, ComplexUtils.real2Complex(kernel));
 		}
 		throw new RuntimeException("Invalid preference value");
 	}
@@ -186,30 +183,79 @@ public class Convolver {
 		return convolve(volume, kernel, 0);
 	}
 	
+	public Complex[] convolve(Complex[] vector, Complex[] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch(convolverPrefs[pref]) {
+		case 3:
+			return ftcpu.convolve(vector, kernel);
+		case 4:
+			return ftgpu.convolve(vector, kernel);
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+	
+	public Complex[][] convolve(Complex[][] image, Complex[] kernel, int dim) {
+		if (dim > 1) throw new RuntimeException("2D image, 1D kernel: Invalid dim specification");
+		if (dim == 0) image = JVCLUtils.shiftDim(image);
+		int height = image.length;
+		for (int n = 0; n < height; n++) {
+			image[n] = convolve(image[n], kernel);
+		}
+		if (dim == 0) {
+			return JVCLUtils.shiftDim(image);
+		} else {
+			return image;
+		}
+	}
+	
+	public Complex[][] convolve(Complex[][] image, Complex[] kernel) {
+		return convolve(image, kernel, 0);
+	}
+	
+	public Complex[][][] convolve(Complex[][][] volume, Complex[] kernel, int dim) {
+		if (dim == 0) volume = JVCLUtils.shiftDim(volume, 2);
+		if (dim == 1) volume = JVCLUtils.shiftDim(volume, 1);
+		if (dim > 2) throw new RuntimeException("Invalid dim");
+		
+		int volumeWidth = volume.length;
+		int volumeHeight = volume[0].length;
+		
+		for (int x = 0; x < volumeWidth; x++) {
+			for (int y = 0; y < volumeHeight; y++) {
+				volume[x][y] = convolve(volume[x][y], kernel);
+			}
+		}
+		return volume;
+	}
+	
+	public Complex[][][] convolve(Complex[][][] volume, Complex[] kernel) {
+		return convolve(volume, kernel, 0);
+	}
+	
 	public double[][] convolve(double[][] vector, double[][] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
-		switch (pref) {
+		switch(convolverPrefs[pref]) {
 		case 0:
-			return naive.convolve(vector, kernel);
+			return FDCPUNaive.convolve(vector, kernel);
 		case 1:
 			return unrolled.convolve(vector, kernel);
 		case 2:
 			return fdgpu.convolve(vector, kernel);
 		case 3:
-			return ftcpu.convolve(vector, kernel);
+			return ComplexUtils.complex2Real(ftcpu.convolve(ComplexUtils.real2Complex(vector), ComplexUtils.real2Complex(kernel)));
 		case 4:
-			return ftgpu.convolve(vector, kernel, false);
+			return ComplexUtils.complex2Real(ftgpu.convolve(ComplexUtils.real2Complex(vector), ComplexUtils.real2Complex(kernel)));
 		}
 		throw new RuntimeException("Invalid preference value");
 	}
 	
 	public Complex[][] convolve(Complex[][] vector, double[][] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
-		switch (pref) {
+		switch(convolverPrefs[pref]) {
 		case 0:
 			return ComplexUtils.split2Complex(
-					naive.convolve(ComplexUtils.complex2Real(vector), kernel),
-					naive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+					FDCPUNaive.convolve(ComplexUtils.complex2Real(vector), kernel),
+					FDCPUNaive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 1:
 			return ComplexUtils.split2Complex(
@@ -221,6 +267,18 @@ public class Convolver {
 					fdgpu.convolve(ComplexUtils.complex2Real(vector), kernel),
 					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
+		case 3:
+			return ftcpu.convolve(vector, ComplexUtils.real2Complex(kernel));
+		case 4:
+			return ftgpu.convolve(vector, ComplexUtils.real2Complex(kernel));
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+	
+
+	public Complex[][] convolve(Complex[][] vector, Complex[][] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch(convolverPrefs[pref]) {
 		case 3:
 			return ftcpu.convolve(vector, kernel);
 		case 4:
@@ -231,28 +289,28 @@ public class Convolver {
 
 	public double[][][] convolve(double[][][] vector, double[][][] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
-		switch (pref) {
+		switch(convolverPrefs[pref]) {
 		case 0:
-			return naive.convolve(vector, kernel);
+			return FDCPUNaive.convolve(vector, kernel);
 		case 1:
 			return unrolled.convolve(vector, kernel);
 		case 2:
 			return fdgpu.convolve(vector, kernel);
 		case 3:
-			return ftcpu.convolve(vector, kernel, false);
+			return ComplexUtils.complex2Real(ftcpu.convolve(ComplexUtils.real2Complex(vector), ComplexUtils.real2Complex(kernel)));
 		case 4:
-			return ftgpu.convolve(vector, kernel, false);
+			return ComplexUtils.complex2Real(ftgpu.convolve(ComplexUtils.real2Complex(vector), ComplexUtils.real2Complex(kernel)));
 		}
 		throw new RuntimeException("Invalid preference value");
 	}
 	
 	public Complex[][][] convolve(Complex[][][] vector, double[][][] kernel) {
 		int pref = getPreferredConvolution(vector.length, kernel.length);
-		switch (pref) {
+		switch(convolverPrefs[pref]) {
 		case 0:
 			return ComplexUtils.split2Complex(
-					naive.convolve(ComplexUtils.complex2Real(vector), kernel),
-					naive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
+					FDCPUNaive.convolve(ComplexUtils.complex2Real(vector), kernel),
+					FDCPUNaive.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 1:
 			return ComplexUtils.split2Complex(
@@ -265,9 +323,20 @@ public class Convolver {
 					fdgpu.convolve(ComplexUtils.complex2Imaginary(vector), kernel)
 			);
 		case 3:
-			return ftcpu.convolve(vector, kernel, true);
+			return ftcpu.convolve(vector, ComplexUtils.real2Complex(kernel));
 		case 4:
-			return ftgpu.convolve(vector, kernel, true);
+			return ftgpu.convolve(vector, ComplexUtils.real2Complex(kernel));
+		}
+		throw new RuntimeException("Invalid preference value");
+	}
+	
+	public Complex[][][] convolve(Complex[][][] vector, Complex[][][] kernel) {
+		int pref = getPreferredConvolution(vector.length, kernel.length);
+		switch(convolverPrefs[pref]) {
+		case 3:
+			return ftcpu.convolve(vector, kernel);
+		case 4:
+			return ftgpu.convolve(vector, kernel);
 		}
 		throw new RuntimeException("Invalid preference value");
 	}
@@ -291,7 +360,7 @@ public class Convolver {
 	
 	
 	private int getPreferredConvolution(int vl, int kl) {
-		int row = JVCLUtils.nextPwr2(vl) - 6;
+		int row = FastMath.max((int)(FastMath.log(JVCLUtils.nextPwr2(vl))/FastMath.log(2) - 6), 0);
 		int col = -1;
 		if (kl <= 3) {
 			col = 0;
@@ -315,7 +384,7 @@ public class Convolver {
 			col = 9;
 		} else {
 			col = 10;
-		}
+		} 
 		return row*10 + col;
 	}
 	
@@ -324,6 +393,84 @@ public class Convolver {
 		convolverPrefs = p.getByteArray("preferences", new byte[60]);
 	}
 		
+	static public double[] applyBoundaries(double[] r, double[] g, int boundary) {
+		final int ri = r.length;
+		final int gi = g.length;
+		final int hgi = (int)( gi / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi - 1 : hgi;
+		switch (boundary) {
+			case FULL:
+				return r;
+			case SAME:
+				int rSameI = ri - hgi - hgie;
+				double[] rSame = new double[rSameI];
+				System.arraycopy(r, hgi, rSame, 0, rSameI);
+				return rSame;
+			case VALID:
+				int rValidI = ri - 2*hgi - 2*hgie;
+				double[] rValid = new double[rValidI];
+				System.arraycopy(r, hgi + hgie, rValid, 0, rValidI);
+				return rValid;
+		}
+		throw new RuntimeException("Invalid Boundary Condition");
+	}
+	
+	static public double[][] applyBoundaries(double[][] r, double[][] g, int boundary) {
+		final int ri = r.length;
+		final int rj = r[0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int hgi = (int)( (gi) / 2.0);
+		final int hgj = (int)( (gj) / 2.0);
+		//final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		//final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+		switch (boundary) {
+			case FULL:
+				return r;
+			case SAME:
+				int rSameI = ri - 2 * hgi;
+				int rSameJ = rj - 2 * hgj;
+				int sameStart = hgj;
+				double[][] rSame = new double[rSameI][rSameJ];
+				for (int i = 0; i < rSameI; i++) {
+					System.arraycopy(r[i], sameStart, rSame[i], 0, rSameJ);
+				}
+				return rSame;
+			case VALID:
+				int rValidI = ri - 2 * (2 * hgi + 1);
+				int rValidJ = rj - 2 * (2 * hgj + 1);
+				int validStart = 2 * hgj + 1;
+				double[][] rValid = new double[rValidI][rValidJ];
+				for (int i = 0; i < rValidI; i++) {
+					System.arraycopy(r, validStart, rValid, 0, rValidI);
+				}
+				return rValid;
+		}
+		throw new RuntimeException("Invalid Boundary Condition");
+	}
+	
+	public static void main(String[] args) {
+		int length = 16;
+		Convolver c = new Convolver();
+		double[] f = JVCLUtils.fillWithSecondOrder(length);
+		double[] g = new double[] {-1, 1};
+		JVCLUtils.display(
+				applyBoundaries(
+					c.convolve(f, g), 
+				g, FULL),
+			"Full", 8);
+		JVCLUtils.display(
+				applyBoundaries(
+					c.convolve(f, g), 
+				g, SAME),
+			"Same", 8);
+		JVCLUtils.display(
+				applyBoundaries(
+					c.convolve(f, g), 
+				g, VALID),
+			"Valid", 8);
+	}
+	
 }
 
 

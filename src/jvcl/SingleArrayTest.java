@@ -31,6 +31,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.apache.commons.math4.complex.Complex;
+
 import java.beans.*;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -130,13 +132,13 @@ public class SingleArrayTest {
 		for (arraySize = arrayMin; arraySize < arrayMax; arraySize += 32) {
 			for (kernelSize = kernelMin; kernelSize < arraySize; kernelSize = kernelSize * 2 - 1) {
 				pb.taskOutput.append(String.format("Array size %d Kernel Size %d \n", arraySize, kernelSize));
-				double[] array = new double[arraySize];
-				double[] kernel = new double[kernelSize];
+				Complex[] array = new Complex[arraySize];
+				Complex[] kernel = new Complex[kernelSize];
 				for (int x = 0; x < arraySize; x++) {
 					if (x < kernelSize) {
-						kernel[x] = random.nextDouble();
+						kernel[x] = new Complex(random.nextDouble());
 					}
-					array[x] = random.nextDouble();
+					array[x] = new Complex(random.nextDouble());
 				}
 				// FD Naive
 				start = System.currentTimeMillis();
@@ -167,7 +169,7 @@ public class SingleArrayTest {
 				// FTCPU
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					ftcpu.convolve(array, kernel, false);
+					ftcpu.convolve(array, kernel);
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
@@ -186,7 +188,7 @@ public class SingleArrayTest {
 					// FTGPU
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						ftgpu.convolve(array, kernel, false);
+						ftgpu.convolve(array, kernel);
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;
@@ -209,32 +211,34 @@ public class SingleArrayTest {
 	
 	private void run2dTests() {
 		long start, end, duration;
-		arraySize = 512;
+		arraySize = 256;
 		int kernelSize = 3;
 			while (kernelSize < arraySize) {
 				pb.taskOutput.append(String.format("Array size %d Kernel Size %d \n", arraySize, kernelSize));
-				double[][] array = new double[arraySize][arraySize];
-				double[][] kernel = new double[kernelSize][kernelSize];
+				Complex[][] array = new Complex[arraySize][arraySize];
+				Complex[][] kernel = new Complex[kernelSize][kernelSize];
 				for (int x = 0; x < arraySize; x++) {
 					for (int y = 0; y < arraySize; y++) {
 						if (x < kernelSize && y < kernelSize) {
-							kernel[x][y] = random.nextDouble();
+							kernel[x][y] = new Complex(random.nextDouble(), random.nextDouble());
 						}
-						array[x][y] = random.nextDouble();
+						array[x][y] = new Complex(random.nextDouble(), random.nextDouble());
 					}
 				}
 				// FD Naive
+				System.gc();
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					naive.convolve(array, kernel);
+					//naive.convolve(array, kernel);
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
-				pb.taskOutput.append(String.format("2D Naive FD: %.3f sec %n", duration / 1000.0 ));
+				//pb.taskOutput.append(String.format("2D Naive FD: %.3f sec %n", duration / 1000.0 ));
 				temp[NAIVE] = duration;
 				System.gc();
-				if (kernel.length <= 5) {
+				if (kernel.length <= 0) { // TEST REMOVE UNROLLED
 					// FD Unrolled
+					System.gc();
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
 						if (kernel.length == 3) {
@@ -250,11 +254,11 @@ public class SingleArrayTest {
 				} else {
 					temp[UNROLLED] = Integer.MAX_VALUE;
 				}
-				System.gc();
 				// FTCPU
+				System.gc();
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					ftcpu.convolve(array, kernel, false);
+					ftcpu.convolve(array, kernel);
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
@@ -262,6 +266,7 @@ public class SingleArrayTest {
 				temp[FTCPU] = duration;
 				if (hasOpenCL) {
 					// FDGPU
+					System.gc();
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
 						fdgpu.convolve(array, kernel);
@@ -270,17 +275,16 @@ public class SingleArrayTest {
 					duration = end-start;
 					pb.taskOutput.append(String.format("2D FD on GPU: %.3f sec %n", duration / 1000.0 ));
 					temp[FDGPU] = duration;
-					System.gc();
 					// FTGPU STRIDE
+					System.gc();
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						ftgpu.convolveStride(array, kernel, false);
+						ftgpu.convolve(array, kernel);
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;
-					pb.taskOutput.append(String.format("2D FT on GPU STRIDE: %.3f sec %n", duration / 1000.0 ));
+					pb.taskOutput.append(String.format("2D FT on GPU: %.3f sec %n", duration / 1000.0 ));
 					temp[FTGPU] = duration;
-					System.gc();
 				} else {
 					temp[FTGPU] = Integer.MAX_VALUE;
 					temp[FDGPU] = Integer.MAX_VALUE;
@@ -309,15 +313,15 @@ public class SingleArrayTest {
 		for (int arraySize = arrayMin; arraySize < arrayMax; arraySize += 32) {
 			for (int kernelSize = kernelMin; kernelSize < kernelMax; kernelSize = kernelSize * 2 - 1) {
 				pb.taskOutput.append(String.format("Array size %d Kernel Size %d \n", arraySize, kernelSize));
-				double[][][] array = new double[arraySize][arraySize][arraySize];
-				double[][][] kernel = new double[kernelSize][kernelSize][kernelSize];
+				Complex[][][] array = new Complex[arraySize][arraySize][arraySize];
+				Complex[][][] kernel = new Complex[kernelSize][kernelSize][kernelSize];
 				for (int x = 0; x < arraySize; x++) {
 					for (int y = 0; y < arraySize; y++) {
 						for (int z = 0; z < arraySize; z++) {
 							if (x < kernelSize && y < kernelSize && z < kernelSize) {
-								kernel[x][y][z] = random.nextDouble();
+								kernel[x][y][z] = new Complex(random.nextDouble(), random.nextDouble());
 							}
-							array[x][y][z] = random.nextDouble();
+							array[x][y][z] = new Complex(random.nextDouble(), random.nextDouble());
 						}
 					}
 				}
@@ -350,7 +354,7 @@ public class SingleArrayTest {
 				// FTCPU
 				start = System.currentTimeMillis();
 				for (int t = 0; t < 10; t++) {
-					ftcpu.convolve(array, kernel, false);
+					ftcpu.convolve(array, kernel);
 				}
 				end = System.currentTimeMillis();
 				duration = end-start;
@@ -360,7 +364,7 @@ public class SingleArrayTest {
 					// FDGPU
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						fdgpu.convolve(array, kernel);
+						//fdgpu.convolve(array, kernel);
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;
@@ -369,7 +373,7 @@ public class SingleArrayTest {
 					// FTGPU
 					start = System.currentTimeMillis();
 					for (int t = 0; t < 10; t++) {
-						ftgpu.convolve(array, kernel, false);
+						ftgpu.convolve(array, kernel);
 					}
 					end = System.currentTimeMillis();
 					duration = end-start;

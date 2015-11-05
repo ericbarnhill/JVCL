@@ -1,35 +1,35 @@
-// A simple image convolution kernel
 
-kernel void Convolve3d(global float *input,global float *mask,global float *output,int imageWidth, int imageHeight,int imageDepth,
-int kernelWidth, int kernelHeight, int kernelDepth, int halfWidth, int halfHeight, int halfDepth) 
+
+kernel void Convolve3d(global float* f, global float* g, global float* r, const int ri, const int rj, const int rk, const int gi, const int gj, const int gk, const int hgi, const int hgj, const int hgk, const int hgie, const int hgje, const int hgke)
 {
 	
-    int x = get_global_id(0);
-    int y = get_global_id(1);
-	int z = get_global_id(2);
-	int imageArea = imageWidth*imageHeight;
-	int kernelArea = kernelWidth*kernelHeight;
-	
-	if ( x >= halfWidth && x < imageWidth-halfWidth && y >= halfHeight && y < imageHeight - halfHeight &&
-			z >= halfDepth && z < imageDepth-halfDepth) {
-        float sum = (float)0;
-        for (int p = 0; p < kernelWidth; p++) {
-            for (int q = 0; q < kernelHeight; q++) {
-				for (int r = 0; r < kernelDepth; r++) {
-		            int mi = r*kernelArea + q*kernelWidth + p;
-		            int ix = x - halfWidth + p;
-		            int iy = y - halfHeight + q;
-					int iz = z - halfDepth + r;
-		            int i = iz*imageArea + iy*imageWidth + ix;
-		            sum += input[i] * mask[mi];
+    int i = get_global_id(0);
+    int j = get_global_id(1);
+	int k = get_global_id(2);
+	float sum = 0;
+	int ai, aj, ak, fInd, gInd;
+	for (int p = 0; p < gi; p++) {
+		for (int q = 0; q < gj; q++) {
+			for (int s = 0; s < gk; s++) {
+				ai = i + (p - hgie);
+				aj = j + (q - hgje);
+				ak = k + (s - hgke);
+				if (ai >= 0 && ai < ri) {
+					if (aj >= 0 && aj < rj) {
+						if (ak >= 0 && ak < rk) {
+							fInd = ak*ri*rj + aj*ri + ai;
+							gInd = (gi-1-p)*gi*gj +(gj-1-q)*gi + (gk-1-s);
+							sum += f[fInd]*g[gInd];
+								
+						}
+					}
 				}
-            }
-        }
-        output[z*imageArea + y*imageWidth + x] = sum;
-    } else {
-		output[z*imageArea + y*imageWidth + x] = (float)0;
+			}
+		}
 	}
+	r[k*ri*rj + j*ri +i] = sum; 
 	
+	barrier(CLK_LOCAL_MEM_FENCE);
 }
 
 

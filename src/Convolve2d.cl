@@ -1,67 +1,25 @@
-// A simple image convolution kernel
-#define ZERO_BOUNDARY 0
-#define MIRROR_BOUNDARY 1
-#define PERIODIC_BOUNDARY 2
 
-
-kernel void Convolve2d(global float *image,global float *mask,global float *result,const int imageWidth, const int imageHeight,
-const int kernelWidth, const int kernelHeight, const int halfWidth, const int halfHeight, const int boundaryConditions) {
-	int adjX, adjY, maskIndex, imageIndex;
-	float sum;
-    int x = get_global_id(0);
-    int y = get_global_id(1);
+kernel void Convolve2d(global float* f, global float* g, global float* r, const int ri, const int rj, const int gi, const int gj, const int hgi, const int hgj, const int hgie, const int hgje) {
 	
-	if ( x >= halfWidth && x < imageWidth-halfWidth && y >= halfHeight && y < imageHeight - halfHeight) {
-        sum = (float)0;
-        for(int p = 0; p < kernelWidth; p++) {
-            for(int q = 0; q < kernelHeight; q++) {
-                adjX = x - halfWidth + p;
-                adjY = y - halfHeight + q;
-				maskIndex = q*kernelWidth + p;
-                imageIndex = adjY*imageWidth + adjX;
-                sum += image[imageIndex] * mask[maskIndex];
-            }
-        }
-        result[y*imageWidth+x] = sum;
-    } else {
-		sum = (float)0;
-		for (int p = 0; p < kernelWidth; p++) {
-			for (int q = 0; q < kernelHeight; q++) {
-				adjX = x + (p - halfWidth);
-				adjY = y + (q - halfHeight);
-				if (adjX < 0) {
-					if (boundaryConditions == MIRROR_BOUNDARY) {
-						adjX = abs(adjX);
-					} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-						adjX = imageWidth + adjX;
-					}
-				} else if (adjX >= imageWidth) {
-					if (boundaryConditions == MIRROR_BOUNDARY) {
-						adjX = 2*imageWidth - adjX - 1;
-					} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-						adjX = adjX - imageWidth;
-					}
-				}
-				if (adjY < 0) {
-					if (boundaryConditions == MIRROR_BOUNDARY) {
-						adjY = abs(adjY);
-					} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-						adjY = imageWidth + adjY;
-					}
-				} else if (adjY >= imageHeight) {
-					if (boundaryConditions == MIRROR_BOUNDARY) {
-						adjY = 2*imageHeight - adjY - 1;
-					} else if (boundaryConditions == PERIODIC_BOUNDARY) {
-						adjY = adjY - imageHeight;
-					}
-				}
-				int maskIndex = q*kernelWidth + p;
-                int imageIndex = adjY*imageWidth + adjX;
-                sum += image[imageIndex] * mask[maskIndex];
-			} // for q
-		} // for p
-	} // if boundary
+    int i = get_global_id(0);
+    int j = get_global_id(1);
 
+	float sum = 0;
+	int ai, aj, fInd, gInd;
+	for (int p = 0; p < gi; p++) {
+		for (int q = 0; q < gj; q++) {
+			ai = i + (p - hgi);
+			aj = j + (q - hgj);
+			if (ai >= 0 && ai < ri) {
+				if (aj >= 0 && aj < rj) {
+                	fInd = aj*ri + ai;
+					gInd = (gj-1-q)*gi + (gi-1-p);
+					sum += f[fInd]*g[gInd];
+				}
+			}
+		}
+	}
+	r[j*ri + i] = sum;
 
-		barrier(CLK_LOCAL_MEM_FENCE);
+	barrier(CLK_LOCAL_MEM_FENCE);
 }
