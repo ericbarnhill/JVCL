@@ -134,19 +134,19 @@ public class JVCLUtils {
 		double[][][] result;
 		if (nDims == 1) {
 			result = new double[height][depth][width];
-			for (int x = 0; x < height; x++) {
-				for (int y = 0; y < depth; y++) {
-					for (int z = 0; z < width; z++) {
-						result[x][y][z] = volume[y][z][x];
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					for (int z = 0; z < depth; z++) {
+						result[y][z][x] = volume[x][y][z];
 					}
 				}
 			}
 		} else if (nDims == 2) {
 			result = new double[depth][width][height];
-			for (int x = 0; x < depth; x++) {
-				for (int y = 0; y < width; y++) {
-					for (int z = 0; z < height; z++) {
-						result[x][y][z] = volume[z][x][y];
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					for (int z = 0; z < depth; z++) {
+						result[z][x][y] = volume[x][y][z];
 					}
 				}
 			}
@@ -199,19 +199,19 @@ public class JVCLUtils {
 		Complex[][][] result;
 		if (nDims == 1) {
 			result = new Complex[height][depth][width];
-			for (int x = 0; x < height; x++) {
-				for (int y = 0; y < depth; y++) {
-					for (int z = 0; z < width; z++) {
-						result[x][y][z] = volume[y][z][x];
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					for (int z = 0; z < depth; z++) {
+						result[y][z][x] = volume[x][y][z];
 					}
 				}
 			}
 		} else if (nDims == 2) {
 			result = new Complex[depth][width][height];
-			for (int x = 0; x < depth; x++) {
-				for (int y = 0; y < width; y++) {
-					for (int z = 0; z < height; z++) {
-						result[x][y][z] = volume[z][x][y];
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					for (int z = 0; z < depth; z++) {
+						result[z][x][y] = volume[x][y][z];
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 package jvcl;
 
-//TODO: 2d against 1d methods etc.
+//NOTA BENE: Always convert complex to interleaved when in vector format if possible. Saves all kind of headaches.
 
 import static com.jogamp.opencl.CLMemory.Mem.READ_ONLY;
 import static com.jogamp.opencl.CLMemory.Mem.WRITE_ONLY;
@@ -26,7 +26,7 @@ import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
 
-public class FDGPU {
+public class FDGPU{
 	
     CLDevice device;
     CLCommandQueue queue;
@@ -36,33 +36,38 @@ public class FDGPU {
     int localWorkSize;
 	
 	public FDGPU() {
-		context = CLContext.create();
-		device = context.getMaxFlopsDevice();
-        queue = device.createCommandQueue();
-        Path currentRelativePath = Paths.get("");
-        String s = currentRelativePath.toAbsolutePath().toString();
-        System.out.println("Current relative path is: " + s);
-        String path="/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/";
-        String source1d = JVCLUtils.readFile(path+"src/Convolve1d.cl");
-        String source2d = JVCLUtils.readFile(path+"src/Convolve2d.cl");
-        String source3d = JVCLUtils.readFile(path+"src/Convolve3d.cl");
-        String source1dComplex = JVCLUtils.readFile(path+"src/Convolve1dComplex.cl");
-        String source2dComplex = JVCLUtils.readFile(path+"src/Convolve2dComplex.cl");
-        String source3dComplex = JVCLUtils.readFile(path+"src/Convolve3dComplex.cl");
-        String source21 = JVCLUtils.readFile(path+"src/Convolve21.cl");
-        String source21Complex = JVCLUtils.readFile(path+"src/Convolve21Complex.cl");
-        String source31 = JVCLUtils.readFile(path+"src/Convolve31.cl");
-        //String source31Complex = JVCLUtils.readFile(path+"src/Convolve31Complex.cl");
-        program1d = context.createProgram(source1d).build(); 
-        program2d = context.createProgram(source2d).build(); 
-        program3d = context.createProgram(source3d).build(); 
-        program21 = context.createProgram(source21).build();
-        program31 = context.createProgram(source31).build();
-        program1dComplex = context.createProgram(source1dComplex).build(); 
-        program2dComplex = context.createProgram(source2dComplex).build(); 
-        program3dComplex = context.createProgram(source3dComplex).build(); 
-        program21Complex = context.createProgram(source21Complex).build();
-		localWorkSize = min(device.getMaxWorkGroupSize(), 32);  // Local work size dimensions
+		//try {
+			context = CLContext.create();
+			device = context.getMaxFlopsDevice();
+	        queue = device.createCommandQueue();
+	        Path currentRelativePath = Paths.get("");
+	        String s = currentRelativePath.toAbsolutePath().toString();
+	        System.out.println("Current relative path is: " + s);
+	        String path="/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/";
+	        String source1d = JVCLUtils.readFile(path+"src/Convolve1d.cl");
+	        String source2d = JVCLUtils.readFile(path+"src/Convolve2d.cl");
+	        String source3d = JVCLUtils.readFile(path+"src/Convolve3d.cl");
+	        String source1dComplex = JVCLUtils.readFile(path+"src/Convolve1dComplex.cl");
+	        String source2dComplex = JVCLUtils.readFile(path+"src/Convolve2dComplex.cl");
+	        String source3dComplex = JVCLUtils.readFile(path+"src/Convolve3dComplex.cl");
+	        String source21 = JVCLUtils.readFile(path+"src/Convolve21.cl");
+	        String source21Complex = JVCLUtils.readFile(path+"src/Convolve21Complex.cl");
+	        String source31 = JVCLUtils.readFile(path+"src/Convolve31.cl");
+	        String source31Complex = JVCLUtils.readFile(path+"src/Convolve31Complex.cl");
+	        program1d = context.createProgram(source1d).build(); 
+	        program2d = context.createProgram(source2d).build(); 
+	        program3d = context.createProgram(source3d).build(); 
+	        program21 = context.createProgram(source21).build();
+	        program31 = context.createProgram(source31).build();
+	        program1dComplex = context.createProgram(source1dComplex).build(); 
+	        program2dComplex = context.createProgram(source2dComplex).build(); 
+	        program3dComplex = context.createProgram(source3dComplex).build(); 
+	        program21Complex = context.createProgram(source21Complex).build();
+	        program31Complex = context.createProgram(source31Complex).build();
+			localWorkSize = min(device.getMaxWorkGroupSize(), 32);  // Local work size dimensions
+		//} catch (Exception e) {
+		//	throw new NoGPUException(); 
+		//}
 	}
 
 	public double[] convolve(double[] f, double[] g) {
@@ -147,7 +152,7 @@ public class FDGPU {
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj, WRITE_ONLY);
-        clF.getBuffer().put(JVCLUtils.vectorise(JVCLUtils.double2Float(fPad))).rewind();
+        clF.getBuffer().put(JVCLUtils.double2Float(JVCLUtils.vectorise(fPad))).rewind();
         clG.getBuffer().put(JVCLUtils.double2Float(g)).rewind();
         CLKernel Kernel = program21.createCLKernel("Convolve21");
         Kernel.putArg(clF)
@@ -177,7 +182,10 @@ public class FDGPU {
 	}
 	
 	public Complex[][] convolve(Complex[][] f, Complex[] g, int dim) {
-		if (dim == 1) f = JVCLUtils.shiftDim(f);
+		if (dim == 1) {
+			f = JVCLUtils.shiftDim(f);
+		}
+        JVCLUtils.display(JVCLUtils.vectorise(f), "21c f", f.length);
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int gi = g.length;
@@ -189,8 +197,8 @@ public class FDGPU {
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*2, WRITE_ONLY);
-        clF.getBuffer().put(JVCLUtils.vectorise(ComplexUtils.complex2InterleavedFloat(fPad))).rewind();
-        JVCLUtils.display(JVCLUtils.vectorise(ComplexUtils.complex2InterleavedFloat(fPad)), "21c fpad", ri*2);
+        clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(JVCLUtils.vectorise(fPad))).rewind();
+        JVCLUtils.display(ComplexUtils.complex2InterleavedFloat(JVCLUtils.vectorise(fPad)), "21c fpad", ri*2);
         clG.getBuffer().put(ComplexUtils.complex2InterleavedFloat(g)).rewind();
         CLKernel Kernel = program21Complex.createCLKernel("Convolve21Complex");
         Kernel.putArg(clF)
@@ -205,7 +213,7 @@ public class FDGPU {
         	.putWriteBuffer(clG, false)
         	.put2DRangeKernel(Kernel, 0, 0, ri, fj, 0,0)
         	.putReadBuffer(clR, true);
-		float[] resultVec = new float[ri*fj];
+		float[] resultVec = new float[ri*fj*2];
 		clR.getBuffer().get(resultVec);  
 		clF.release();
 		clG.release();
@@ -234,23 +242,22 @@ public class FDGPU {
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*fk, WRITE_ONLY);
-        clF.getBuffer().put(JVCLUtils.vectorise(JVCLUtils.double2Float(fPad))).rewind();
+        clF.getBuffer().put(JVCLUtils.double2Float(JVCLUtils.vectorise(fPad))).rewind();
         clG.getBuffer().put(JVCLUtils.double2Float(g)).rewind();
-        CLKernel Kernel = program21.createCLKernel("Convolve21");
+        CLKernel Kernel = program31.createCLKernel("Convolve31");
         Kernel.putArg(clF)
         	.putArg(clG)
         	.putArg(clR)
         	.putArg(ri)
         	.putArg(fj)
-        	.putArg(fk)
         	.putArg(gi)
         	.putArg(hgi)
         	.putArg(hgie);
         queue.putWriteBuffer(clF, false)
         	.putWriteBuffer(clG, false)
-        	.put2DRangeKernel(Kernel, 0, 0, fj, ri, 0,0)
+        	.put3DRangeKernel(Kernel, 0, 0, 0, ri, fj, fk, 0,0, 0)
         	.putReadBuffer(clR, true);
-		float[] resultVec = new float[ri*fj];
+		float[] resultVec = new float[ri*fj*fk];
 		clR.getBuffer().get(resultVec);  
 		clF.release();
 		clG.release();
@@ -265,7 +272,7 @@ public class FDGPU {
 		return convolve(f, g, 0);
 	}
 	
-	/*
+
 	public Complex[][][] convolve(Complex[][][] f, Complex[] g, int dim) {
 		if (dim == 1) f = JVCLUtils.shiftDim(f, 1);
 		if (dim == 2) f = JVCLUtils.shiftDim(f, 2);
@@ -279,11 +286,11 @@ public class FDGPU {
 		Complex[][][] r = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk*2, READ_ONLY);
-        CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
+        CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*fk*2, WRITE_ONLY);
-        clF.getBuffer().put(JVCLUtils.vectorise(ComplexUtils.complex2InterleavedFloat(fPad),0)).rewind();
+        clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(JVCLUtils.vectorise(fPad))).rewind();
         clG.getBuffer().put(ComplexUtils.complex2InterleavedFloat(g)).rewind();
-        CLKernel Kernel = program21.createCLKernel("Convolve21");
+        CLKernel Kernel = program31Complex.createCLKernel("Convolve31Complex");
         Kernel.putArg(clF)
         	.putArg(clG)
         	.putArg(clR)
@@ -294,14 +301,14 @@ public class FDGPU {
         	.putArg(hgie);
         queue.putWriteBuffer(clF, false)
         	.putWriteBuffer(clG, false)
-        	.put2DRangeKernel(Kernel, 0, 0, fj, ri, 0,0)
+        	.put3DRangeKernel(Kernel, 0, 0, 0, ri, fj, fk, 0,0,0)
         	.putReadBuffer(clR, true);
-		float[] resultVec = new float[ri*fj];
+		float[] resultVec = new float[ri*fj*fk*2];
 		clR.getBuffer().get(resultVec);  
 		clF.release();
 		clG.release();
 		clR.release();
-        Complex[][][] result = JVCLUtils.devectorise(JVCLUtils.interleaved2Complex(resultVec), ri, fj, 0);    
+        Complex[][][] result = JVCLUtils.devectorise(ComplexUtils.interleaved2Complex(resultVec), ri, fj);    
         if (dim == 1) result = JVCLUtils.shiftDim(result, 2);
 		if (dim == 2) result = JVCLUtils.shiftDim(result, 1);
 		return result;
@@ -310,7 +317,8 @@ public class FDGPU {
 	public Complex[][][] convolve(Complex[][][] f, Complex[] g) {
 		return convolve(f, g, 0);
 	}
-	*/
+
+	
 	
 	public double[][] convolve(double[][] f, double[][] g) {
 		final int fi = f.length;
@@ -523,18 +531,20 @@ public class FDGPU {
 		
 		FDGPU fdgpu = new FDGPU();
 		try {
-			double[][] test = new double[16][16];
-			Complex[][] testC = new Complex[16][16];
+			double[][][] test = new double[16][16][16];
+			Complex[][][] testC = new Complex[16][16][16];
 			for (int n = 0; n < 16; n++) {
-				test[n] = JVCLUtils.fillWithSecondOrder(16);
-				testC[n] = ComplexUtils.real2Complex(JVCLUtils.fillWithSecondOrder(16));
+				for (int p = 0; p < 16; p++) {
+					test[n][p] = JVCLUtils.fillWithSecondOrder(16);
+					testC[n][p] = ComplexUtils.real2Complex(JVCLUtils.fillWithSecondOrder(16));
+				}
 			}
-			JVCLUtils.display(JVCLUtils.vectorise(testC), "vec 21C", testC.length);
+			//JVCLUtils.display(JVCLUtils.vectorise(testC), "vec 21C", testC.length);
 			//double[][] convolve21 = fdgpu.convolve(JVCLUtils.shiftDim(test), new double[] {1, -2, 1}, 0);
-			double[][] convolve21 = fdgpu.convolve(test, new double[] {1, -2, 1}, 1);
-			JVCLUtils.display(JVCLUtils.vectorise(convolve21), "convolve 21", convolve21.length);
-			Complex[][] convolve21C = fdgpu.convolve(testC, ComplexUtils.real2Complex(new double[] {1, -2, 1}), 1);
-			JVCLUtils.display(JVCLUtils.vectorise(convolve21C), "convolve 21C", convolve21C.length);
+			double[][][] convolve31 = fdgpu.convolve(test, new double[] {1, -2, 1}, 2);
+			JVCLUtils.display(JVCLUtils.vectorise(convolve31), "convolve 31", convolve31.length);
+			Complex[][][] convolve31C = fdgpu.convolve(testC, ComplexUtils.real2Complex(new double[] {1, -2, 1}), 2);
+			JVCLUtils.display(JVCLUtils.vectorise(convolve31C), "convolve 31C", convolve31C.length);
 			
 			/*
 			double[] f1 = JVCLUtils.fillWithSecondOrder(16);

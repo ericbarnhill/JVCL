@@ -21,6 +21,9 @@
 
 package jvcl;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.math4.complex.Complex;
 
 public class FDCPUUnrolled {
@@ -31,6 +34,9 @@ public class FDCPUUnrolled {
 	final int MIRROR_BOUNDARY = 1;
 	final int PERIODIC_BOUNDARY = 2;
 	
+	ExecutorService threadPool;
+	int cores;
+	
 	/** Unrolled convolutions for small kernels. This produces a performance boost despite the claims that the JVM makes it unnecessary,
 	* particularly when the convolution is fast enough that the JVM is still warming up. If you used the Autotuner the root Convolve class will
 	* call these unrolled methods when they benefit you.
@@ -38,6 +44,8 @@ public class FDCPUUnrolled {
 	*/
 	public FDCPUUnrolled(int boundaryConditions) {
 		this.boundaryConditions = boundaryConditions;
+		 cores = Runtime.getRuntime().availableProcessors();
+		 threadPool = Executors.newFixedThreadPool(cores);
 	}
 	
 	/** Unrolled convolutions for small kernels, see {@link #FDCPUUnrolled(int boundaryConditions) previous constructor}. Default boundaries
@@ -45,7 +53,39 @@ public class FDCPUUnrolled {
 	*/
 	public FDCPUUnrolled() {
 		this.boundaryConditions = ZERO_BOUNDARY;
+		cores = Runtime.getRuntime().availableProcessors();
+		threadPool = Executors.newFixedThreadPool(cores);
 	}
+	
+	class DTConvolver2d implements Runnable {
+		int x;
+		double[][] fPad, r;
+		double[] g;
+		public DTConvolver2d(double[][] fPad, double[] g, double[][] r, int x) {
+			this.fPad = fPad;
+			this.g = g;
+			this.x = x;
+			this.r = r;
+		}
+		public void run() {
+			r[x] = convolve10(fPad[x], g, r[x]);
+		}
+	}
+	
+	class DTConvolver3d implements Runnable {
+		int x, y;
+		double[][][] fPad, r;
+		double[] g;
+		public DTConvolver3d(double[][][] fPad, double[] g, double[][][] r, int x, int y) {
+			this.fPad = fPad;
+			this.g = g;
+			this.x = x;
+		}
+		public void run() {
+			r[x][y] = convolve10(fPad[x][y], g, r[x][y]);
+		}
+	}
+
 	
 	public double[] convolve(double[] vector, double[] kernel) {
 		if (kernel.length == 3) {
@@ -1145,5 +1185,96 @@ public class FDCPUUnrolled {
 		return result;
 		
 	}
+	
+	public double[] convolve10(double[] f, double[] g, double[] r) {
+		final int fi = f.length;
+		final int gi = g.length;
+		final int ri = r.length;
+		for (int x = 5; x <= ri-5; x++) {
+			r[x] = 
+				f[x-5]*g[9] + 
+				f[x-4]*g[8] + 
+				f[x-3]*g[7] + 
+				f[x-2]*g[6] + 
+				f[x-1]*g[5] + 
+				f[x]*g[4] + 
+				f[x+1]*g[3] + 
+				f[x+2]*g[2] + 
+				f[x+3]*g[1] + 
+				f[x+4]*g[0];
+		}
+		r[0] = f[0]*g[4] + f[1]*g[3] + f[2]*g[2] + f[3]*g[1] + f[4]*g[0];
+		r[1] = f[0]*g[5] + f[1]*g[4] + f[2]*g[3] + f[3]*g[2] + f[4]*g[1] + f[5]*g[0];
+		r[2] = f[0]*g[6] + f[1]*g[5] + f[2]*g[4] + f[3]*g[3] + f[4]*g[2]  + f[5]*g[1] + f[6]*g[0];
+		r[3] = f[0]*g[7] + f[1]*g[6] + f[2]*g[5] + f[3]*g[4] + f[4]*g[3]  + f[5]*g[2] + f[6]*g[1] + f[7]*g[0];
+		r[4] = f[0]*g[8] + f[1]*g[7] + f[2]*g[6] + f[3]*g[5] + f[4]*g[4]  + f[5]*g[3] + f[6]*g[2] + f[7]*g[1] + f[8]*g[0];
+		r[ri-1] = f[ri-1]*g[4] + f[ri-2]*g[5] + f[ri-3]*g[6] + f[ri-4]*g[7] + f[ri-5]*g[8] + f[ri-6]*g[9];
+		r[ri-2] = f[ri-1]*g[3] + f[ri-2]*g[4] + f[ri-3]*g[5] + f[ri-4]*g[6] + f[ri-5]*g[7] + f[ri-6]*g[8] + f[ri-7]*g[9];
+		r[ri-3] = f[ri-1]*g[2] + f[ri-2]*g[3] + f[ri-3]*g[4] + f[ri-4]*g[5] + f[ri-5]*g[6] + f[ri-6]*g[7] + f[ri-7]*g[8] + f[ri-8]*g[9];
+		r[ri-4] = f[ri-1]*g[1] + f[ri-2]*g[2] + f[ri-3]*g[3] + f[ri-4]*g[4] + f[ri-5]*g[5] + f[ri-6]*g[6] + f[ri-7]*g[7] + f[ri-8]*g[8] + f[ri-9]*g[9];
+		return r;
+	}
+	
+	public double[][] convolve10T(double[][] f, double[] g, int dim) {
+		if ( dim == 1) {
+			f = JVCLUtils.shiftDim(f);
+		}
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int gi = g.length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		double[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgi, 0, 0);
+		double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgi, 0, 0);
+		for (int x = 0; x < fi; x++) {
+			Runnable d = new DTConvolver2d(fPad, g, r, x);
+			threadPool.execute(d);
+		}
+		threadPool.shutdown();
+        while (!threadPool.isTerminated()) {
+        }
+        if ( dim == 1) {
+			f = JVCLUtils.shiftDim(r);
+		}
+        return r;
+	}
+	
+	public double[][] convolve10(double[][] f, double[] g, int dim) {
+		if ( dim == 1) {
+			f = JVCLUtils.shiftDim(f);
+		}
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int gi = g.length;
+		final int hgi = (int)( (gi - 1) / 2.0);
+		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+		double[][] fPad = JVCLUtils.zeroPadBoundaries(f, 0, 0, hgi, hgie);
+		double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], 0, 0, hgi, hgie);
+		for (int x = 0; x < fi; x++) {
+			r[x] = convolve10(fPad[x], g, r[x]);
+		}
+		if ( dim == 1) {
+			f = JVCLUtils.shiftDim(r);
+		}
+        return r;
+	}
+	
+	public static void main(String[] args) {
+		double[] g = new double[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+		double[][] f = new double[64][64];
+		for (int n = 0; n < 64; n++) {
+			f[n] = JVCLUtils.fillWithGradient(64);
+		}
+		FDCPUUnrolled u = new FDCPUUnrolled();
+		long t1 = System.currentTimeMillis();
+		//double[][] ft = u.convolve10T(f, g, 0);
+		long t2 = System.currentTimeMillis();
+		double[][] fnt = u.convolve10(f, g, 0);
+		long t3 = System.currentTimeMillis();
+		System.out.format("Threads %.3f No Threads %.3f %n", (t2-t1)/1000.0, (t3-t2)/1000.0);
+		JVCLUtils.display2DArray(fnt, fnt.length, fnt[0].length, fnt.length, 0);
+	}
+	
+	
 	
 }

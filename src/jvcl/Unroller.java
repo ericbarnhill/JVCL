@@ -40,6 +40,26 @@ public class Unroller {
 	}
 	
 
+	public static void makeUnroll(int xDim) {
+		
+		int halfWidth = xDim/2;
+		String xString = "";
+		System.out.println("result[x] = ");
+		for (int x = -halfWidth; x <= halfWidth; x++) {
+			if (x>=0) {
+				xString = String.format("[x+%d]",x);
+			} else {
+				xString = String.format("[x%d]",x);
+			}
+			System.out.format("volume%s*kernel[%d]",xString,x);
+			if (x == halfWidth) {
+				System.out.format(";%n");
+			} else {
+				System.out.format(" + %n");
+			}
+		}
+	}
+	
 	public static void makeUnrollComplex(int xDim, int yDim) {
 		int halfWidth = xDim/2;
 		int halfHeight = yDim/2;
@@ -106,10 +126,7 @@ public class Unroller {
 	
 	public static void main(String[] args) {
 		
-		Unroller.makeUnrollComplex(3,3);
-		Unroller.makeUnrollComplex(5,5);
-		Unroller.makeUnrollComplex(3,3,3);
-		Unroller.makeUnrollComplex(5,5,5);
+		Unroller.makeUnroll(10);
 		
 		
 	}

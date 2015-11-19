@@ -1,5 +1,5 @@
 
-kernel void Convolve31(global float* f, global float* g, global float* r, const int ri, const int rj, const int rk, const int gi, const int hgi, const int hgie) 
+kernel void Convolve31(global float* f, global float* g, global float* r, const int ri, const int rj, const int gi, const int hgi, const int hgie) 
 {
 	
     int i = get_global_id(0);
@@ -11,10 +11,10 @@ kernel void Convolve31(global float* f, global float* g, global float* r, const 
 	for (int p =  0; p < gi; p++) {
 		ai = i + p - hgie;
 		if (ai >= 0 && ai < ri) {
-			sum += f[ai+j*rj+k*rj*rk]*g[gi-1-p];
+			sum += f[ai+j*ri+k*ri*rj]*g[gi-1-p];
 		}
 	}
-	r[i+j*rj+k*rj*rk] = sum;
+	r[i+j*ri+k*ri*rj] = sum;
 
 	barrier(CLK_LOCAL_MEM_FENCE);
 		
