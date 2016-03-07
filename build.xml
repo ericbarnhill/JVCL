@@ -1,0 +1,25 @@
+<project name="JVCL" default="main" basedir=".">
+    <description>
+        TESTPlugin_ build file
+    </description>
+  	<property name="src" location="src" />
+  	<property name="build" location="bin" />
+	<property name="dist"  location="dist" />
+	<property name="MatlabMRE"  location="/home/ericbarnhill/Documents/MATLAB/MRElastography/" />
+ 	<property name="user.name" value="Eric Barnhill" />
+<target name="main" depends="compress" description="Main target">
+	<echo>
+		Building the .jar file.
+	</echo>
+</target>
+ <target name="compress" depends="" description="generate the distribution">
+ 	<jar jarfile="JVCL.jar">
+			<fileset dir="${build}" includes="**/*.*" />
+ 		<manifest>
+ 		 	 	      <attribute name="Built-By" value="${user.name}"/>
+ 		</manifest>
+ 	</jar>
+    <copy file="JVCL.jar" toDir="${MatlabMRE}" />
+ 	<move file="JVCL.jar" toDir="${dist}" />
+  </target>
+</project>
