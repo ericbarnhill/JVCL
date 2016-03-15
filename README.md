@@ -14,6 +14,8 @@ Formal testing is still to come, however initial tests suggested that contrary t
 
 To further support convolution unrolling, an Unroller class is in the package which will create a public unrolled Convolution method to dimensions of your specification, which can be added to the Unrolled.java source file. The ant buildfile can then be run to re-compile the package. This method will be streamlined in future releases.
 
+Also to come: a Fourier-domain convolution on the GPU using Stockham's FFT. It is close to operational but cannot be finished at this time, so I have excluded it.
+
 JVCL is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
   
 JVCL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with JVCL.  If not, see http://www.gnu.org/licenses/ .
