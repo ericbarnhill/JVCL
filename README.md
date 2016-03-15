@@ -28,16 +28,17 @@ This code uses methods from the JTransforms package by Piotr Wendykier. JTransfo
 
 
 
---- A glossary of variables
-f: array
-g: kernel
-r: result
-fi, fj, fk: array dimension
-gi, gj, gk: kernel dimension
-hgi, hgj, hgk = kernel half dimension
-ai, aj, ak = adjusted dimension
-i, j, k: array loops
-p, q, s: kernel loops
-
+<b>A glossary of variables</b>
+<ul>
+<li>f: array
+<li>g: kernel
+<li>r: result
+<li>fi, fj, fk: array dimension
+<li>gi, gj, gk: kernel dimension
+<li>hgi, hgj, hgk = kernel half dimension
+<li>ai, aj, ak = adjusted dimension
+<li>i, j, k: array loops
+<li>p, q, s: kernel loops
+</ul>
 
 
