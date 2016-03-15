@@ -1,6 +1,6 @@
 # JVCL
 
-Java Volumetric Convolution Library 0.1 (JVCL) (c) Eric Barnhill 2016 All Rights Reserved.
+Java Volumetric Convolution Library 0.1 (JVCL) (c) Eric Barnhill 2016 All Rights Reserved. [![DOI](https://zenodo.org/badge/20868/ericbarnhill/JVCL.svg)](https://zenodo.org/badge/latestdoi/20868/ericbarnhill/JVCL)
 
 Note: This package is in alpha until I code the JUnit tests, then it will move to beta.
 
