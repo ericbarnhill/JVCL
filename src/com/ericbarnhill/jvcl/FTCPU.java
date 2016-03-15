@@ -1,6 +1,27 @@
+/*
+ * (c) Eric Barnhill 2016 All Rights Reserved.
+ *
+ * This file is part of the Java Volumetric Convolution Library (JVCL). JVCL is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * JVCL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with JVCL.  If not, see http://www.gnu.org/licenses/ .
+ *
+ * This code uses software from the Apache Software Foundation.
+ * The Apache Software License can be found at: http://www.apache.org/licenses/LICENSE-2.0.txt .
+ *
+ * This code uses software from the JogAmp project.
+ * Jogamp information and software license can be found at: https://jogamp.org/ .
+ *
+ * This code uses methods from the JTransforms package by Piotr Wendykier.
+ * JTransforms information and software license can be found at: https://github.com/wendykierp/JTransforms .
+ *
+ */
 package com.ericbarnhill.jvcl;
-
-import java.util.Random;
 
 import org.apache.commons.math4.complex.Complex;
 import org.apache.commons.math4.complex.ComplexUtils;
@@ -11,149 +32,138 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
 
-
+/**
+ * This class performs Fourier-domain convolutions on the CPU.
+ * Arrays must be rectangular i.e. non-ragged. Array and kernel must have the same dimension.
+ *
+ * @author ericbarnhill
+ * @since 0.1
+ */
 public class FTCPU {
-		
-	public FTCPU() {
-	}
-	
-	public Complex[] convolve(Complex[] vector, Complex[] kernel) {
-		int vectorLength = vector.length;
-		int kernelLength = kernel.length;
-		double[] v = ComplexUtils.complex2Interleaved(
-						JVCLUtils.zeroPadBoundaries(vector, kernelLength)
+
+	/**
+	 * Convolve 1D {@code Complex[]} array with 1D {@code Complex[]} g
+	 * @param f {@code Complex[]} array
+	 * @param g {@code Complex[]} g
+	 * @return {@code Complex[]}
+	 */
+	public static Complex[] convolve(Complex[] f, Complex[] g) {
+		final int fi = f.length;
+		final int gi = g.length;
+		final int pad = gi*2;
+		final double[] v = ComplexUtils.complex2Interleaved(
+						JVCLUtils.zeroPadBoundaries(f, pad)
 					);
-		double[] k = JVCLUtils.deepCopyToPadded(
+		final double[] k = JVCLUtils.deepCopyToPadded(
 						ComplexUtils.complex2Interleaved(
-							JVCLUtils.zeroPadBoundaries(kernel, kernelLength)
+							JVCLUtils.zeroPadBoundaries(g, pad)
 						),
 					v.length);
-		DoubleFFT_1D fft = new DoubleFFT_1D(v.length/2);
+		final DoubleFFT_1D fft = new DoubleFFT_1D(v.length/2);
 		fft.complexForward(v);
 		fft.complexForward(k);
 		ArrayMath.multiply(v, k);
 		fft.complexInverse(v, true);
-		return 	JVCLUtils.stripEndPadding(
-					JVCLUtils.stripBorderPadding(
+		return 	JVCLUtils.stripBorderPadding(
 						ComplexUtils.interleaved2Complex(
-								v), 
-						kernelLength),
-					vectorLength);
+								v),
+						pad, pad);
 	}
-	
-	public double[] convolve(double[] image, double[] kernel) {
+
+	/**
+	 * Convolve 1D {@code double[]} array with 1D {@code double[]} g
+	 * @param f {@code double[]} array
+	 * @param g {@code double[]} g
+	 * @return {@code double[]}
+	 */
+	public static double[] convolve(double[] f, double[] g) {
 		return ComplexUtils.complex2Real(
-				convolve(ComplexUtils.real2Complex(image), ComplexUtils.real2Complex(kernel)
+				convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
 						)
 				);
 	}
-	
-	public Complex[][] convolve(Complex[][] image, Complex[][] kernel) {
-		int imageWidth = image.length;
-		int imageHeight = image[0].length;
-		int kernelWidth = kernel.length;
-		int kernelHeight = kernel[0].length;
-		int imageWidthInterleaved = imageWidth;
-		int imageHeightInterleaved = 2*imageHeight;
-		int kernelWidthInterleaved = kernelWidth;
-		int kernelHeightInterleaved = 2*kernelHeight;
-		int paddedWidth = imageWidthInterleaved+2*kernelWidthInterleaved;
-		int paddedHeight = imageHeightInterleaved+2*kernelHeightInterleaved;
-		double[][] v = JVCLUtils.zeroPadBoundaries(
-							ComplexUtils.complex2Interleaved(image),
-					kernelWidthInterleaved, kernelHeightInterleaved);
-		double[][] k = JVCLUtils.deepCopyToPadded(
+
+	/**
+	 * Convolve 2D {@code Complex[][]} array with 2D {@code Complex[][]} g
+	 * @param f {@code Complex[][]} array
+	 * @param g {@code Complex[][]} g
+	 * @return {@code Complex[][]}
+	 */
+	public static Complex[][] convolve(Complex[][] f, Complex[][] g) {
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int fiInterleaved = fi;
+		final int fjInterleaved = 2*fj;
+		final int giInterleaved = gi;
+		final int gjInterleaved = 2*gj;
+		final int fiPadded = fiInterleaved+2*giInterleaved;
+		final int fjPadded = fjInterleaved+2*gjInterleaved;
+		final double[][] v = JVCLUtils.zeroPadBoundaries(
+							ComplexUtils.complex2Interleaved(f),
+					giInterleaved, gjInterleaved);
+		final double[][] k = JVCLUtils.deepCopyToPadded(
 						JVCLUtils.zeroPadBoundaries(
-								ComplexUtils.complex2Interleaved(kernel),
-						kernelWidthInterleaved, kernelHeightInterleaved),
-						paddedWidth, paddedHeight);
-		DoubleFFT_2D fft = new DoubleFFT_2D(paddedWidth, paddedHeight/2);
+								ComplexUtils.complex2Interleaved(g),
+						giInterleaved, gjInterleaved),
+						fiPadded, fjPadded);
+		final DoubleFFT_2D fft = new DoubleFFT_2D(fiPadded, fjPadded/2);
 		fft.complexForward(v);
 		fft.complexForward(k);
 		ArrayMath.multiply(v,k);
 		fft.complexInverse(v, true);
 		return ComplexUtils.interleaved2Complex(
 				JVCLUtils.stripBorderPadding(
-					v, kernelWidthInterleaved, kernelHeightInterleaved)
+					v, 2*giInterleaved, 2*gjInterleaved)
 				);
 	}
-	
-	public Complex[][][] convolve(Complex[][][] volume, Complex[][][] kernel) {
-		
-		int volumeWidth = volume.length;
-		int volumeHeight = volume[0].length;
-		int volumeDepth = volume[0][0].length;
-		int kernelWidth = kernel.length;
-		int kernelHeight = kernel[0].length;
-		int kernelDepth = kernel[0][0].length;
-		int volumeWidthInterleaved = 2*volumeWidth;
-		int volumeHeightInterleaved = 2*volumeHeight;
-		int volumeDepthInterleaved = 2*volumeDepth;
-		int kernelWidthInterleaved = 2*kernelWidth;
-		int kernelHeightInterleaved = 2*kernelHeight;
-		int kernelDepthInterleaved = 2*kernelDepth;
-		int paddedWidth = JVCLUtils.nextPwr2(volumeWidthInterleaved+2*kernelWidthInterleaved);
-		int paddedHeight = JVCLUtils.nextPwr2(volumeHeightInterleaved+2*kernelHeightInterleaved);
-		int paddedDepth = JVCLUtils.nextPwr2(volumeDepthInterleaved+2*kernelDepthInterleaved);
-		double[][][] v = JVCLUtils.zeroPadBoundaries(
-							ComplexUtils.complex2Interleaved(volume), 
-					kernelWidthInterleaved, kernelHeightInterleaved, kernelDepthInterleaved
+
+	/**
+	 * Convolve 3D {@code Complex[][][]} array with 2D {@code Complex[][][]} g
+	 * @param f {@code Complex[][][]} array
+	 * @param g {@code Complex[][][]} g
+	 * @return {@code Complex[][][]}
+	 */
+	public static Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
+
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int fk = f[0][0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int gk = g[0][0].length;
+		final int fiInterleaved = 2*fi;
+		final int fjInterleaved = 2*fj;
+		final int fkInterleaved = 2*fk;
+		final int giInterleaved = 2*gi;
+		final int gjInterleaved = 2*gj;
+		final int gkInterleaved = 2*gk;
+		final int fiPadded = JVCLUtils.nextPwr2(fiInterleaved+2*giInterleaved);
+		final int fjPadded = JVCLUtils.nextPwr2(fjInterleaved+2*gjInterleaved);
+		final int paddedDepth = JVCLUtils.nextPwr2(fkInterleaved+2*gkInterleaved);
+		final double[][][] v = JVCLUtils.zeroPadBoundaries(
+							ComplexUtils.complex2Interleaved(f),
+					giInterleaved, gjInterleaved, gkInterleaved
 				);
-		double[][][] k = JVCLUtils.deepCopyToPadded(
+		final double[][][] k = JVCLUtils.deepCopyToPadded(
 					JVCLUtils.zeroPadBoundaries(
-						ComplexUtils.complex2Interleaved(volume), 
-						kernelWidthInterleaved, kernelHeightInterleaved, kernelDepthInterleaved), 
-					paddedWidth, paddedHeight, paddedDepth);
-		DoubleFFT_3D fft = new DoubleFFT_3D(paddedWidth, paddedHeight, paddedDepth);
+						ComplexUtils.complex2Interleaved(f),
+						giInterleaved, gjInterleaved, gkInterleaved),
+					fiPadded, fjPadded, paddedDepth);
+		final DoubleFFT_3D fft = new DoubleFFT_3D(fiPadded, fjPadded, paddedDepth);
 		fft.complexForward(v);
 		fft.complexForward(k);
 		ArrayMath.multiply(v, k);
 		fft.complexInverse(v, true);
 		return ComplexUtils.interleaved2Complex(
 					JVCLUtils.stripBorderPadding(v,
-					kernelWidthInterleaved, kernelHeightInterleaved, kernelDepthInterleaved)
+					giInterleaved, gjInterleaved, gkInterleaved)
 			);
-		
+
 	}
 
-	public double[] fft(double[] vec, boolean forward) {
-		DoubleFFT_1D fft = new DoubleFFT_1D(vec.length/2);
-		if (forward) {
-			fft.complexForward(vec);
-		} else {
-			fft.complexInverse(vec, true);
-		}
-		return vec;
-	}
-	
-	public static void main(String[] args) {
-		Random random = new Random();
-		int arraySize = 512;
-		int kernelSize = 7;
-		long start, end, duration;
-		FTCPU ftcpu = new FTCPU();
-		System.out.format("Array size %d Kernel Size %d \n", arraySize, kernelSize);
-		double[][] array = new double[arraySize][arraySize];
-		double[][] kernel = new double[kernelSize][kernelSize];
-		for (int x = 0; x < arraySize; x++) {
-			for (int y = 0; y < arraySize; y++) {
-				if (x < kernelSize && y < kernelSize) {
-					kernel[x][y] = random.nextDouble();
-				}
-				array[x][y] = random.nextDouble();
-			}
-		}
-		start = System.currentTimeMillis();
-		for (int t = 0; t < 10; t++) {
-			ftcpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
-			System.out.println("---");
-		}
-		end = System.currentTimeMillis();
-		duration = end-start;
-		System.out.format("2D FT on CPU: %.1f sec %n", duration / 1000.0 );
-		System.out.println("Done");
-	}
-	
+
 }
 
 

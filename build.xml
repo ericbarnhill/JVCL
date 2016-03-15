@@ -1,25 +1,47 @@
 <project name="JVCL" default="main" basedir=".">
     <description>
-        TESTPlugin_ build file
+        JVCL build file
     </description>
-  	<property name="src" location="src" />
-  	<property name="build" location="bin" />
-	<property name="dist"  location="dist" />
-	<property name="MatlabMRE"  location="/home/ericbarnhill/Documents/MATLAB/MRElastography/" />
- 	<property name="user.name" value="Eric Barnhill" />
-<target name="main" depends="compress" description="Main target">
-	<echo>
-		Building the .jar file.
-	</echo>
-</target>
- <target name="compress" depends="" description="generate the distribution">
- 	<jar jarfile="JVCL.jar">
-			<fileset dir="${build}" includes="**/*.*" />
- 		<manifest>
- 		 	 	      <attribute name="Built-By" value="${user.name}"/>
- 		</manifest>
- 	</jar>
-    <copy file="JVCL.jar" toDir="${MatlabMRE}" />
- 	<move file="JVCL.jar" toDir="${dist}" />
-  </target>
+	<property name="proj.dir" location="."/>
+ 	<property name="src.dir" location="src" />
+ 	<property name="build.dir" location="bin" />
+ 	<property name="dist.dir"  location="dist" />
+ 	<property name="doc.dir" location="doc" />
+ 	<property name="home" location="/home/ericbarnhill"/>
+ 	<property name="code" location="${home}/Documents/code" />
+ 	<property name="commons.math" location="${code}/commons-math-fork/commons-math/target/classes/" />
+	<property name="user.name" value="Eric Barnhill" /> 
+	<target name="main" depends="doc" description="Main target">
+		<echo>
+			Building the .jar file.
+		</echo>
+	</target>
+	 <target name="compress" depends="" description="generate the distribution">
+	 	<jar jarfile="JVCL.jar">
+		 	<manifest>
+		 	<attribute name="Author" value="${user.name}" />
+            <attribute name="Main-Class" value="com.ericbarnhill.jvcl.FDCPU"/>
+            <attribute name="Class-Path" value="."/>
+        </manifest>
+        <fileset dir="${build.dir}"/>
+        <zipfileset excludes="META-INF/*.SF" src="${home}/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="${home}/Documents/code/jogamp/jocl/build/jar/jocl.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="${home}/Documents/code/jogamp/gluegen/build/gluegen-rt.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="${home}/Documents/code/jtransforms-2.4.jar"/>
+        <fileset dir="${proj.dir}/../ArrayMath/bin"/>
+        <fileset dir="${commons.math}"/>
+        <zipfileset excludes="META-INF/*.SF" src="${home}/Documents/code/commons-lang3-3.1/commons-lang3-3.1.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar"/>
+	 	</jar>
+	 	<move file="JVCL.jar" toDir="${dist.dir}" />
+	  </target>
+	 <target name="doc" depends="compress" description="generate documentation">
+	 	<delete dir="${doc.dir}" />
+	 	<javadoc access="protected" author="true" classpath="/home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar:/home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar:/home/ericbarnhill/.p2/pool/plugins/org.hamcrest.core_1.3.0.v201303031735.jar:/home/ericbarnhill/Documents/code/commons-lang3-3.1/commons-lang3-3.1.jar:/home/ericbarnhill/JUnit/bin:/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar:/home/ericbarnhill/Documents/code/jtransforms-2.4.jar:/home/ericbarnhill/Documents/code/commons-math-fork/commons-math/target/test-classes:/home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar:/home/ericbarnhill/.p2/pool/plugins/org.junit_4.12.0.v201504281640/junit.jar:/home/ericbarnhill/Documents/code/commons-math-fork/commons-math/target/classes:../ArrayMath/bin" destdir="doc" doctitle="Java ArrayMath API Documentation" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.ericbarnhill.jvcl" source="1.7" sourcepath="src" splitindex="true" use="true" version="true">
+	 	    <link href="file:/home/ericbarnhill/barnhill-eclipse-workspace/ArrayMath/doc/"/>
+        	<link href="file:/home/ericbarnhill/Documents/code/commons-math-fork/commons-math/doc/"/>
+	 		<link href="/home/ericbarnhill/Documents/code/jogamp/jocl/build/javadoc/jocl/javadoc" />
+	 	</javadoc>
+	  </target>
+
 </project>

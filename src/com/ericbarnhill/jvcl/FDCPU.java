@@ -1,281 +1,532 @@
-/* Copyright (c) 2015 Eric Barnhill
-*
-*Permission is hereby granted, free of charge, to any person obtaining a copy
-*of this software and associated documentation files (the "Software"), to deal
-*in the Software without restriction, including without limitation the rights
-*to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-*copies of the Software, and to permit persons to whom the Software is
-*furnished to do so, subject to the following conditions:
-*
-*The above copyright notice and this permission notice shall be included in all
-*copies or substantial portions of the Software.
-*
-*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-*IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-*FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-*LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-*OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-*SOFTWARE.
-*/
+/*
+ * (c) Eric Barnhill 2016 All Rights Reserved.
+ *
+ * This file is part of the Java Volumetric Convolution Library (JVCL). JVCL is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * JVCL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with JVCL.  If not, see http://www.gnu.org/licenses/ .
+ *
+ * This code uses software from the Apache Software Foundation.
+ * The Apache Software License can be found at: http://www.apache.org/licenses/LICENSE-2.0.txt .
+ *
+ * This code uses software from the JogAmp project.
+ * Jogamp information and software license can be found at: https://jogamp.org/ .
+ *
+ * This code uses methods from the JTransforms package by Piotr Wendykier.
+ * JTransforms information and software license can be found at: https://github.com/wendykierp/JTransforms .
+ *
+ */
 
 package com.ericbarnhill.jvcl;
 
 import org.apache.commons.math4.complex.Complex;
 import org.apache.commons.math4.complex.ComplexUtils;
+import org.apache.commons.math4.exception.OutOfRangeException;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 
+/**
+ * This class performs naive Finite-Differences convolutions on the CPU.
+ *
+ * @author ericbarnhill
+ * @since 0.1
+ *
+ */
 public class FDCPU {
+    /**
+     * Convolve 1D {@code double[]} array with 1D {@code double[]} kernel
+     * 
+     * @param f
+     *            {@code double[]} array
+     * @param g
+     *            {@code double[]} kernel
+     * @return {@code double[]}
+     */
+    public static double[] convolve(double[] f, double[] g) {
+        final int fi = f.length;
+        final int gi = g.length;
+        final int hgi = (int) ((gi - 1) / 2.0);
+        final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+        double[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
+        double[] r = JVCLUtils.zeroPadBoundaries(new double[fi], hgi, hgie);
+        final int ri = r.length;
+        int ai;
+        for (int i = 0; i < ri; i++) {
+            for (int p = 0; p < gi; p++) {
+                ai = i + p - hgie;
+                if (ai >= 0 && ai < ri) {
+                    r[i] += fPad[ai] * g[gi - 1 - p];
+                }
+            }
+        }
+        return r;
+    }
 
-	/** Default constructor sets zero boundary conditions 
-	*/
-	public FDCPU() {
-	}
-	
-	/*
-	 * A glossary of variables
-	 * f: array
-	 * g: kernel
-	 * r: result
-	 * fi, fj, fk: array dimension
-	 * gi, gj, gk: kernel dimension
-	 * hgi, hgj, hgk = kernel half dimension
-	 * ai, aj, ak = adjusted dimension
-	 * i, j, k: array loops
-	 * p, q, s: kernel loops
-	 */
+    /**
+     * Convolve 1D {@code Complex[]} array with 1D {@code Complex[]} kernel
+     * 
+     * @param f
+     *            {@code Complex[]} array
+     * @param g
+     *            {@code Complex[]} kernel
+     * @return {@code Complex[]}
+     */
+    public static Complex[] convolve(Complex[] f, Complex[] g) {
+        final int fi = f.length;
+        final int gi = g.length;
+        final int hgi = (int) ((gi - 1) / 2.0);
+        final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+        Complex[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
+        Complex[] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi]), hgi, hgie);
+        final int ri = r.length;
+        int ai;
+        for (int i = 0; i < ri; i++) {
+            for (int p = 0; p < gi; p++) {
+                ai = i + p - hgie;
+                if (ai >= 0 && ai < ri) {
+                    r[i] = r[i].add(fPad[ai].multiply(g[gi - 1 - p]));
+                }
+            }
+        }
+        return r;
+    }
 
-	public static double[] convolve(double[] f, double[] g) {
-		
-		final int fi = f.length;
-		final int gi = g.length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
-		double[] r = JVCLUtils.zeroPadBoundaries(new double[fi], hgi, hgie);
-		final int ri = r.length;
-		int ai;
-		for (int i = 0; i < ri; i++) {
-			for (int p =  0; p < gi; p++) {
-				ai = i + p - hgie;
-				if (ai >= 0 && ai < ri) {
-					r[i] += fPad[ai]*g[gi-1-p];
-				}
-			}
-		}
-		return r;
-	}
-	
-	public static Complex[] convolve(Complex[] f, Complex[] g) {
+    /**
+     * Convolve 2D {@code double[][]} array with 1D {@code double[]} kernel.
+     * 
+     * @param f
+     *            {@code double[][]} array
+     * @param g
+     *            {@code double[]} kernel
+     * @param dim
+     *            orientation of kernel(0 or 1)
+     * @return {@code double[][]}
+     */
+    public static double[][] convolve(double[][] f, double[] g, int dim) {
+        if (dim < 0 || dim > 1) {
+            throw new OutOfRangeException(dim, 0, 1);
+        }
+        if (dim == 1)
+            f = ArrayMath.shiftDim(f);
+        final int fi = f.length;
+        for (int i = 0; i < fi; i++) {
+            f[i] = convolve(f[i], g);
+        }
+        if (dim == 1)
+            f = ArrayMath.shiftDim(f);
+        return f;
+    }
 
-		final int fi = f.length;
-		final int gi = g.length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		Complex[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
-		Complex[] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi]), hgi, hgie);
-		final int ri = r.length;
-		int ai;
-		for (int i = 0; i < ri; i++) {
-			for (int p =  0; p < gi; p++) {
-				ai = i + p - hgie;
-				if (ai >= 0 && ai < ri) {
-					r[i] = r[i].add(fPad[ai].multiply(g[gi-1-p]));
-				}
-			}
-		}
-		return r;
-	}
-	
-	public static double[][] convolve(double[][] f, double[][] g) {
-		final int fi = f.length;
-		final int fj = f[0].length;
-		final int gi = g.length;
-		final int gj = g[0].length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgj = (int)( (gj - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		double[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-		double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
-		final int ri = r.length;
-		final int rj = r[0].length;
-		int ai, aj;
-		for (int i = 0; i < ri; i++) {
-			for (int j = 0; j < rj; j++) {
-				for (int p = 0; p < gi; p++) {
-					for (int q = 0; q < gj; q++) {
-						ai = i + (p - hgie);
-						aj = j + (q - hgje);
-						if (ai >= 0 && ai < ri) {
-							if (aj >= 0 && aj < rj) {
-								r[i][j] += fPad[ai][aj]*g[gi-1-p][gj-1-q];
-							}
-						}
-					}
-				}
-			}
-		}
-		return r;
-	}
-	
-	public static Complex[][] convolve(Complex[][] f, Complex[][] g) {
-		final int fi = f.length;
-		final int fj = f[0].length;
-		final int gi = g.length;
-		final int gj = g[0].length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgj = (int)( (gj - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		Complex[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-		Complex[][] r = JVCLUtils.zeroPadBoundaries(
-							ComplexUtils.initialize(new Complex[fi][fj]),
-						hgi, hgie, hgj, hgje);
-		final int ri = r.length;
-		final int rj = r[0].length;
-		int ai, aj;
-		for (int i = 0; i < ri; i++) {
-			for (int j = 0; j < rj; j++) {
-				for (int p = 0; p < gi; p++) {
-					for (int q = 0; q < gj; q++) {
-						ai = i + (p - hgie);
-						aj = j + (q - hgje);
-						if (ai >= 0 && ai < ri) {
-							if (aj >= 0 && aj < rj) {
-								r[i][j] = r[i][j].add(fPad[ai][aj].multiply(g[gi-1-p][gj-1-q]));
-							}
-						}
-					}
-				}
-			}
-		}
-		return r;
-	}
-	
-	public static double[][][] convolve(double[][][] f, double[][][] g) {
-		final int fi = f.length;
-		final int fj = f[0].length;
-		final int fk = f[0][0].length;
-		final int gi = g.length;
-		final int gj = g[0].length;
-		final int gk = g[0][0].length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgj = (int)( (gj - 1) / 2.0);
-		final int hgk = (int)( (gk - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-		double[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-		double[][][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
-		final int ri = r.length;
-		final int rj = r[0].length;
-		final int rk = r[0][0].length;
-		int ai, aj, ak;
-		for (int i = 0; i < ri; i++) {
-			for (int j = 0; j < rj; j++) {
-				for (int k = 0; k < rk; k++) {
-					for (int p = 0; p < gi; p++) {
-						for (int q = 0; q < gj; q++) {
-							for (int s = 0; s < gk; s++) {
-								ai = i + (p - hgie);
-								aj = j + (q - hgje);
-								ak = k + (s - hgke);
-								if (ai >= 0 && ai < ri) {
-									if (aj >= 0 && aj < rj) {
-										if (ak >= 0 && ak < rk) {
-											r[i][j][k] += fPad[ai][aj][ak]*g[gi-1-p][gj-1-q][gk-1-s];
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return r;
-	}
-	
-	public static Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
-		final int fi = f.length;
-		final int fj = f[0].length;
-		final int fk = f[0][0].length;
-		final int gi = g.length;
-		final int gj = g[0].length;
-		final int gk = g[0][0].length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgj = (int)( (gj - 1) / 2.0);
-		final int hgk = (int)( (gk - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-		Complex[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-		Complex[][][] r = JVCLUtils.zeroPadBoundaries(
-								ComplexUtils.initialize(new Complex[fi][fj][fk]),
-							hgi, hgie, hgj, hgje, hgk, hgke);
-		final int ri = r.length;
-		final int rj = r[0].length;
-		final int rk = r[0][0].length;
-		int ai, aj, ak;
-		for (int i = 0; i < ri; i++) {
-			for (int j = 0; j < rj; j++) {
-				for (int k = 0; k < rk; k++) {
-					for (int p = 0; p < gi; p++) {
-						for (int q = 0; q < gj; q++) {
-							for (int s = 0; s < gk; s++) {
-								ai = i + (p - hgie);
-								aj = j + (q - hgje);
-								ak = k + (s - hgke);
-								if (ai >= 0 && ai < ri) {
-									if (aj >= 0 && aj < rj) {
-										if (ak >= 0 && ak < rk) {
-											r[i][j][k] = r[i][j][k].add(
-													fPad[ai][aj][ak].multiply(g[gi-1-p][gj-1-q][gk-1-s])
-												);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return r;
-	}
-	
-	
-	
-	public static void main(String[] args) {
-		double[] f1 = JVCLUtils.fillWithSecondOrder(16);
-		double[] g1 = new double[] {1, -2, 1};
-		JVCLUtils.display(convolve(f1, g1), "1D Double", 16);
-		Complex[] f2 = JVCLUtils.fillWithSecondOrderComplex(16);
-		Complex[] g2 = ComplexUtils.real2Complex(g1);
-		JVCLUtils.display(convolve(f2, g2), "1D Complex", 16);
-		double[][] f3 = JVCLUtils.fillWithSecondOrder(16, 16);
-		JVCLUtils.display(ArrayMath.vectorise(f3), "Second Order", f3.length);
-		double[][] g3 = ArrayMath.devectorise(new double[] {0,1,0, 0, 1,-4,1, 0, 0,1,0, 0}, 4);
-		JVCLUtils.display(ArrayMath.vectorise(g3), "Second Order Kernel", g3.length);
-		double[][] r3 = convolve(f3, g3);
-		JVCLUtils.display(ArrayMath.vectorise(r3), "2D Double", r3.length);
-		Complex[][] f4 = JVCLUtils.fillWithSecondOrderComplex(16, 16);
-		Complex[][] g4 = ComplexUtils.real2Complex(g3);
-		Complex[][] r4 = convolve(f4, g4);
-		JVCLUtils.display(ArrayMath.vectorise(r4), "2D Complex", r4.length);
-		double[][][] f5 = JVCLUtils.fillWithSecondOrder(8, 8, 8);
-		double[][][] g5 = ArrayMath.devectorise(new double[] {
-				0,0,0,0,1,0,0,0,0,0,1,0,1,-6,1,0,1,0,0,0,0,0,1,0,0,0,0}, 3, 3);
-		JVCLUtils.display(ArrayMath.vectorise(g5), "Third Order Kernel", g5.length);
-		double[][][] r5 = convolve(f5, g5);
-		JVCLUtils.display(ArrayMath.vectorise(r5), "3D Double", r5.length);
-		Complex[][][] f6 = JVCLUtils.fillWithSecondOrderComplex(8, 8, 8);
-		Complex[][][] g6 = ComplexUtils.real2Complex(g5);
-		Complex[][][] r6 = convolve(f6, g6);
-		JVCLUtils.display(ArrayMath.vectorise(r6), "3D Complex", r6.length);
-	}
+    /**
+     * Convolve 2D {@code double[][]} array with 1D {@code double[]} kernel.
+     * Default orientation of 0 (first depth level)
+     * 
+     * @param f
+     *            {@code double[][]} array
+     * @param g
+     *            {@code double[]} kernel
+     * @return {@code double[][]}
+     */
+    public static double[][] convolve(double[][] f, double[] g) {
+        return convolve(f, g, 0);
+    }
 
-	
+    /**
+     * Convolve 2D {@code Complex[][]} array with 1D {@code Complex[]} kernel.
+     * 
+     * @param f
+     *            {@code Complex[][]} array
+     * @param g
+     *            {@code Complex[]} kernel
+     * @param dim
+     *            orientation of kernel(0 or 1)
+     * @return {@code Complex[][]}
+     */
+    public static Complex[][] convolve(Complex[][] f, Complex[] g, int dim) {
+        if (dim < 0 || dim > 1) {
+            throw new OutOfRangeException(dim, 0, 1);
+        }
+        if (dim == 1)
+            f = ArrayMath.shiftDim(f);
+        final int fi = f.length;
+        for (int i = 0; i < fi; i++) {
+            f[i] = convolve(f[i], g);
+        }
+        if (dim == 1)
+            f = ArrayMath.shiftDim(f);
+        return f;
+    }
+
+    /**
+     * Convolve 2D {@code Complex[][]} array with 1D {@code Complex[]} kernel.
+     * Default orientation of 0 (first depth level)
+     * 
+     * @param f
+     *            {@code Complex[][]} array
+     * @param g
+     *            {@code Complex[]} kernel
+     * @return {@code Complex[][]}
+     */
+    public static Complex[][] convolve(Complex[][] f, Complex[] g) {
+        return convolve(f, g, 0);
+    }
+
+    /**
+     * Convolve 3D {@code double[][][]} array with 1D {@code double[]} kernel
+     * 
+     * @param f
+     *            {@code double[][][]} array
+     * @param g
+     *            {@code double[]} kernel
+     * @param dim
+     *            orientation of kernel (0, 1 or 2)
+     * @return {@code double[][][]}
+     */
+    public static double[][][] convolve(double[][][] f, double[] g, int dim) {
+        if (dim < 0 || dim > 2) {
+            throw new OutOfRangeException(dim, 0, 2);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, dim);
+        final int fi = f.length;
+        for (int i = 0; i < fi; i++) {
+            f[i] = convolve(f[i], g);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, 3 - dim);
+        return f;
+    }
+
+    /**
+     * Convolve 3D {@code double[][][]} array with 1D {@code double[]} kernel
+     * Default orientation of 0 (first depth level)
+     * 
+     * @param f
+     *            {@code double[][][]} array
+     * @param g
+     *            {@code double[]} kernel
+     * @return {@code double[][][]}
+     */
+    public static double[][][] convolve(double[][][] f, double[] g) {
+        return convolve(f, g, 0);
+    }
+
+    /**
+     * Convolve 3D {@code Complex[][][]} array with 1D {@code Complex[]} kernel
+     * 
+     * @param f
+     *            {@code Complex[][][]} array
+     * @param g
+     *            {@code Complex[]} kernel
+     * @param dim
+     *            orientation of kernel (0, 1 or 2)
+     * @return {@code Complex[][][]}
+     */
+    public static Complex[][][] convolve(Complex[][][] f, Complex[] g, int dim) {
+        if (dim < 0 || dim > 2) {
+            throw new OutOfRangeException(dim, 0, 2);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, dim);
+        final int fi = f.length;
+        for (int i = 0; i < fi; i++) {
+            f[i] = convolve(f[i], g);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, 3 - dim);
+        return f;
+    }
+
+    /**
+     * Convolve 3D {@code Complex[][][]} array with 1D {@code Complex[]} kernel
+     * Default orientation of 0 (first depth level)
+     * 
+     * @param f
+     *            {@code Complex[][][]} array
+     * @param g
+     *            {@code Complex[]} kernel
+     * @return {@code Complex[][][]}
+     */
+    public static Complex[][][] convolve(Complex[][][] f, Complex[] g) {
+        return convolve(f, g, 0);
+    }
+
+    /**
+     * Convolve 2D {@code double[][]} array with 2D {@code double[][]} kernel
+     * 
+     * @param f
+     *            {@code double[][]} array
+     * @param g
+     *            {@code double[][]} kernel
+     * @return {@code double[][]}
+     */
+    public static double[][] convolve(double[][] f, double[][] g) {
+        final int fi = f.length;
+        final int fj = f[0].length;
+        final int gi = g.length;
+        final int gj = g[0].length;
+        final int hgi = (int) ((gi - 1) / 2.0);
+        final int hgj = (int) ((gj - 1) / 2.0);
+        final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+        final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+        double[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+        double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
+        final int ri = r.length;
+        final int rj = r[0].length;
+        int ai, aj;
+        for (int i = 0; i < ri; i++) {
+            for (int j = 0; j < rj; j++) {
+                for (int p = 0; p < gi; p++) {
+                    for (int q = 0; q < gj; q++) {
+                        ai = i + (p - hgie);
+                        aj = j + (q - hgje);
+                        if (ai >= 0 && ai < ri) {
+                            if (aj >= 0 && aj < rj) {
+                                r[i][j] += fPad[ai][aj] * g[gi - 1 - p][gj - 1 - q];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
+    /**
+     * Convolve 2D {@code Complex[][]} array with 2D {@code Complex[][]} kernel
+     * 
+     * @param f
+     *            {@code Complex[][]} array
+     * @param g
+     *            {@code Complex[][]} kernel
+     * @return {@code Complex[][]}
+     */
+    public static Complex[][] convolve(Complex[][] f, Complex[][] g) {
+        final int fi = f.length;
+        final int fj = f[0].length;
+        final int gi = g.length;
+        final int gj = g[0].length;
+        final int hgi = (int) ((gi - 1) / 2.0);
+        final int hgj = (int) ((gj - 1) / 2.0);
+        final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+        final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+        Complex[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+        Complex[][] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj]), hgi, hgie, hgj, hgje);
+        final int ri = r.length;
+        final int rj = r[0].length;
+        int ai, aj;
+        for (int i = 0; i < ri; i++) {
+            for (int j = 0; j < rj; j++) {
+                for (int p = 0; p < gi; p++) {
+                    for (int q = 0; q < gj; q++) {
+                        ai = i + (p - hgie);
+                        aj = j + (q - hgje);
+                        if (ai >= 0 && ai < ri) {
+                            if (aj >= 0 && aj < rj) {
+                                r[i][j] = r[i][j].add(fPad[ai][aj].multiply(g[gi - 1 - p][gj - 1 - q]));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
+    /**
+     * Convolve 3D {@code double[][][]} array with 2D {@code double[][]} kernel
+     * 
+     * @param f
+     *            {@code double[][][]} array
+     * @param g
+     *            {@code double[][]} kernel
+     * @param dim
+     *            orientation of kernel (0, 1 or 2)
+     * @return {@code double[][][]}
+     */
+    public static double[][][] convolve(double[][][] f, double[][] g, int dim) {
+        if (dim < 0 || dim > 2) {
+            throw new OutOfRangeException(dim, 0, 2);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, dim);
+        final int fi = f.length;
+        for (int i = 0; i < fi; i++) {
+            f[i] = convolve(f[i], g);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, 3 - dim);
+        return f;
+    }
+
+    /**
+     * Convolve 3D {@code double[][][]} array with 2D {@code double[][]} kernel
+     * Default kernel orientation/depth level of 0.
+     * 
+     * @param f
+     *            {@code double[][][]} array
+     * @param g
+     *            {@code double[][]} kernel
+     * @return {@code double[][][]}
+     */
+    public static double[][][] convolve(double[][][] f, double[][] g) {
+        return convolve(f, g, 0);
+    }
+
+    /**
+     * Convolve 3D {@code Complex[][][]} array with 2D {@code Complex[][]}
+     * kernel
+     * 
+     * @param f
+     *            {@code Complex[][][]} array
+     * @param g
+     *            {@code Complex[][]} kernel
+     * @param dim
+     *            orientation of kernel (0, 1 or 2)
+     * @return {@code Complex[][][]}
+     */
+    public static Complex[][][] convolve(Complex[][][] f, Complex[][] g, int dim) {
+        if (dim < 0 || dim > 2) {
+            throw new OutOfRangeException(dim, 0, 2);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, dim);
+        final int fi = f.length;
+        for (int i = 0; i < fi; i++) {
+            f[i] = convolve(f[i], g);
+        }
+        if (dim > 0)
+            f = ArrayMath.shiftDim(f, 3 - dim);
+        return f;
+    }
+
+    /**
+     * Convolve 3D {@code Complex[][][]} array with 2D {@code Complex[][]}
+     * kernel Default kernel orientation/depth level of 0.
+     * 
+     * @param f
+     *            {@code Complex[][][]} array
+     * @param g
+     *            {@code Complex[][]} kernel
+     * @return {@code Complex[][][]}
+     */
+    public static Complex[][][] convolve(Complex[][][] f, Complex[][] g) {
+        return convolve(f, g, 0);
+    }
+
+    /**
+     * Convolve 3D {@code Complex[][][]} array with 3D {@code double[][][]}
+     * kernel
+     * 
+     * @param f
+     *            {@code double[][][]} array
+     * @param g
+     *            {@code double[][][]} kernel
+     * @return {@code double[][][]}
+     */
+    public static double[][][] convolve(double[][][] f, double[][][] g) {
+        final int fi = f.length;
+        final int fj = f[0].length;
+        final int fk = f[0][0].length;
+        final int gi = g.length;
+        final int gj = g[0].length;
+        final int gk = g[0][0].length;
+        final int hgi = (int) ((gi - 1) / 2.0);
+        final int hgj = (int) ((gj - 1) / 2.0);
+        final int hgk = (int) ((gk - 1) / 2.0);
+        final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+        final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+        final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
+        double[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+        double[][][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
+        final int ri = r.length;
+        final int rj = r[0].length;
+        final int rk = r[0][0].length;
+        int ai, aj, ak;
+        for (int i = 0; i < ri; i++) {
+            for (int j = 0; j < rj; j++) {
+                for (int k = 0; k < rk; k++) {
+                    for (int p = 0; p < gi; p++) {
+                        for (int q = 0; q < gj; q++) {
+                            for (int s = 0; s < gk; s++) {
+                                ai = i + (p - hgie);
+                                aj = j + (q - hgje);
+                                ak = k + (s - hgke);
+                                if (ai >= 0 && ai < ri) {
+                                    if (aj >= 0 && aj < rj) {
+                                        if (ak >= 0 && ak < rk) {
+                                            r[i][j][k] += fPad[ai][aj][ak] * g[gi - 1 - p][gj - 1 - q][gk - 1 - s];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
+    /**
+     * Convolve 3D {@code Complex[][][]} array with 3D {@code Complex[][][]}
+     * kernel
+     * 
+     * @param f
+     *            {@code Complex[][][]} array
+     * @param g
+     *            {@code Complex[][][]} kernel
+     * @return {@code Complex[][][]}
+     */
+    public static Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
+        final int fi = f.length;
+        final int fj = f[0].length;
+        final int fk = f[0][0].length;
+        final int gi = g.length;
+        final int gj = g[0].length;
+        final int gk = g[0][0].length;
+        final int hgi = (int) ((gi - 1) / 2.0);
+        final int hgj = (int) ((gj - 1) / 2.0);
+        final int hgk = (int) ((gk - 1) / 2.0);
+        final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
+        final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
+        final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
+        Complex[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+        Complex[][][] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]), hgi, hgie, hgj,
+                hgje, hgk, hgke);
+        final int ri = r.length;
+        final int rj = r[0].length;
+        final int rk = r[0][0].length;
+        int ai, aj, ak;
+        for (int i = 0; i < ri; i++) {
+            for (int j = 0; j < rj; j++) {
+                for (int k = 0; k < rk; k++) {
+                    for (int p = 0; p < gi; p++) {
+                        for (int q = 0; q < gj; q++) {
+                            for (int s = 0; s < gk; s++) {
+                                ai = i + (p - hgie);
+                                aj = j + (q - hgje);
+                                ak = k + (s - hgke);
+                                if (ai >= 0 && ai < ri) {
+                                    if (aj >= 0 && aj < rj) {
+                                        if (ak >= 0 && ak < rk) {
+                                            r[i][j][k] = r[i][j][k].add(
+                                                    fPad[ai][aj][ak].multiply(g[gi - 1 - p][gj - 1 - q][gk - 1 - s]));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
 }

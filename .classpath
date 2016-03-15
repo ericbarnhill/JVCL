@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="jvcl/mathArray/Interleaved.java|jvcl/mathArray/MathArray.java|jvcl/UnrollDebug.java|jvclTesting/UnrollTest.java|jvcl/FDGPU_old.java|jvcl/GPUFFT_old.java|jvcl/GPUFFT.java" kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre"/>
+	<classpathentry excluding="jvcl/mathArray/Interleaved.java|jvcl/mathArray/MathArray.java|jvcl/UnrollDebug.java|jvclTesting/UnrollTest.java|jvcl/FDGPU_old.java|jvcl/GPUFFT_old.java|jvcl/GPUFFT.java|com/ericbarnhill/jvcl/FTGPU.java" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar" sourcepath="/home/ericbarnhill/Documents/code/jogamp/jocl-demos/src">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/home/ericbarnhill/Documents/code/jogamp/jocl/build/javadoc/"/>
@@ -14,13 +14,9 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar" sourcepath="/home/ericbarnhill/Documents/code/jogamp/gluegen/src"/>
 	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jtransforms-2.4.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ArrayMath"/>
-	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/commons-configuration2-2.0-beta1/commons-configuration2-2.0-beta1.jar"/>
-	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/commons-lang3-3.1/commons-lang3-3.1.jar"/>
 	<classpathentry kind="lib" path="/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar"/>
-	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/commons-el-1.0/commons-el.jar"/>
-	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/commons-jexl-2.1.1/commons-jexl-2.1.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/commons-math4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ArrayMath"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

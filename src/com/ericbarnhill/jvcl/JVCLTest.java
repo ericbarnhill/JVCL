@@ -1,0 +1,33 @@
+package com.ericbarnhill.jvcl;
+
+import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.math4.complex.ComplexUtils;
+
+import com.ericbarnhill.arrayMath.ArrayMath;
+
+public class JVCLTest {
+
+	public static void main(String[] args) {
+		System.out.println("2D SECOND ORDER KERNEL CONVOLVED WITH 2D LAPLACIAN OPERATOR");
+		System.out.println("RESULTS SHOULD BE 4 EXCEPT AT BOUNDARIES");
+		int dim = 28;
+		double[][] testArray = ArrayMath.secondOrder(dim, dim);
+		double[][] kernel = JVCLUtils.laplacian2();
+		Complex[][] testArrayComplex = ComplexUtils.real2Complex(testArray);
+		Complex[][] kernelComplex = ComplexUtils.real2Complex(kernel);
+
+		double[][] r1 = FDCPU.convolve(testArray, kernel);
+		JVCLUtils.display(r1, "FDCPU", dim+2);
+
+		FDGPU fdgpu = new FDGPU();
+		double[][] r2 = fdgpu.convolve(testArray, kernel);
+		fdgpu.close();
+		JVCLUtils.display(r2, "FDGPU", dim+2);
+
+		Complex[][] r3 = FTCPU.convolve(testArrayComplex, kernelComplex);
+		JVCLUtils.display(ComplexUtils.complex2Real(r3), "FTCPU", dim);
+
+	}
+
+
+}

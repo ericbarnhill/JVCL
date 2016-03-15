@@ -1,23 +1,26 @@
-/* Copyright (c) 2015 Eric Barnhill
-*
-*Permission is hereby granted, free of charge, to any person obtaining a copy
-*of this software and associated documentation files (the "Software"), to deal
-*in the Software without restriction, including without limitation the rights
-*to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-*copies of the Software, and to permit persons to whom the Software is
-*furnished to do so, subject to the following conditions:
-*
-*The above copyright notice and this permission notice shall be included in all
-*copies or substantial portions of the Software.
-*
-*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-*IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-*FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-*LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-*OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-*SOFTWARE.
-*/
+/*
+ * (c) Eric Barnhill 2016 All Rights Reserved.
+ *
+ * This file is part of the Java Volumetric Convolution Library (JVCL). JVCL is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * JVCL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with JVCL.  If not, see http://www.gnu.org/licenses/ .
+ *
+ * This code uses software from the Apache Software Foundation.
+ * The Apache Software License can be found at: http://www.apache.org/licenses/LICENSE-2.0.txt .
+ *
+ * This code uses software from the JogAmp project.
+ * Jogamp information and software license can be found at: https://jogamp.org/ .
+ *
+ * This code uses methods from the JTransforms package by Piotr Wendykier.
+ * JTransforms information and software license can be found at: https://github.com/wendykierp/JTransforms .
+ *
+ */
 
 package com.ericbarnhill.jvcl;
 
@@ -26,19 +29,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.apache.commons.math4.complex.Complex;
 import org.apache.commons.math4.complex.ComplexUtils;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 
-public class JVCLUtils {
-	
-	/** A utility class to shift dimensions. Equivalent to Matlab shiftDim. 
-	*/
-	public JVCLUtils() {};
 
+/**
+ * This collection of static utility methods contains several methods called by the convolution classes,
+ * and several methods that may be convenient for the convolution calls of users. More documentation of these
+ * methods can be added on request.
+*/
+public class JVCLUtils {
+
+	/**
+	 * Flips dimensions of 2D image without leaving 1D representation
+	 * @param image {@code float[]} vectorised image
+	 * @param width int first depth level dimension
+	 * @return {@code float[]} with dimensions swapped
+	 */
 	public static float[] shiftVectorDim(float[] image, int width) {
 		int length = image.length;
 		int height = length / width;
@@ -51,65 +61,13 @@ public class JVCLUtils {
 		}
 		return result;
 	}
-	
-	public static Complex[] split2Complex(double[] real, double[] imag) {
-		int length = real.length;
-		Complex[] c = new Complex[length];
-		for (int n = 0; n < length; n++) {
-			c[n] = new Complex(real[n], imag[n]);
-		}
-		return c;
-	}
-	
-	public static Complex[] split2Complex(float[] real, float[] imag) {
-		int length = real.length;
-		Complex[] c = new Complex[length];
-		for (int n = 0; n < length; n++) {
-			c[n] = new Complex(real[n], imag[n]);
-		}
-		return c;
-	}
-	
-	public static double[][] complex2Split(Complex[] c) {
-		int length = c.length;
-		double[][] split  = new double[2][length];
-		for (int n = 0; n < length; n++) {
-			split[0][n] = c[n].getReal();
-			split[1][n] = c[n].getImaginary();
-		}
-		return split;
-	}
-	
-	public static float[][] complex2SplitFloat(Complex[] c) {
-		int length = c.length;
-		float[][] split  = new float[2][length];
-		for (int n = 0; n < length; n++) {
-			split[0][n] = (float)c[n].getReal();
-			split[1][n] = (float)c[n].getImaginary();
-		}
-		return split;
-	}
-	
-	public static double[] split2interleaved(double[] real, double[] imag) {
-		int length = real.length;
-		double[] interleaved = new double[length*2];
-		for (int n = 0; n < length; n++) {
-			interleaved[n*2] = real[n];
-			interleaved[n*2+1] = imag[n];
-		}
-		return interleaved;
-	}
-	
-	public static float[] split2interleaved(float[] real, float[] imag) {
-		int length = real.length;
-		float[] interleaved = new float[length*2];
-		for (int n = 0; n < length; n++) {
-			interleaved[n*2] = real[n];
-			interleaved[n*2+1] = imag[n];
-		}
-		return interleaved;
-	}
-	
+
+	/**
+	 * A standard utility method for OpenCL thread and block allocation
+	 * @param groupSize
+	 * @param globalSize
+	 * @return minimum required global size for group size
+	 */
 	public static int roundUp(int groupSize, int globalSize) {
         int r = globalSize % groupSize;
         if (r == 0) {
@@ -118,7 +76,7 @@ public class JVCLUtils {
             return globalSize + groupSize - r;
         }
     }
-	
+
     public static String readFile(String fileName) {
         try  {
             BufferedReader br = new BufferedReader(
@@ -140,10 +98,10 @@ public class JVCLUtils {
             System.exit(1);
             return null;
         }
-    } 
-    
+    }
+
 	public static int nextPwr2(int length) {
-		
+
 		int pwr2Length = 1;
 		while(pwr2Length < length) {
 			pwr2Length *= 2;
@@ -158,14 +116,14 @@ public class JVCLUtils {
 		for (int n = 0; n < length; n++) {
 			paddedArray[paddingF+n] = array[n];
 		}
-		return paddedArray;	
+		return paddedArray;
 	}
-	
+
 	public static double[] zeroPadBoundaries(double[] array, int padding) {
 		return zeroPadBoundaries(array, padding, padding);
 	}
-	
-	public static double[][] zeroPadBoundaries(double[][] image, int paddingXF, 
+
+	public static double[][] zeroPadBoundaries(double[][] image, int paddingXF,
 		int paddingXB, int paddingYF, int paddingYB) {
 		int width = image.length;
 		int height = image[0].length;
@@ -177,18 +135,18 @@ public class JVCLUtils {
 				paddedImage[x+paddingXF][y+paddingYF] = image[x][y];
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static double[][] zeroPadBoundaries(double[][] image, int paddingX, int paddingY) {
 		return zeroPadBoundaries(image, paddingX, paddingX, paddingY, paddingY);
 	}
-	
+
 
 	public static double[][] zeroPadBoundaries(double[][] image, int padding) {
 		return zeroPadBoundaries(image, padding, padding);
 	}
-	
+
 	public static double[][][] zeroPadBoundaries(double[][][] volume, int paddingXF,
 			int paddingXB, int paddingYF, int paddingYB, int paddingZF, int paddingZB) {
 		int width = volume.length;
@@ -205,20 +163,19 @@ public class JVCLUtils {
 				}
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static double[][][] zeroPadBoundaries(double[][][] volume, int paddingX,
 			int paddingY, int paddingZ) {
-		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);		
+		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);
 	}
-	
+
 	public static double[][][] zeroPadBoundaries(double[][][] volume, int padding) {
-		return zeroPadBoundaries(volume, padding, padding, padding);		
+		return zeroPadBoundaries(volume, padding, padding, padding);
 	}
-	
+
 	// FLOAT
-	
 
 	public static float[] zeroPadBoundaries(float[] array, int paddingF, int paddingB) {
 		int length = array.length;
@@ -227,14 +184,14 @@ public class JVCLUtils {
 		for (int n = 0; n < length; n++) {
 			paddedArray[paddingF+n] = array[n];
 		}
-		return paddedArray;	
+		return paddedArray;
 	}
-	
+
 	public static float[] zeroPadBoundaries(float[] array, int padding) {
 		return zeroPadBoundaries(array, padding, padding);
 	}
-	
-	public static float[][] zeroPadBoundaries(float[][] image, int paddingXF, 
+
+	public static float[][] zeroPadBoundaries(float[][] image, int paddingXF,
 		int paddingXB, int paddingYF, int paddingYB) {
 		int width = image.length;
 		int height = image[0].length;
@@ -246,18 +203,18 @@ public class JVCLUtils {
 				paddedImage[x+paddingXF][y+paddingYF] = image[x][y];
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static float[][] zeroPadBoundaries(float[][] image, int paddingX, int paddingY) {
 		return zeroPadBoundaries(image, paddingX, paddingX, paddingY, paddingY);
 	}
-	
+
 
 	public static float[][] zeroPadBoundaries(float[][] image, int padding) {
 		return zeroPadBoundaries(image, padding, padding);
 	}
-	
+
 	public static float[][][] zeroPadBoundaries(float[][][] volume, int paddingXF,
 			int paddingXB, int paddingYF, int paddingYB, int paddingZF, int paddingZB) {
 		int width = volume.length;
@@ -274,20 +231,19 @@ public class JVCLUtils {
 				}
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static float[][][] zeroPadBoundaries(float[][][] volume, int paddingX,
 			int paddingY, int paddingZ) {
-		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);		
+		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);
 	}
-	
+
 	public static float[][][] zeroPadBoundaries(float[][][] volume, int padding) {
-		return zeroPadBoundaries(volume, padding, padding, padding);		
+		return zeroPadBoundaries(volume, padding, padding, padding);
 	}
-	
+
 	// COMPLEX
-	
 
 	public static Complex[] zeroPadBoundaries(Complex[] array, int paddingF, int paddingB) {
 		int length = array.length;
@@ -296,14 +252,14 @@ public class JVCLUtils {
 		for (int n = 0; n < length; n++) {
 			paddedArray[paddingF+n] = array[n];
 		}
-		return paddedArray;	
+		return paddedArray;
 	}
-	
+
 	public static Complex[] zeroPadBoundaries(Complex[] array, int padding) {
 		return zeroPadBoundaries(array, padding, padding);
 	}
-	
-	public static Complex[][] zeroPadBoundaries(Complex[][] image, int paddingXF, 
+
+	public static Complex[][] zeroPadBoundaries(Complex[][] image, int paddingXF,
 		int paddingXB, int paddingYF, int paddingYB) {
 		int width = image.length;
 		int height = image[0].length;
@@ -315,18 +271,17 @@ public class JVCLUtils {
 				paddedImage[x+paddingXF][y+paddingYF] = image[x][y];
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static Complex[][] zeroPadBoundaries(Complex[][] image, int paddingX, int paddingY) {
 		return zeroPadBoundaries(image, paddingX, paddingX, paddingY, paddingY);
 	}
-	
 
 	public static Complex[][] zeroPadBoundaries(Complex[][] image, int padding) {
 		return zeroPadBoundaries(image, padding, padding);
 	}
-	
+
 	public static Complex[][][] zeroPadBoundaries(Complex[][][] volume, int paddingXF,
 			int paddingXB, int paddingYF, int paddingYB, int paddingZF, int paddingZB) {
 		int width = volume.length;
@@ -343,20 +298,18 @@ public class JVCLUtils {
 				}
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static Complex[][][] zeroPadBoundaries(Complex[][][] volume, int paddingX,
 			int paddingY, int paddingZ) {
-		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);		
+		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);
 	}
-	
-	public static Complex[][][] zeroPadBoundaries(Complex[][][] volume, int padding) {
-		return zeroPadBoundaries(volume, padding, padding, padding);		
-	}
-	
 
-	
+	public static Complex[][][] zeroPadBoundaries(Complex[][][] volume, int padding) {
+		return zeroPadBoundaries(volume, padding, padding, padding);
+	}
+
 	public static double[] stripBorderPadding(double[] array, int padding) {
 		int length = array.length;
 		int newLength = length - 2*padding;
@@ -364,9 +317,9 @@ public class JVCLUtils {
 		for (int n = 0; n < newLength; n++) {
 			strippedArray[n] = array[padding+n];
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static Complex[] stripBorderPadding(Complex[] array, int padding) {
 		int length = array.length;
 		int newLength = length - 2*padding;
@@ -374,9 +327,19 @@ public class JVCLUtils {
 		for (int n = 0; n < newLength; n++) {
 			strippedArray[n] = array[padding+n];
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
+	public static Complex[] stripBorderPadding(Complex[] array, int paddingF, int paddingB) {
+		int length = array.length;
+		int newLength = length - paddingF - paddingB;
+		Complex[] strippedArray = new Complex[newLength];
+		for (int n = 0; n < newLength; n++) {
+			strippedArray[n] = array[paddingF+n];
+		}
+		return strippedArray;
+	}
+
 	public static double[][] stripBorderPadding(double[][] image, int paddingX, int paddingY) {
 		int width = image.length;
 		int height = image[0].length;
@@ -388,13 +351,12 @@ public class JVCLUtils {
 				paddedImage[x][y] = image[x+paddingX][y+paddingY];
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static double[][] stripBorderPadding(double[][] image, int padding) {
 		return stripBorderPadding(image, padding, padding);
 	}
-	
 
 	public static Complex[][] stripBorderPadding(Complex[][] image, int paddingX, int paddingY) {
 		int width = image.length;
@@ -407,9 +369,23 @@ public class JVCLUtils {
 				paddedImage[x][y] = image[x+paddingX][y+paddingY];
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
+	public static Complex[][] stripBorderPadding(Complex[][] image, int paddingFX, int paddingBX, int paddingFY, int paddingBY) {
+		int width = image.length;
+		int height = image[0].length;
+		int newWidth = width - paddingFX - paddingBX;
+		int newHeight = height - paddingFY - paddingBY;
+		Complex[][] paddedImage = new Complex[newWidth][newHeight];
+		for (int x = 0; x < newWidth; x++) {
+			for (int y = 0; y < newHeight; y++) {
+				paddedImage[x][y] = image[x+paddingFX][y+paddingFY];
+			}
+		}
+		return paddedImage;
+	}
+
 	public static double[][][] stripBorderPadding(double[][][] volume, int paddingX, int paddingY, int paddingZ) {
 		int width = volume.length;
 		int height = volume[0].length;
@@ -425,14 +401,13 @@ public class JVCLUtils {
 				}
 			}
 		}
-		return paddedImage;	
+		return paddedImage;
 	}
-	
+
 	public static double[][][] stripBorderPadding(double[][][] volume, int padding) {
 		return stripBorderPadding(volume, padding, padding, padding);
 	}
 
-	
 	public static double[] stripEndPadding(double[] array, int newLength) {
 		double[] strippedArray = new double[newLength];
 		if (newLength > array.length) {
@@ -441,9 +416,9 @@ public class JVCLUtils {
 		for (int n = 0; n < newLength; n++) {
 			strippedArray[n] = array[n];
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static Complex[] stripEndPadding(Complex[] array, int newLength) {
 		Complex[] strippedArray = new Complex[newLength];
 		if (newLength > array.length) {
@@ -452,9 +427,9 @@ public class JVCLUtils {
 		for (int n = 0; n < newLength; n++) {
 			strippedArray[n] = array[n];
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static Complex[][] stripEndPadding(Complex[][] array, int newWidth, int newHeight) {
 		Complex[][] strippedArray = new Complex[newWidth][newHeight];
 		for (int x = 0; x < newWidth; x++) {
@@ -462,18 +437,17 @@ public class JVCLUtils {
 				strippedArray[x][y] = array[x][y];
 			}
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
-	
+
 	public static float[] stripEndPadding(float[] array, int newLength) {
 		float[] strippedArray = new float[newLength];
 		for (int n = 0; n < newLength; n++) {
 			strippedArray[n] = array[n];
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static double[][] stripEndPadding(double[][] array, int newWidth, int newHeight) {
 		double[][] strippedArray = new double[newWidth][newHeight];
 		for (int x = 0; x < newWidth; x++) {
@@ -481,9 +455,9 @@ public class JVCLUtils {
 				strippedArray[x][y] = array[x][y];
 			}
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static float[][] stripEndPadding(float[][] array, int newWidth, int newHeight) {
 		float[][] strippedArray = new float[newWidth][newHeight];
 		for (int x = 0; x < newWidth; x++) {
@@ -491,9 +465,9 @@ public class JVCLUtils {
 				strippedArray[x][y] = array[x][y];
 			}
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static double[][][] stripEndPadding(double[][][] array, int newWidth, int newHeight, int newDepth) {
 		int width = array.length;
 		int height = array[0].length;
@@ -506,9 +480,9 @@ public class JVCLUtils {
 				}
 			}
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static float[][][] stripEndPadding(float[][][] array, int newWidth, int newHeight, int newDepth) {
 		int width = array.length;
 		int height = array[0].length;
@@ -521,9 +495,9 @@ public class JVCLUtils {
 				}
 			}
 		}
-		return strippedArray;	
+		return strippedArray;
 	}
-	
+
 	public static double[] deepCopy(double[] array) {
 		int length = array.length;
 		double[] copy = new double[length];
@@ -532,7 +506,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static Complex[] deepCopy(Complex[] array) {
 		int length = array.length;
 		Complex[] copy = new Complex[length];
@@ -541,7 +515,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static double[][] deepCopy(double[][] array) {
 		int width = array.length;
 		int height = array[0].length;
@@ -553,7 +527,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static Complex[][] deepCopy(Complex[][] array) {
 		int width = array.length;
 		int height = array[0].length;
@@ -580,7 +554,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static Complex[][][] deepCopy(Complex[][][] array) {
 		int width = array.length;
 		int height = array[0].length;
@@ -595,7 +569,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static float[] deepCopy(float[] array) {
 		int length = array.length;
 		float[] copy = new float[length];
@@ -604,7 +578,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static double[] deepCopyToPadded(double[] array, int newSize) {
 		int length = array.length;
 		if (newSize < length) {
@@ -616,7 +590,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static double[][] deepCopyToPadded(double[][] image, int newWidth, int newHeight) {
 		int width = image.length;
 		int height = image[0].length;
@@ -631,7 +605,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static double[][][] deepCopyToPadded(double[][][] image, int newWidth, int newHeight, int newDepth) {
 		int width = image.length;
 		int height = image[0].length;
@@ -649,7 +623,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static float[] deepCopyToPadded(float[] array, int newSize) {
 		int length = array.length;
 		if (newSize < length) {
@@ -661,7 +635,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static float[][] deepCopyToPadded(float[][] image, int newWidth, int newHeight) {
 		int width = image.length;
 		int height = image[0].length;
@@ -676,7 +650,7 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
+
 	public static float[][][] deepCopyToPadded(float[][][] image, int newWidth, int newHeight, int newDepth) {
 		int width = image.length;
 		int height = image[0].length;
@@ -694,129 +668,10 @@ public class JVCLUtils {
 		}
 		return copy;
 	}
-	
-	public static double[] real2Interleaved(double[] array) {
-		int length = array.length;
-		double[] interleaved = new double[length*2];
-		for (int n = 0; n < length; n++) {
-			interleaved[n*2] = array[n];
-		}
-		return interleaved;
-	}	
-	
-	public static double[][] real2Interleaved(double[][] image) {
-		int width = image.length;
-		int height = image[0].length;
-		double[][] interleaved = new double[width*2][height*2];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				interleaved[x*2][y*2] = image[x][y];
-			}
-		}
-		return interleaved;
-	}
-	
-	public static double[][][] real2Interleaved(double[][][] image) {
-		int width = image.length;
-		int height = image[0].length;
-		int depth = image[0][0].length;
-		double[][][] interleaved = new double[width*2][height*2][depth*2];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				for (int z = 0; z < depth; z++) {
-					interleaved[x*2][y*2][z*2] = image[x][y][z];
-				}
-			}
-		}
-		return interleaved;
-	}
-	
-	public static float[] double2Float(double[] array) {
-		final int length = array.length;
-		float[] floatArray = new float[length];
-		for (int n = 0; n < length; n++) floatArray[n] = (float)array[n];
-		return floatArray;
-	}
-	
-	public static float[][] double2Float(double[][] array) {
-		final int width = array.length;
-		final int height = array[0].length;
-		float[][] floatArray = new float[width][height];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				floatArray[x][y] = (float)array[x][y];
-			}
-		}
-		return floatArray;
-	}
-	
-	public static float[][][] double2Float(double[][][] array) {
-		final int width = array.length;
-		final int height = array[0].length;
-		final int depth = array[0][0].length;
-		float[][][] floatArray = new float[width][height][depth];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				for (int z = 0; z < depth; z++) {
-					floatArray[x][y][z] = (float)array[x][y][z];
-				}
-			}
-		}
-		return floatArray;
-	}
-	
-	public static double[] float2Double(float[] array) {
-		final int length = array.length;
-		double[] floatArray = new double[length];
-		for (int n = 0; n < length; n++) floatArray[n] = array[n];
-		return floatArray;
-	}
-	
-	public static double[][] float2Double(float[][] array) {
-		int width = array.length;
-		int height = array[0].length;
-		double[][] floatArray = new double[width][height];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				floatArray[x][y] = (float)array[x][y];
-			}
-		}
-		return floatArray;
-	}
-	
-	public static double[][][] float2Double(float[][][] array) {
-		int width = array.length;
-		int height = array[0].length;
-		int depth = array[0][0].length;
-		double[][][] doubleArray = new double[width][height][depth];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				for (int z = 0; z < depth; z++) {
-					doubleArray[x][y][z] = array[x][y][z];
-				}
-			}
-		}
-		return doubleArray;
-	}
-	
-	public static float[] getInterleavedReal(float[] interleaved) {
-		int length = interleaved.length;
-		float[] real = new float[length/2];
-		for (int n = 0; n < length/2; n++) {
-			real[n] = interleaved[n*2];
-		}
-		return real;
-	}
-	
-	public static float[] getInterleavedImag(float[] interleaved) {
-		int length = interleaved.length;
-		float[] real = new float[length/2];
-		for (int n = 0; n < length/2; n++) {
-			real[n] = interleaved[n*2+1];
-		}
-		return real;
-	}
-		
+
+	/**
+	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
+	 */
 	public static void display(Complex[] array, String message, int b) {
 		System.out.println(message);
 		for (int n = 0; n < array.length; n++) {
@@ -824,7 +679,10 @@ public class JVCLUtils {
 			if ((n+1) % b == 0) System.out.format("%n");
 		}
 	}
-	
+
+	/**
+	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
+	 */
 	public static void display(float[] array, String message, int b) {
 		System.out.println("--");
 		System.out.println(message);
@@ -834,6 +692,9 @@ public class JVCLUtils {
 		}
 	}
 
+	/**
+	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
+	 */
 	public static void display(double[] array, String message, int b) {
 		System.out.println("--");
 		System.out.println(message);
@@ -842,15 +703,21 @@ public class JVCLUtils {
 			if ((n+1) % b == 0) System.out.format("%n");
 		}
 	}
-	
+
+	/**
+	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
+	 */
 	public static void display(double[][] array, String message, int b) {
 		display(ArrayMath.vectorise(array), message, b);
 	}
-	
+
+	/**
+	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
+	 */
 	public static void display(double[][][] array, String message, int b) {
 		display(ArrayMath.vectorise(array), message, b);
 	}
-	
+
  	public static double[] cat(double[] d1, double[] d2) {
 		int l1 = d1.length;
 		int l2 = d2.length;
@@ -863,7 +730,7 @@ public class JVCLUtils {
 		}
 		return cat;
 	}
-	
+
 	public static float[] cat(float[] d1, float[] d2) {
 		int l1 = d1.length;
 		int l2 = d2.length;
@@ -876,7 +743,7 @@ public class JVCLUtils {
 		}
 		return cat;
 	}
-	
+
 	public static ArrayList<double[]> split(double[] d, int l1, int l2) {
 		double[] split1 = new double[l1];
 		double[] split2 = new double[l2];
@@ -891,7 +758,7 @@ public class JVCLUtils {
 		splits.add(split2);
 		return splits;
 	}
-	
+
 	public static ArrayList<float[]> split(float[] d, int l1, int l2) {
 		float[] split1 = new float[l1];
 		float[] split2 = new float[l2];
@@ -906,156 +773,7 @@ public class JVCLUtils {
 		splits.add(split2);
 		return splits;
 	}
-	
-	public static void splitMultiply(double[] d) {
-		final int length = d.length;
-		for (int n = 0; n < length / 2; n++) {
-			d[n] *= d[n+length/2];
-		}
-	}
-	
-	public static void splitMultiply(float[] d) {
-		final int length = d.length;
-		for (int n = 0; n < length / 2; n++) {
-			d[n] *= d[n+length/2];
-		}
-	}
 
-	public static Complex[][] initializeRandom(int dim) {
-		Random r = new Random();
-		Complex[][] c = new Complex[dim][dim];
-		for (int x = 0; x < dim; x++) {
-			for (int y = 0; y < dim; y++) {
-				c[x][y] = new Complex(r.nextDouble(), r.nextDouble());
-			}
-		}
-		return c;
-	}
-	
-	public static double[] fillWithSecondOrder(int dim) {
-		double[] c = new double[dim];
-		for (int x = 0; x < dim; x++) {
-				c[x] = x*x;
-		}
-		return c;
-	}
-	
-	public static double[][] fillWithSecondOrder(int dim1, int dim2) {
-		double[][] c = new double[dim1][dim2];
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				c[x][y] = x*x + y*y;
-			}
-		}
-		return c;
-	}
-	
-	public static double[][][] fillWithSecondOrder(int dim1, int dim2, int dim3) {
-		double[][][] c = new double[dim1][dim2][dim3];
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				for (int z = 0; z < dim3; z++) {
-					c[x][y][z] = x*x + y*y + z*z;
-				}
-			}
-		}
-		return c;
-	}
-	
-	public static Complex[] fillWithSecondOrderComplex(int dim) {
-		Complex[] c = new Complex[dim];
-		for (int x = 0; x < dim; x++) {
-				c[x] = new Complex(x*x);
-		}
-		return c;
-	}
-	
-	public static Complex[][] fillWithSecondOrderComplex(int dim1, int dim2) {
-		Complex[][] c = new Complex[dim1][dim2];
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				c[x][y] = new Complex(x*x + y*y);
-			}
-		}
-		return c;
-	}
-	
-	public static Complex[][][] fillWithSecondOrderComplex(int dim1, int dim2, int dim3) {
-		Complex[][][] c = new Complex[dim1][dim2][dim3];
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				for (int z = 0; z < dim3; z++) {
-					c[x][y][z] = new Complex(x*x + y*y + z*z);
-				}
-			}
-		}
-		return c;
-	}
-	
-	public static double[] fillWithGradient(int dim) {
-		double[] c = new double[dim];
-		for (int x = 0; x < dim; x++) {
-				c[x] = x+1;
-		}
-		return c;
-	}
-	
-	public static double[][] fillWithGradient(int dim1, int dim2) {
-		double[][] c = new double[dim1][dim2];
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				c[x][y] = x + y + 2;
-			}
-		}
-		return c;
-	}
-	
-	public static double[][][] fillWithGradient(int dim1, int dim2, int dim3) {
-		double[][][] c = new double[dim1][dim2][dim3];
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				for (int z = 0; z < dim3; z++) {
-					c[x][y][z] = x + y + z + 3;
-				}
-			}
-		}
-		return c;
-	}
-
-
-	public static double[] fillWithRandom(int dim) {
-		double[] c = new double[dim];
-		Random r = new Random();
-		for (int x = 0; x < dim; x++) {
-				c[x] = r.nextDouble();
-		}
-		return c;
-	}
-	
-	public static double[][] fillWithRandom(int dim1, int dim2) {
-		double[][] c = new double[dim1][dim2];
-		Random r = new Random();
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				c[x][y] = r.nextDouble();
-			}
-		}
-		return c;
-	}
-	
-	public static double[][][] fillWithRandom(int dim1, int dim2, int dim3) {
-		double[][][] c = new double[dim1][dim2][dim3];
-		Random r = new Random();
-		for (int x = 0; x < dim1; x++) {
-			for (int y = 0; y < dim2; y++) {
-				for (int z = 0; z < dim3; z++) {
-					c[x][y][z] = r.nextDouble();
-				}
-			}
-		}
-		return c;
-	}
-	
 	public static double[] mirror(double[] vec) {
 		int length = vec.length;
 		double[] mirrorVec = new double[length*2];
@@ -1065,7 +783,7 @@ public class JVCLUtils {
 		}
 		return mirrorVec;
 	}
-	
+
 	public static double[] mirrorComplexInterleaved(double[] vec) {
 		int length = vec.length;
 		double[] mirrorVec = new double[length*2];
@@ -1077,7 +795,7 @@ public class JVCLUtils {
 		}
 		return mirrorVec;
 	}
-	
+
 	public static double[] interpolateZeros(double[] vec, int factor) {
 		int length = vec.length;
 		double[] interpVec = new double[length*factor-(factor-1)];
@@ -1086,7 +804,7 @@ public class JVCLUtils {
 		}
 		return interpVec;
 	}
-	
+
 	public static Complex[] interpolateZeros(Complex[] vec, int factor) {
 		int length = vec.length;
 		Complex[] interpVec = new Complex[length*factor - (factor-1)];
@@ -1095,7 +813,7 @@ public class JVCLUtils {
 		}
 		return interpVec;
 	}
-	
+
 	public static float[] interpolateZeros(float[] vec, int factor) {
 		int length = vec.length;
 		float[] interpVec = new float[length*factor - (factor-1)];
@@ -1104,7 +822,7 @@ public class JVCLUtils {
 		}
 		return interpVec;
 	}
-	
+
 	public static double[] decimate(double[] vec, int factor) {
 		int length = vec.length / factor + vec.length % factor;
 		double[] deciVec = new double[length]; // off by one removed EB jan 2016
@@ -1113,7 +831,7 @@ public class JVCLUtils {
 		}
 		return deciVec;
 	}
-	
+
 	public static Complex[] decimate(Complex[] vec, int factor) {
 		int length = vec.length / factor + vec.length % factor;
 		Complex[] deciVec = new Complex[length];
@@ -1122,7 +840,7 @@ public class JVCLUtils {
 		}
 		return deciVec;
 	}
-	
+
 	public static float[] decimate(float[] vec, int factor) {
 		int length = vec.length;
 		float[] deciVec = new float[length];
@@ -1131,7 +849,10 @@ public class JVCLUtils {
 		}
 		return deciVec;
 	}
-	
-	
+
+	public static double[][] laplacian2() {
+		return new double[][] { {0, 1, 0}, {1, -4, 1}, {0, 1, 0} };
+	}
+
 }
 

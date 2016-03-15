@@ -1,3 +1,26 @@
+/*
+ * (c) Eric Barnhill 2016 All Rights Reserved.
+ *
+ * This file is part of the Java Volumetric Convolution Library (JVCL). JVCL is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * JVCL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with JVCL.  If not, see http://www.gnu.org/licenses/ .
+ *
+ * This code uses software from the Apache Software Foundation.
+ * The Apache Software License can be found at: http://www.apache.org/licenses/LICENSE-2.0.txt .
+ *
+ * This code uses software from the JogAmp project.
+ * Jogamp information and software license can be found at: https://jogamp.org/ .
+ *
+ * This code uses methods from the JTransforms package by Piotr Wendykier.
+ * JTransforms information and software license can be found at: https://github.com/wendykierp/JTransforms .
+ *
+ */
 package com.ericbarnhill.jvcl;
 
 import java.util.Random;
@@ -12,218 +35,141 @@ import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
 
-public class FTGPU {
-		
+/**
+ * This class performs Fourier-domain convolutions on the GPU. Note that the Stockham implementation used
+ * is quite simple and it does not outperform the CPU method except in specialised cases. Users are welcome
+ * to fork the Stockham implementation and add improvements.
+ *
+ * Arrays must be rectangular i.e. non-ragged. Array and kernel must have the same dimension.
+ *
+ * @author ericbarnhill
+ * @since 0.1
+ * @see StockhamFFT
+ */
+class FTGPU {
+
     CLDevice device;
     CLCommandQueue queue;
     CLProgram program;
     CLContext context;
     CLKernel Kernel;
-    StockhamGPUStride s;
+    StockhamFFT s;
     boolean debug;
-	
-	public FTGPU() {
-		String path = "/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/";
+
+	FTGPU() {
+		String path = "openCL/";
 		context = CLContext.create();
 		device = context.getMaxFlopsDevice();
 		queue = device.createCommandQueue();
-	    String source = JVCLUtils.readFile(path+"src/stockhamStride.cl");
+	    String source = JVCLUtils.readFile(path+"stockhamStride.cl");
 		program = context.createProgram(source).build();
 		Kernel = program.createCLKernel("stockhamStride");
 	}
 
-	public Complex[] convolve(Complex[] vector, Complex[] kernel) {
-		
-		int vectorLength = vector.length;
-		int kernelLength = kernel.length;
-		int vectorLengthInterleaved = 2*vectorLength;
-		int kernelLengthInterleaved = 2*kernelLength;
-		int paddedLength = JVCLUtils.nextPwr2(vectorLengthInterleaved+2*kernelLengthInterleaved);
-		float[] v = JVCLUtils.deepCopyToPadded(
-						JVCLUtils.zeroPadBoundaries(
-							JVCLUtils.double2Float(
-								ComplexUtils.complex2Interleaved(vector) 
-							),
-						kernelLengthInterleaved),
-					paddedLength);
-		float[] k = JVCLUtils.deepCopyToPadded(
-						JVCLUtils.zeroPadBoundaries(
-							JVCLUtils.double2Float(
-								ComplexUtils.complex2Interleaved(kernel) 
-							),
-						kernelLengthInterleaved),
-					paddedLength);
-		s = new StockhamGPUStride(context, device, program, Kernel, queue);
-		int N = v.length / 2;
-		s.fft(v, true, N);
-		s.fft(k, true, N);
-		ArrayMath.multiply(v, k);
-		s.fft(v, false, N);
-		//s.close();
-		return ComplexUtils.interleaved2Complex(
-					JVCLUtils.stripEndPadding(
-						JVCLUtils.stripBorderPadding(
-							JVCLUtils.float2Double(v), kernelLengthInterleaved), 
-						vectorLengthInterleaved)
-				);
-					
+	Complex[] convolve(Complex[] f, Complex[] g) {
+
+		final int fi = f.length;
+		final int gi = g.length;
+		final int padFront = gi;
+		final int padBackF = JVCLUtils.nextPwr2(fi+2*gi) - fi - gi; // rounds out to next power of 2
+		final int padBackG = JVCLUtils.nextPwr2(fi+2*gi) - gi - gi; // rounds out to next power of 2
+		final int totalLengthF = padFront + fi + padBackF;
+		final int totalLengthG = padFront + gi + padBackG;
+		System.out.format("%d %d %d %d %d %d %d %n", fi, gi, padFront, padBackF, padBackG, totalLengthF, totalLengthG);
+		Complex[] fPad = JVCLUtils.zeroPadBoundaries(f, padFront, padBackF);
+		Complex[] gPad = JVCLUtils.zeroPadBoundaries(g, padFront, padBackG);
+		s = new StockhamFFT(context, device, program, Kernel, queue);
+		int N = totalLengthF;
+		JVCLUtils.display(fPad, "prefft", 16);
+		fPad = s.fft(fPad, true, N);
+		gPad = s.fft(gPad, true, N);
+		JVCLUtils.display(fPad, "premult", 16);
+		ArrayMath.multiply(fPad, gPad);
+		JVCLUtils.display(fPad, "postmult", 16);
+		fPad = s.fft(fPad, false, N);
+		JVCLUtils.display(fPad, "postifft", 16);
+		s.close();
+		fPad = JVCLUtils.stripBorderPadding(fPad, padFront, padBackF);
+		//fPad = JVCLUtils.stripBorderPadding(fPad, fi/2, fi/2);
+		JVCLUtils.display(fPad, "post strip", 16);
+		return fPad;
 	}
 
-	public Complex[][] convolve(Complex[][] image, Complex[][] kernel) {
-		debug = false;
-		long t1 = 0; long t2 = 0; long t3 = 0; long t4 = 0; long t5 = 0;long t6 = 0;
-		int imageWidth = image.length;
-		int imageHeight = image[0].length;
-		int kernelWidth = kernel.length;
-		int kernelHeight = kernel[0].length;
-		int imageWidthInterleaved = 2*imageWidth;
-		int imageHeightInterleaved = 2*imageHeight;
-		int kernelWidthInterleaved = 2*kernelWidth;
-		int kernelHeightInterleaved = 2*kernelHeight;
-		int paddedWidth = JVCLUtils.nextPwr2(imageWidthInterleaved+2*kernelWidthInterleaved);
-		int paddedHeight = JVCLUtils.nextPwr2(imageHeightInterleaved+2*kernelHeightInterleaved);
-		if (debug) t1 = System.currentTimeMillis();
-		float[] v = ArrayMath.vectorise(
-						JVCLUtils.deepCopyToPadded(
-							JVCLUtils.zeroPadBoundaries(
-								JVCLUtils.double2Float(
-									ComplexUtils.complex2Interleaved(image)
-								), 
-							kernelWidthInterleaved, kernelHeightInterleaved),
-						paddedWidth, paddedHeight)
-					);
-		float[] k = ArrayMath.vectorise(
-						JVCLUtils.deepCopyToPadded(
-							JVCLUtils.zeroPadBoundaries(
-								JVCLUtils.double2Float(
-									ComplexUtils.complex2Interleaved(kernel)
-								), 
-							kernelWidthInterleaved, kernelHeightInterleaved),
-						paddedWidth, paddedHeight)
-					);
-		s = new StockhamGPUStride(context, device, program, Kernel, queue);
-		int N = paddedWidth / 2;
-		if (debug) t2 = System.currentTimeMillis();
-		s.fft(v, true, N);
-		s.fft(k, true, N);
-		if (debug) t3 = System.currentTimeMillis();
-		JVCLUtils.shiftVectorDim(v, paddedWidth);
-		JVCLUtils.shiftVectorDim(k, paddedWidth);
-		N = paddedHeight / 2;
-		if (debug) t4 = System.currentTimeMillis();
-		s.fft(v, true, N);
-		s.fft(k, true, N);
-		ArrayMath.multiply(v, k);
-		s.fft(v, false, N);
-		if (debug) t5 = System.currentTimeMillis();
-		JVCLUtils.shiftVectorDim(v, paddedHeight);
-		s.fft(v, false, N);
-		if (debug) t6 = System.currentTimeMillis();
-		if (debug) System.out.format("%d %d %d %d %d %n", t2-t1, t3-t2, t4-t3, t5-t4, t6-t5);
-		return ComplexUtils.interleaved2Complex(
-					JVCLUtils.stripEndPadding(
-						JVCLUtils.stripBorderPadding(
-							ArrayMath.devectorise(
-								JVCLUtils.float2Double(v)
-							, paddedWidth),
-						kernelWidthInterleaved, kernelHeightInterleaved), 
-					imageWidthInterleaved, imageHeightInterleaved)
-				);
-					
-	}
-	
-	public Complex[][][] convolve(Complex[][][] image, Complex[][][] kernel) {
-		
-		int imageWidth = image.length;
-		int imageHeight = image[0].length;
-		int imageDepth = image[0][0].length;
-		int kernelWidth = kernel.length;
-		int kernelHeight = kernel[0].length;
-		int kernelDepth = kernel[0][0].length;
-		int imageWidthInterleaved = 2*imageWidth;
-		int imageHeightInterleaved = 2*imageHeight;
-		int imageDepthInterleaved = 2*imageDepth;
-		int kernelWidthInterleaved = 2*kernelWidth;
-		int kernelHeightInterleaved = 2*kernelHeight;
-		int kernelDepthInterleaved = 2*kernelDepth;
-		int paddedWidth = JVCLUtils.nextPwr2(imageWidthInterleaved+2*kernelWidthInterleaved);
-		int paddedHeight = JVCLUtils.nextPwr2(imageHeightInterleaved+2*kernelHeightInterleaved);
-		int paddedDepth = JVCLUtils.nextPwr2(imageDepthInterleaved+2*kernelDepthInterleaved);
-		float[] v = ArrayMath.vectorise(
-						JVCLUtils.deepCopyToPadded(
-							JVCLUtils.zeroPadBoundaries(
-								JVCLUtils.double2Float(
-									ComplexUtils.complex2Interleaved(image) 
-								),
-							kernelWidthInterleaved, kernelHeightInterleaved, kernelDepthInterleaved),
-						paddedWidth, paddedHeight, paddedDepth)
-					);
-		float[] k = ArrayMath.vectorise(
-						JVCLUtils.deepCopyToPadded(
-							JVCLUtils.zeroPadBoundaries(
-								JVCLUtils.double2Float(
-									ComplexUtils.complex2Interleaved(kernel) 
-								),
-							kernelWidthInterleaved, kernelHeightInterleaved, kernelDepthInterleaved),
-						paddedWidth, paddedHeight, paddedDepth)
-					);
-		s = new StockhamGPUStride(context, device, program, Kernel, queue);
-		int N = paddedWidth / 2;
-		s.fft(v, true, N);
-		s.fft(k, true, N);
-		JVCLUtils.shiftVectorDim(v, paddedWidth);
-		JVCLUtils.shiftVectorDim(k, paddedWidth);
-		N = paddedHeight / 2;
-		s.fft(v, true, N);
-		s.fft(k, true, N);
-		ArrayMath.multiply(v, k);
-		s.fft(v, false, N);
-		JVCLUtils.shiftVectorDim(v, paddedHeight);
-		s.fft(v, true, N);
+	Complex[][] convolve(Complex[][] f, Complex[][] g) {
+
+		final int fi = f.length;
+		final int fj = f[0].length;
+		final int gi = g.length;
+		final int gj = g[0].length;
+		final int padFrontI = gi;
+		final int padBackFI = JVCLUtils.nextPwr2(fi+2*gi) - fi - gi; // rounds out to next power of 2
+		final int padBackGI = JVCLUtils.nextPwr2(fi+2*gi) - gi - gi; // rounds out to next power of 2
+		final int padFrontJ = gj;
+		final int padBackFJ = JVCLUtils.nextPwr2(fj+2*gj) - fj - gj; // rounds out to next power of 2
+		final int padBackGJ = JVCLUtils.nextPwr2(fj+2*gj) - gj - gj; // rounds out to next power of 2
+		final int totalLengthFI = padFrontI + fi + padBackFI;
+		final int totalLengthGI = padFrontI + gi + padBackGI;
+		final int totalLengthFJ = padFrontJ + fj + padBackFJ;
+		final int totalLengthGJ = padFrontJ + gj + padBackGJ;
+		Complex[][] fPad = JVCLUtils.zeroPadBoundaries(f, padFrontI, padBackFI, padFrontJ, padBackFJ);
+		Complex[][] gPad = JVCLUtils.zeroPadBoundaries(g, padFrontI, padBackGI, padFrontJ, padBackGJ);
+		s = new StockhamFFT(context, device, program, Kernel, queue);
+		int NI = totalLengthFI;
+		int NJ = totalLengthFJ;
+		fPad = s.fft(fPad, true, NI);
+		gPad = s.fft(gPad, true, NI);
+		fPad = ArrayMath.shiftDim(fPad);
+		gPad = ArrayMath.shiftDim(gPad);
+	    fPad = s.fft(fPad, true, NJ);
+	    gPad = s.fft(gPad, true, NJ);
+		ArrayMath.multiply(fPad, gPad);
+		fPad = s.fft(fPad, false, NJ);
+		fPad = ArrayMath.shiftDim(fPad);
+        fPad = s.fft(fPad, false, NI);
 		s.close();
-		return ComplexUtils.interleaved2Complex(
-					JVCLUtils.stripEndPadding(
-						JVCLUtils.stripBorderPadding(
-							ArrayMath.devectorise(
-								JVCLUtils.float2Double(v)
-							, paddedWidth, paddedHeight),
-						kernelWidthInterleaved, kernelHeightInterleaved, kernelDepthInterleaved), 
-					imageWidthInterleaved, imageHeightInterleaved, imageDepthInterleaved)
-				);
-					
+		return JVCLUtils.stripBorderPadding(fPad, padFrontI, padBackFI, padFrontJ, padBackFJ);
+		//return JVCLUtils.stripBorderPadding(fPad, fi/2, fi/2, fj/2, fj/2);
 	}
-	
-	public void close() {
+
+	/**
+	 * Should be called as destructor method.
+	 */
+	void close() {
 		context.release();
 	}
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		Random random = new Random();
-		int arraySize = 512;
-		int kernelSize = 7;
+		int arraySize = 128;
+		int gSize = 7;
 		long start, end, duration;
 		FTGPU ftgpu = new FTGPU();
-		System.out.format("Array size %d Kernel Size %d \n", arraySize, kernelSize);
-		double[][] array = new double[arraySize][arraySize];
-		double[][] kernel = new double[kernelSize][kernelSize];
-		for (int x = 0; x < arraySize; x++) {
-			for (int y = 0; y < arraySize; y++) {
-				if (x < kernelSize && y < kernelSize) {
-					kernel[x][y] = random.nextDouble();
-				}
-				array[x][y] = random.nextDouble();
-			}
-		}
+		System.out.format("Array size %d Kernel Size %d \n", arraySize, gSize);
+		// 1D
+		double[] f = ArrayMath.secondOrder(arraySize);
+		double[] lap1D = new double[] {1, -2, 1};
 		start = System.currentTimeMillis();
-		for (int t = 0; t < 10; t++) {
-			ftgpu.convolve(ComplexUtils.real2Complex(array), ComplexUtils.real2Complex(kernel));
-			System.out.println("---");
-		}
+		Complex[] result = ftgpu.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(lap1D));
 		end = System.currentTimeMillis();
 		duration = end-start;
-		System.out.format("2D FT on GPU: %.1f sec %n", duration / 1000.0 );
+		System.out.format("1D FT on GPU: %.1f sec %n", duration / 1000.0 );
+		JVCLUtils.display(ComplexUtils.complex2Real(result), "result", 16);
 		System.out.println("Done");
 		ftgpu.close();
+		/*
+		// 2D
+		ftgpu = new FTGPU();
+	    double[][] f2 = ArrayMath.secondOrder(arraySize, arraySize);
+	    double[][] lap2D = JVCLUtils.laplacian2();
+	    start = System.currentTimeMillis();
+	    Complex[][] result2 = ftgpu.convolve(ComplexUtils.real2Complex(f2), ComplexUtils.real2Complex(lap2D));
+	    end = System.currentTimeMillis();
+	    duration = end-start;
+	    System.out.format("1D FT on GPU: %.1f sec %n", duration / 1000.0 );
+	    JVCLUtils.display(ComplexUtils.complex2Real(result2), "result", 32);
+	    System.out.println("Done");
+	    ftgpu.close();
+	    */
 	}
 
 }
