@@ -47,7 +47,7 @@ import com.jogamp.opencl.demos.fft.CLFFTPlan;
  * @since 0.1
  * @see FTGPU
  */
-public class StockhamFFT {
+class StockhamFFT {
 
 	CLFFTPlan fft;
     JVCLUtils ds;
@@ -63,7 +63,7 @@ public class StockhamFFT {
 	FloatBuffer realBuffer;
 	FloatBuffer imagBuffer;
 
-	public StockhamFFT() {
+	StockhamFFT() {
 		context = CLContext.create();
 		device = context.getMaxFlopsDevice();
 		queue = device.createCommandQueue();
@@ -72,7 +72,7 @@ public class StockhamFFT {
 		Kernel = program.createCLKernel("stockhamStride");
 	}
 
-	public StockhamFFT(CLContext context, CLDevice device, CLProgram program, CLKernel Kernel, CLCommandQueue queue) {
+	StockhamFFT(CLContext context, CLDevice device, CLProgram program, CLKernel Kernel, CLCommandQueue queue) {
 		this.context = context;
 		this.device = device;
 		this.program = program;
@@ -81,7 +81,7 @@ public class StockhamFFT {
 		Kernel = program.createCLKernel("stockhamStride");
 	}
 
-	public void fft(float[] real, float[] imag, boolean isForward, int N) {
+	void fft(float[] real, float[] imag, boolean isForward, int N) {
 	    final int len = real.length;
 	    final int blocks = len / N;
 	    final int pwr2 = (int)(Math.log(N)/Math.log(2));
@@ -120,11 +120,11 @@ public class StockhamFFT {
 		}
 	}
 
-	public void fft(ArrayList<float[]> split, boolean isForward, int N) {
+	void fft(ArrayList<float[]> split, boolean isForward, int N) {
 		fft(split.get(0), split.get(1), isForward, N);
 	}
 
-	public Complex[] fft(Complex[] c, boolean isForward, int N) {
+	Complex[] fft(Complex[] c, boolean isForward, int N) {
 		float[] re = ComplexUtils.complex2RealFloat(c);
 		float[] im = ComplexUtils.complex2ImaginaryFloat(c);
 		fft(re, im, isForward, N);
@@ -132,7 +132,7 @@ public class StockhamFFT {
 		return cFFT;
 	}
 
-   public Complex[][] fft(Complex[][] c, boolean isForward, int N) {
+   Complex[][] fft(Complex[][] c, boolean isForward, int N) {
        final int ci = c.length;
        final int cj = c[0].length;
        Complex[][] cFFT = ComplexUtils.initialize(new Complex[ci][cj]);
@@ -142,7 +142,7 @@ public class StockhamFFT {
        return cFFT;
     }
 
-   public Complex[][][] fft(Complex[][][] c, boolean isForward, int N) {
+   Complex[][][] fft(Complex[][][] c, boolean isForward, int N) {
        final int ci = c.length;
        final int cj = c[0].length;
        final int ck = c[0][0].length;
@@ -157,7 +157,7 @@ public class StockhamFFT {
 	/**
 	 * should be called as destructor method
 	 */
-	public void close() {
+	void close() {
 		Kernel.release();
 	}
 

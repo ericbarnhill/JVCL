@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="jvcl/mathArray/Interleaved.java|jvcl/mathArray/MathArray.java|jvcl/UnrollDebug.java|jvclTesting/UnrollTest.java|jvcl/FDGPU_old.java|jvcl/GPUFFT_old.java|jvcl/GPUFFT.java|com/ericbarnhill/jvcl/FTGPU.java" kind="src" path="src"/>
+	<classpathentry excluding="jvcl/mathArray/Interleaved.java|jvcl/mathArray/MathArray.java|jvcl/UnrollDebug.java|jvclTesting/UnrollTest.java|jvcl/FDGPU_old.java|jvcl/GPUFFT_old.java|jvcl/GPUFFT.java|com/ericbarnhill/jvcl/FTGPU.java|com/ericbarnhill/jvcl/StockhamFFT.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar" sourcepath="/home/ericbarnhill/Documents/code/jogamp/jocl-demos/src">
 		<attributes>
