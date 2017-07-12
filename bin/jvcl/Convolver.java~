@@ -1,0 +1,148 @@
+/* Copyright (c) 2015 Eric Barnhill
+*
+*Permission is hereby granted, free of charge, to any person obtaining a copy
+*of this software and associated documentation files (the "Software"), to deal
+*in the Software without restriction, including without limitation the rights
+*to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+*copies of the Software, and to permit persons to whom the Software is
+*furnished to do so, subject to the following conditions:
+*
+*The above copyright notice and this permission notice shall be included in all
+*copies or substantial portions of the Software.
+*
+*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*SOFTWARE.
+*/
+
+package jvcl;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Random;
+
+public class Convolver {
+	
+	int boundaryConditions;
+	
+	final int ZERO_BOUNDARY = 0;
+	final int MIRROR_BOUNDARY = 1;
+	final int PERIODIC_BOUNDARY = 2;
+	FDCPUNaive naive;
+	FDCPUUnrolled unrolled;
+	FTCPU ftcpu;
+	FDGPU fdgpu;
+	FTGPU ftgpu;
+	
+	public Convolver(int boundaryConditions) {
+		this.boundaryConditions = boundaryConditions;
+		naive = new FDCPUNaive(boundaryConditions);
+		unrolled = new FDCPUUnrolled(boundaryConditions);
+		ftcpu = new FTCPU();
+		fdgpu = new FDGPU(boundaryConditions);
+		ftgpu = new FTGPU();
+	}
+	
+	public Convolver() {
+		this.boundaryConditions = ZERO_BOUNDARY;
+		naive = new FDCPUNaive(boundaryConditions);
+		unrolled = new FDCPUUnrolled(boundaryConditions);
+		ftcpu = new FTCPU();
+		fdgpu = new FDGPU(boundaryConditions);
+		ftgpu = new FTGPU();
+	}
+	
+	void readPreferences() {
+		
+		prefs = Preferences.userNodeForPackage( this.getClass() );
+		lut = prefs.get(LUT, "Grays");
+		min = prefs.getDouble(MIN, 0);
+		max = prefs.getDouble(MAX, 5000);
+		ticks = prefs.getInt(TICKS, 6);
+		decimalPlaces = prefs.getInt(DECIMALPLACES, 0);
+		fontSize = prefs.getInt(FONTSIZE, 12);
+		font = prefs.get(FONT, "Arial");
+		xMargin = prefs.getInt(XMARGIN, 4);
+		yMargin = prefs.getInt(YMARGIN, 4);
+		fillColor = prefs.get(FILLCOLOR, colors[0]);
+		textColor = prefs.get(TEXTCOLOR, colors[3]);
+		boxOutlineColor = prefs.get(BOXOUTLINECOLOR, colors[0]);
+		barOutlineColor = prefs.get(BAROUTLINECOLOR, colors[3]);
+		height = prefs.getInt(HEIGHT, 0);
+		width = prefs.getInt(WIDTH,0);
+		barHeight = prefs.getInt(BARHEIGHT, 0);
+		barWidth = prefs.getInt(BARWIDTH,0);
+		
+		return;
+		
+		
+	}
+	
+	void writePreferences() {
+			
+		prefs.put(LUT, lut);
+		prefs.putDouble(MIN, min);
+		prefs.putDouble(MAX, max);
+		prefs.putInt(TICKS, ticks);
+		prefs.putInt(DECIMALPLACES, decimalPlaces);
+		prefs.putInt(FONTSIZE, fontSize);
+		prefs.putInt(XMARGIN, xMargin);
+		prefs.putInt(YMARGIN, yMargin);
+		prefs.put(FILLCOLOR, fillColor);
+		prefs.put(TEXTCOLOR, textColor);
+		prefs.put(BOXOUTLINECOLOR, boxOutlineColor);
+		prefs.put(BAROUTLINECOLOR, barOutlineColor);
+		if (heightAuto) {
+			prefs.putInt(HEIGHT, 0);
+		} else {
+			prefs.putInt(HEIGHT, height);
+		}
+		if (widthAuto) {
+			prefs.putInt(WIDTH, 0);
+		} else {
+			prefs.putInt(WIDTH, width);
+		}
+		if (barHeightAuto) {
+			prefs.putInt(BARHEIGHT, 0);
+		} else {
+			prefs.putInt(BARHEIGHT, barHeight);
+		}
+		if (barWidthAuto) {
+			prefs.putInt(BARWIDTH, 0);
+		} else {
+			prefs.putInt(BARWIDTH, barWidth);
+		}
+		
+		try {
+			prefs.flush();
+		} catch (Exception e) {
+			System.out.println("Couldn't flush prefs");
+			e.printStackTrace();
+		}
+		
+		return;	
+	}
+
+	static private byte[] object2Bytes( Object o ) throws IOException {
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	  ObjectOutputStream oos = new ObjectOutputStream( baos );
+	  oos.writeObject( o );
+	  return baos.toByteArray();
+	}
+
+	static private Object bytes2Object( byte raw[] )
+    throws IOException, ClassNotFoundException {
+	  ByteArrayInputStream bais = new ByteArrayInputStream( raw );
+	  ObjectInputStream ois = new ObjectInputStream( bais );
+	  Object o = ois.readObject();
+	  return o;
+	}
+}
+		
+}
+
+

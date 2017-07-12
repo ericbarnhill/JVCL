@@ -25,8 +25,8 @@ package com.ericbarnhill.jvcl;
 
 import java.util.Random;
 
-import org.apache.commons.math4.complex.Complex;
-import org.apache.commons.math4.complex.ComplexUtils;
+import org.apache.commons.numbers.complex.Complex;
+import org.apache.commons.numbers.complex.ComplexUtils;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.jogamp.opencl.CLCommandQueue;

@@ -9,7 +9,7 @@
  	<property name="doc.dir" location="doc" />
  	<property name="home" location="/home/ericbarnhill"/>
  	<property name="code" location="${home}/Documents/code" />
- 	<property name="commons.math" location="${code}/commons-math-fork/commons-math/target/classes/" />
+ 	<property name="commons.math" location="${code}/commons-math/target/classes/" />
 	<property name="user.name" value="Eric Barnhill" /> 
 	<target name="main" depends="doc" description="Main target">
 		<echo>
@@ -31,7 +31,6 @@
         <fileset dir="${proj.dir}/../ArrayMath/bin"/>
         <fileset dir="${commons.math}"/>
         <zipfileset excludes="META-INF/*.SF" src="${home}/Documents/code/commons-lang3-3.1/commons-lang3-3.1.jar"/>
-        <zipfileset excludes="META-INF/*.SF" src="/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar"/>
 	 	</jar>
 	 	<move file="JVCL.jar" toDir="${dist.dir}" />
 	  </target>
@@ -39,7 +38,7 @@
 	 	<delete dir="${doc.dir}" />
 	 	<javadoc access="protected" author="true" classpath="/home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar:/home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar:/home/ericbarnhill/.p2/pool/plugins/org.hamcrest.core_1.3.0.v201303031735.jar:/home/ericbarnhill/Documents/code/commons-lang3-3.1/commons-lang3-3.1.jar:/home/ericbarnhill/JUnit/bin:/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar:/home/ericbarnhill/Documents/code/jtransforms-2.4.jar:/home/ericbarnhill/Documents/code/commons-math-fork/commons-math/target/test-classes:/home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar:/home/ericbarnhill/.p2/pool/plugins/org.junit_4.12.0.v201504281640/junit.jar:/home/ericbarnhill/Documents/code/commons-math-fork/commons-math/target/classes:../ArrayMath/bin" destdir="doc" doctitle="Java ArrayMath API Documentation" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.ericbarnhill.jvcl" source="1.7" sourcepath="src" splitindex="true" use="true" version="true">
 	 	    <link href="file:/home/ericbarnhill/barnhill-eclipse-workspace/ArrayMath/doc/"/>
-        	<link href="file:/home/ericbarnhill/Documents/code/commons-math-fork/commons-math/doc/"/>
+        	<link href="file:/home/ericbarnhill/Documents/code/commons-math/target/site/apidocs"/>
 	 		<link href="/home/ericbarnhill/Documents/code/jogamp/jocl/build/javadoc/jocl/javadoc" />
 	 	</javadoc>
 	  </target>

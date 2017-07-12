@@ -26,8 +26,8 @@ package com.ericbarnhill.jvcl;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import org.apache.commons.math4.complex.Complex;
-import org.apache.commons.math4.complex.ComplexUtils;
+import org.apache.commons.numbers.complex.Complex;
+import org.apache.commons.numbers.complex.ComplexUtils;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.jogamp.opencl.CLBuffer;
@@ -36,7 +36,6 @@ import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
-import com.jogamp.opencl.demos.fft.CLFFTPlan;
 
 /**
  * Stockham FFT implementation in JogAmp. Note that this implementation is quite simple.
@@ -49,7 +48,6 @@ import com.jogamp.opencl.demos.fft.CLFFTPlan;
  */
 class StockhamFFT {
 
-	CLFFTPlan fft;
     JVCLUtils ds;
     CLDevice device;
     CLProgram program;

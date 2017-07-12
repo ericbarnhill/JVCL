@@ -1,0 +1,594 @@
+package jvcl;
+
+import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.*;
+
+import com.jogamp.opencl.CLBuffer;
+import com.jogamp.opencl.CLCommandQueue;
+import com.jogamp.opencl.CLContext;
+import com.jogamp.opencl.CLDevice;
+import com.jogamp.opencl.CLKernel;
+import com.jogamp.opencl.CLProgram;
+import com.jogamp.opencl.demos.fft.*;
+import com.jogamp.opencl.demos.fft.CLFFTPlan.InvalidContextException;
+import com.jogamp.common.nio.PointerBuffer;
+
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
+import static java.lang.System.*;
+import static com.jogamp.opencl.CLMemory.Mem.*;
+import static java.lang.Math.*;
+
+public class ConvolveJOCL {
+	
+    CLFFTPlan fft;
+    DimShifter ds;
+    CLDevice device;
+    CLCommandQueue queue;
+    CLProgram program;
+    CLContext context;
+	
+	public ConvolveJOCL() {
+		ds = new DimShifter();
+	}
+
+	public double[] convolveFDJOCL(double[] vector, double[] kernel) throws IOException {
+		context = CLContext.create();
+        double[] result;
+        try{
+            device = context.getMaxFlopsDevice();
+            queue = device.createCommandQueue();
+            Path currentRelativePath = Paths.get("");
+            String s = currentRelativePath.toAbsolutePath().toString();
+            String source = readFile("src/Convolve1d.cl");
+            program = context.createProgram(source).build(); 
+            int vectorLength = vector.length;
+            float[] vectorFloat = new float[vectorLength];
+            for (int n = 0; n < vectorLength; n++) vectorFloat[n] = (float)vector[n];
+            int kernelLength = kernel.length;
+            float[] kernelFloat = new float[kernelLength];
+            for (int n = 0; n < kernelLength; n++) kernelFloat[n] = (float)kernel[n];
+            int halfLength = kernelLength / 2;
+        	int localWorkSize = min(device.getMaxWorkGroupSize(), 256);  // Local work size dimensions
+        	CLBuffer<FloatBuffer> clVector = context.createFloatBuffer(vectorLength, READ_ONLY);
+            CLBuffer<FloatBuffer> clKernel = context.createFloatBuffer(kernelLength, READ_ONLY);
+            CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(vectorLength, WRITE_ONLY);
+            clVector.getBuffer().put(vectorFloat).rewind();
+            clKernel.getBuffer().put(kernelFloat).rewind();
+            CLKernel Kernel = program.createCLKernel("Convolve1d");
+            Kernel.putArg(clVector)
+            	.putArg(clKernel)
+            	.putArg(clOutput)
+            	.putArg(vectorLength)
+            	.putArg(kernelLength)
+            	.putArg(halfLength);
+            queue.putWriteBuffer(clVector, false)
+            	.putWriteBuffer(clKernel, false)
+            	.put1DRangeKernel(Kernel, 0, roundUp(vectorLength, 32),0)
+            	.putReadBuffer(clOutput, true);
+    		result = new double[vectorLength];
+    		for (int x = 0; x < vectorLength; x++) {
+    				result[x] = clOutput.getBuffer().get(x);
+    		}
+        }finally{
+            // cleanup all resources associated with this context.
+            context.release();
+        }
+        return result;    		
+	}
+	
+	public double[][] convolveFDJOCL(double[][] image, double[][] kernel) throws IOException {
+		context = CLContext.create();
+        double[][] result;
+        try{
+            device = context.getMaxFlopsDevice();
+            queue = device.createCommandQueue();
+            Path currentRelativePath = Paths.get("");
+            String s = currentRelativePath.toAbsolutePath().toString();
+            String source = readFile("src/Convolve2d.cl");
+            program = context.createProgram(source).build(); 
+            int imageWidth = image.length;
+            int imageHeight = image[0].length;
+            int imageArea = imageWidth*imageHeight;
+            float[] image1d = new float[imageArea];
+            int index = 0;
+            for (int x = 0; x < imageWidth; x++) {
+            	for (int y = 0; y < imageHeight; y++) {
+            		index = x + imageWidth*y;
+            		image1d[index] = (float)image[x][y];
+            	}
+            }
+            int kernelWidth = kernel.length;
+            int kernelHeight = kernel[0].length;
+            int kernelArea = kernelWidth*kernelHeight;
+            int halfWidth = kernelWidth / 2;
+            int halfHeight = kernelHeight / 2;
+            float[] kernel1d = new float[kernelArea];
+            for (int x = 0; x < kernelWidth; x++) {
+            	for (int y = 0; y < kernelHeight; y++) {
+            		index = x + kernelWidth*y;
+            		kernel1d[index] = (float)kernel[x][y];
+            	}
+            }
+            // TODO get work size finished
+        	int localWorkSize = min(device.getMaxWorkGroupSize(), 256);  // Local work size dimensions
+        	CLBuffer<FloatBuffer> clImage = context.createFloatBuffer(imageArea, READ_ONLY);
+            CLBuffer<FloatBuffer> clKernel = context.createFloatBuffer(kernelArea, READ_ONLY);
+            CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(imageArea, WRITE_ONLY);
+            clImage.getBuffer().put(image1d).rewind();
+            clKernel.getBuffer().put(kernel1d).rewind();
+            CLKernel Kernel = program.createCLKernel("Convolve2d");
+            Kernel.putArg(clImage)
+            	.putArg(clKernel)
+            	.putArg(clOutput)
+            	.putArg(imageWidth)
+            	.putArg(imageHeight)
+            	.putArg(kernelWidth)
+            	.putArg(kernelHeight)
+            	.putArg(halfWidth)
+            	.putArg(halfHeight);
+            queue.putWriteBuffer(clImage, false)
+            	.putWriteBuffer(clKernel, false)
+            	.put2DRangeKernel(Kernel, 0, 0, roundUp(imageWidth, 32),roundUp(imageHeight,32), 0,0)
+            	.putReadBuffer(clOutput, true);
+    		result = new double[imageWidth][imageHeight];
+    		for (int x = 0; x < imageWidth; x++) {
+    			for (int y = 0; y < imageHeight; y++) {
+    				result[x][y] = clOutput.getBuffer().get(x + y*imageWidth);
+    			}
+    		}
+        } finally {
+            // cleanup all resources associated with this context.
+            context.release();
+        }
+        return result;
+	}
+
+	public double[][][] convolveFDJOCL(double[][][] image, double[][][] kernel) throws IOException {
+		context = CLContext.create();
+        //out.println("created "+context);
+        double[][][] result;
+        try{
+            device = context.getMaxFlopsDevice();
+            queue = device.createCommandQueue();
+            Path currentRelativePath = Paths.get("");
+            String s = currentRelativePath.toAbsolutePath().toString();
+            //System.out.println("Current relative path is: " + s);
+            String source = readFile("src/Convolve3d.cl");
+            program = context.createProgram(source).build(); 
+            int imageWidth = image.length;
+            int imageHeight = image[0].length;
+            int imageDepth = image[0][0].length;
+            int imageArea = imageWidth*imageHeight;
+            int imageVolume = imageArea*imageDepth;
+            float[] image1d = new float[imageVolume];
+            int index = 0;
+            for (int x = 0; x < imageWidth; x++) {
+            	for (int y = 0; y < imageHeight; y++) {
+            		for (int z = 0; z < imageDepth; z++) {
+	            		index = x + imageWidth*y + imageArea*z;
+	            		image1d[index] = (float)image[x][y][z];
+            		}
+            	}
+            }
+            int kernelWidth = kernel.length;
+            int kernelHeight = kernel[0].length;
+            int kernelDepth = kernel[0][0].length;
+            int kernelArea = kernelWidth*kernelHeight;
+            int kernelVolume = kernelArea*kernelDepth;
+            int halfWidth = kernelWidth / 2;
+            int halfHeight = kernelHeight / 2;
+            int halfDepth = kernelDepth / 2;
+            float[] kernel1d = new float[kernelVolume];
+            for (int x = 0; x < kernelWidth; x++) {
+            	for (int y = 0; y < kernelHeight; y++) {
+            		for (int z = 0; z < kernelDepth; z++) {
+	            		index = x + kernelWidth*y + kernelArea*z;
+	            		kernel1d[index] = (float)kernel[x][y][z];
+            		}
+            	}
+            }
+        	int localWorkSize = min(device.getMaxWorkGroupSize(), 32);  // Local work size dimensions
+        	int globalX = roundUp(imageWidth, localWorkSize);
+        	int globalY = roundUp(imageHeight, localWorkSize);
+        	int globalZ = roundUp(imageDepth, localWorkSize);
+        	CLBuffer<FloatBuffer> clImage = context.createFloatBuffer(imageVolume, READ_ONLY);
+            CLBuffer<FloatBuffer> clKernel = context.createFloatBuffer(kernelVolume, READ_ONLY);
+            CLBuffer<FloatBuffer> clOutput = context.createFloatBuffer(imageVolume, WRITE_ONLY);
+            clImage.getBuffer().put(image1d).rewind();
+            clKernel.getBuffer().put(kernel1d).rewind();
+            CLKernel Kernel = program.createCLKernel("Convolve3d");
+            Kernel.putArg(clImage)
+            	.putArg(clKernel)
+            	.putArg(clOutput)
+            	.putArg(imageWidth)
+            	.putArg(imageHeight)
+            	.putArg(imageDepth)
+            	.putArg(kernelWidth)
+            	.putArg(kernelHeight)
+            	.putArg(kernelDepth)
+            	.putArg(halfWidth)
+            	.putArg(halfHeight)
+            	.putArg(halfDepth);
+            queue.putWriteBuffer(clImage, false)
+            	.putWriteBuffer(clKernel, false)
+            	.put3DRangeKernel(Kernel, 0, 0, 0, globalX, globalY, globalZ, 0,0,0)
+            	.putReadBuffer(clOutput, true);
+    		result = new double[imageWidth][imageHeight][imageDepth];
+    		for (int x = 0; x < imageWidth; x++) {
+    			for (int y = 0; y < imageHeight; y++) {
+    				for (int z = 0; z < imageDepth; z++) {
+    					result[x][y][z] = clOutput.getBuffer().get(x + y*imageWidth + z*imageArea);
+    				}
+    			}
+    		}
+        }finally{
+            context.release();
+        }
+        return result;
+	}
+
+	public double[] convolveFTJOCL(double[] vector, double[] kernel, boolean isComplex) {
+		
+		int vectorLength = vector.length;
+		int kernelLength = kernel.length;
+		Stockham s = new Stockham();
+		
+		double[] paddedReal;
+		double[] paddedImag;
+		double[] paddedKernel;
+		double[] paddedKernelImag; // only has values post-fft
+		int newLength;
+		if (isComplex) {
+			newLength = nextPwr2(vectorLength / 2 + 2 * kernelLength);
+		} else {
+			newLength = nextPwr2(vectorLength + 2 * kernelLength);
+		}
+		paddedReal = new double[newLength];
+		paddedImag = new double[newLength];
+		paddedKernel = new double[newLength];
+		paddedKernelImag = new double[newLength];
+
+		if (isComplex) {
+			for (int x = 0; x < vectorLength/2; x++) {
+					paddedReal[x+kernelLength] = vector[x*2];
+					paddedImag[x+kernelLength] = vector[x*2+1];
+			}
+		} else {
+			for (int x = 0; x < vectorLength; x++) {
+				paddedReal[x+kernelLength] = vector[x];
+			}
+		}
+		
+		for (int x = 0; x < kernelLength; x++) {
+			paddedKernel[x+kernelLength] = kernel[x];
+		}
+
+		s.fft(paddedReal, paddedImag, true);
+		s.fft(paddedVector, paddedVectorImag, true);
+		
+		for (int x = 0; x < newLength; x++) {
+			paddedReal[x] *= paddedKernel[x];
+			paddedImag[x] *= paddedKernelImag[x];
+		}
+		
+		s.fft(paddedReal, paddedImag, false);
+		// RE-INTERLEAVE
+		double[] result = new double[vectorLength];
+		if (isComplex) {
+			for (int x = 0; x < vectorLength / 2; x++) {
+				result[x*2] = paddedReal[x+kernelLength];
+				result[x*2+1] = paddedImag[x+kernelLength];
+		} else {
+			for (int x = 0; x < vectorLength; x++) {
+				result[x] = paddedReal[x+kernelLength];
+			}
+		}		
+		return result;
+		
+	}
+	
+	public double[][] convolveFTJOCL(double[][] image, double[] kernel, boolean isComplex, int dim) {
+		if (dim > 1) throw new RuntimeException("Invalid dim");
+		if (dim == 0) image = ds.shiftDim(image);
+		int height = image.length;
+		for (int n = 0; n < height; n++) {
+			image[n] = convolveFTJOCL(image[n], kernel, isComplex);
+		}
+		if (dim == 0) {
+			return ds.shiftDim(image);
+		} else {
+			return image;
+		}
+	}
+	
+	public double[][] convolveFTJOCL(double[][] image, double[] kernel, boolean isComplex) {
+		return convolveFTJOCL(image, kernel, isComplex, 0);
+	}
+	
+	
+	public double[][][] convolveFTJOCL(double[][][] volume, double[][] kernel, boolean isComplex, int dim) {
+		if (dim == 0) volume = ds.shiftDim(volume, 2);
+		if (dim == 1) volume = ds.shiftDim(volume, 1);
+		if (dim > 2) throw new RuntimeException("Invalid dim");
+		
+		int volumeWidth = volume.length;
+		
+		for (int x = 0; x < volumeWidth; x++) {
+				volume[x] = convolveFTJOCL(volume[x], kernel, isComplex);
+		}
+		return volume;
+	}
+
+	public double[][] convolveFTJOCL(double[][] image, double[][] kernel, boolean isComplex) {
+		
+		int imageWidth = image.length;
+		int imageHeight = image[0].length;
+		
+		int kernelWidth = kernel.length;
+		int kernelHeight = kernel[0].length;
+				
+		Stockham s = new Stockham();
+		int newWidth, newHeight;
+		if (isComplex) {
+			newWidth = imageWidth+2*kernelWidth;
+			newHeight = imageHeight+2*kernelHeight;			
+		} else {
+			newWidth = 2*(imageWidth+2*kernelWidth);
+			newHeight = 2*(imageHeight+2*kernelHeight);	
+		}
+
+		double[][] paddedReal = new double[newWidth][newHeight];
+		double[][] paddedImag = new double[newWidth][newHeight];
+		double[][] paddedKernel = new double[newWidth][newHeight];
+		double[][] paddedKernelImag = new double[newWidth][newHeight];
+		
+		if (isComplex) {
+			for (int x = 0; x < imageWidth / 2; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					paddedReal[x+kernelWidth][y+kernelHeight] = image[x*2][y];
+					paddedImag[x+kernelWidth][y+kernelHeight] = image[x*2+1][y];
+				} 
+			}
+		} else {
+			for (int x = 0; x < imageWidth; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					paddedReal[x+kernelWidth][y+kernelHeight] = image[x][y];
+				} 
+			}
+		}
+		
+		for (int x = 0; x < kernelWidth; x++) {
+			for (int y = 0; y < kernelHeight; y++) {
+					paddedKernel[x+kernelWidth][y+kernelHeight] = kernel[x][y];
+			}
+		}
+		
+		for (int x = 0; x < newDepth; x++) {
+			s.fft(paddedReal[x], paddedImag[x], true);
+			s.fft(paddedKernel[x], paddedKernelImag[x], true);
+		}
+		paddedReal =  ds.shiftDim(paddedReal);
+		paddedImag = ds.shiftDim(paddedImag);
+		paddedKernel = ds.shiftDim(paddedKernel);
+		paddedKernelImag = ds.shiftDim(paddedKernelImag);
+		for (int y = 0; y < newHeight; y++) {
+			s.fft(paddedReal[y], paddedImag[y], true);
+			s.fft(paddedKernel[y], paddedKernelImag[y], true);
+		}
+		
+		for (int x = 0; x < newWidth; x++) {
+			for (int y = 0; y < newHeight; y++) {
+					paddedImage[x][y] *= paddedKernel[x][y];
+			}
+		}
+		for (int y = 0; y < newHeight; y++) {
+			s.fft(paddedReal[y], paddedImag[y], false);
+		}
+		paddedReal =  ds.shiftDim(paddedReal);
+		paddedImag = ds.shiftDim(paddedImag);
+		for (int x = 0; x < newWidth; x++) {
+			s.fft(paddedReal[x], paddedImag[x], false);
+		}
+		double[][] result = new double[imageWidth][imageHeight];
+		if (isComplex) {
+			for (int x = 0; x < imageWidth / 2; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					result[x*2][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+					result[x*2+1][y] = paddedImag[x+kernelWidth][y+kernelHeight];
+				} 
+			}
+		} else {
+			for (int x = 0; x < imageWidth; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					result[x][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+				} 
+			}
+		}
+		return result;
+		
+	}
+		
+	public double[][][] convolveFTJOCL(double[][][] real, double[][][] imag, double kernel) {
+		
+		int imageWidth = image.length;
+		int imageHeight = image[0].length;
+		int imageDepth = image[0][0].length;
+		
+		int kernelWidth = kernel.length;
+		int kernelHeight = kernel[0].length;
+		int kernelDepth = kernel[0][0].length;
+				
+		Stockham s = new Stockham();
+		int newWidth, newHeight;
+		if (isComplex) {
+			newWidth = imageWidth + 2*kernelWidth;
+			newHeight = imageHeight + 2*kernelHeight;		
+			newDepth = imageDepth + 2*kernelDepth;
+		} else {
+			newWidth = 2*(imageWidth+2*kernelWidth);
+			newHeight = 2*(imageHeight+2*kernelHeight);	
+			newDepth = 2*(imageDepth+2*kernelDepth);
+		}
+
+		double[][] paddedReal = new double[newWidth][newHeight][newDepth];
+		double[][] paddedImag = new double[newWidth][newHeight][newDepth];
+		double[][] paddedKernel = new double[newWidth][newHeight][newDepth];
+		double[][] paddedKernelImag = new double[newWidth][newHeight][newDepth];
+		
+		if (isComplex) {
+			for (int x = 0; x < imageWidth / 2; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					paddedReal[x+kernelWidth][y+kernelHeight][z+kernelDepth] = image[x*2][y][z];
+					paddedImag[x+kernelWidth][y+kernelHeight][z+kernelDepth] = image[x*2+1][y][z];
+				} 
+			}
+		} else {
+			for (int x = 0; x < imageWidth; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					paddedReal[x+kernelWidth][y+kernelHeight][z+kernelDepth] = image[x][y][z];
+				} 
+			}
+		}
+		
+		for (int x = 0; x < kernelWidth; x++) {
+			for (int y = 0; y < kernelHeight; y++) {
+					paddedKernel[x+kernelWidth][y+kernelHeight][z+kernelDepth] = kernel[x][y][z];
+			}
+		}
+		
+		for (int x = 0; x < newWidth; x++) {
+			for (int y = 0; y < newHeight; y++) {
+				s.fft(paddedReal[x][y], paddedImag[x][y], true);
+				s.fft(paddedKernel[x][y], paddedKernelImag[x][y], true);
+			}
+		}
+
+		paddedReal =  ds.shiftDim(paddedReal);
+		paddedImag = ds.shiftDim(paddedImag);
+		paddedKernel = ds.shiftDim(paddedKernel);
+		paddedKernelImag = ds.shiftDim(paddedKernelImag);
+
+		for (int y = 0; y < newHeight; y++) {
+			for (int z = 0; z < newDepth; z++) {
+				s.fft(paddedReal[y][z], paddedImag[y][z], true);
+				s.fft(paddedKernel[y][z], paddedKernelImag[y][z], true);
+			}
+		}
+
+		paddedReal =  ds.shiftDim(paddedReal);
+		paddedImag = ds.shiftDim(paddedImag);
+		paddedKernel = ds.shiftDim(paddedKernel);
+		paddedKernelImag = ds.shiftDim(paddedKernelImag);
+
+		for (int z = 0; z < newDepth; z++) {
+			for (int x = 0; x < newWidth; x++) {
+				s.fft(paddedReal[z][x], paddedImag[z][x], true);
+				s.fft(paddedKernel[z][x], paddedKernelImag[z][x], true);
+			}
+		}
+		
+		for (int x = 0; x < newWidth; x++) {
+			for (int y = 0; y < newHeight; y++) {
+				for (int z = 0; z < newDepth; z++) {
+					paddedImage[x][y][z] *= paddedKernel[x][y][z];
+				}
+			}
+		}
+
+		for (int z = 0; z < newDepth; z++) {
+			for (int x = 0; x < newWidth; x++) {
+				s.fft(paddedReal[z][x], paddedImag[z][x], false);
+			}
+		}
+
+		paddedReal =  ds.shiftDim(paddedReal, 2);
+		paddedImag = ds.shiftDim(paddedImag, 2);
+
+		for (int y = 0; y < newHeight; y++) {
+			for (int z = 0; z < newDepth; z++) {
+				s.fft(paddedReal[y][z], paddedImag[y][z], false);
+			}
+		}
+
+		paddedReal =  ds.shiftDim(paddedReal);
+		paddedImag = ds.shiftDim(paddedImag);
+
+		for (int x = 0; x < newWidth; x++) {
+			for (int y = 0; y < newHeight; y++) {
+				s.fft(paddedReal[x][y], paddedImag[x][y], false);
+			}
+		}
+
+		
+		double[][] result = new double[imageWidth][imageHeight];
+		if (isComplex) {
+			for (int x = 0; x < imageWidth / 2; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					result[x*2][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+					result[x*2+1][y] = paddedImag[x+kernelWidth][y+kernelHeight];
+				} 
+			}
+		} else {
+			for (int x = 0; x < imageWidth; x++) {
+				for (int y = 0; y < imageHeight; y++) {
+					result[x][y] = paddedReal[x+kernelWidth][y+kernelHeight];
+				} 
+			}
+		}
+		return result;
+		
+	}
+	
+	public double[][][] convolveFTJOCL(double[][][] volume, double[][] kernel, boolean isComplex) {
+		return convolveFTJOCL(volume, kernel, isComplex, 0);
+	}
+
+    private static int roundUp(int groupSize, int globalSize) {
+        int r = globalSize % groupSize;
+        if (r == 0) {
+            return globalSize;
+        } else {
+            return globalSize + groupSize - r;
+        }
+    }
+    
+    private static String readFile(String fileName) {
+        try  {
+            BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(fileName)));
+            StringBuffer sb = new StringBuffer();
+            String line = null;
+            while (true) {
+                line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                sb.append(line).append("\n");
+            }
+            br.close();
+            return sb.toString();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
+	
+	int nextPwr2(int length) {
+		
+		int pwr2Length = 1;
+		do {
+			pwr2Length *= 2;
+		} while(pwr2Length < length);
+		return pwr2Length;
+	}
+
+
+		
+}

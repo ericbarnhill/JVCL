@@ -1,0 +1,1485 @@
+Apache Maven 3.3.9
+Maven home: /usr/share/maven
+Java version: 1.8.0_02-Ubuntu, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-8-openjdk-amd64/jre
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "4.4.0-7-generic", arch: "amd64", family: "unix"
+[DEBUG] Created new class realm maven.api
+[DEBUG] Importing foreign packages into class realm maven.api
+[DEBUG]   Imported: javax.enterprise.inject.* < plexus.core
+[DEBUG]   Imported: javax.enterprise.util.* < plexus.core
+[DEBUG]   Imported: javax.inject.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.artifact < plexus.core
+[DEBUG]   Imported: org.apache.maven.classrealm < plexus.core
+[DEBUG]   Imported: org.apache.maven.cli < plexus.core
+[DEBUG]   Imported: org.apache.maven.configuration < plexus.core
+[DEBUG]   Imported: org.apache.maven.exception < plexus.core
+[DEBUG]   Imported: org.apache.maven.execution < plexus.core
+[DEBUG]   Imported: org.apache.maven.execution.scope < plexus.core
+[DEBUG]   Imported: org.apache.maven.lifecycle < plexus.core
+[DEBUG]   Imported: org.apache.maven.model < plexus.core
+[DEBUG]   Imported: org.apache.maven.monitor < plexus.core
+[DEBUG]   Imported: org.apache.maven.plugin < plexus.core
+[DEBUG]   Imported: org.apache.maven.profiles < plexus.core
+[DEBUG]   Imported: org.apache.maven.project < plexus.core
+[DEBUG]   Imported: org.apache.maven.reporting < plexus.core
+[DEBUG]   Imported: org.apache.maven.repository < plexus.core
+[DEBUG]   Imported: org.apache.maven.rtinfo < plexus.core
+[DEBUG]   Imported: org.apache.maven.settings < plexus.core
+[DEBUG]   Imported: org.apache.maven.toolchain < plexus.core
+[DEBUG]   Imported: org.apache.maven.usability < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.authentication < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.authorization < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.events < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.observers < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.proxy < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.repository < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.resource < plexus.core
+[DEBUG]   Imported: org.codehaus.classworlds < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.* < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.classworlds < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.component < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.configuration < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.container < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.context < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.lifecycle < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.logging < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.personality < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.Xpp3Dom < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlPullParser < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlPullParserException < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlSerializer < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.* < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.artifact < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.collection < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.deployment < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.graph < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.impl < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.installation < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.internal.impl < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.metadata < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.repository < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.resolution < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.spi < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.transfer < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.version < plexus.core
+[DEBUG]   Imported: org.slf4j.* < plexus.core
+[DEBUG]   Imported: org.slf4j.helpers.* < plexus.core
+[DEBUG]   Imported: org.slf4j.spi.* < plexus.core
+[DEBUG] Populating class realm maven.api
+[INFO] Error stacktraces are turned on.
+[DEBUG] Reading global settings from /usr/share/maven/conf/settings.xml
+[DEBUG] Reading user settings from /home/ericbarnhill/.m2/settings.xml
+[DEBUG] Reading global toolchains from /usr/share/maven/conf/toolchains.xml
+[DEBUG] Reading user toolchains from /home/ericbarnhill/.m2/toolchains.xml
+[DEBUG] Using local repository at /home/ericbarnhill/.m2/repository
+[DEBUG] Using manager EnhancedLocalRepositoryManager with priority 10.0 for /home/ericbarnhill/.m2/repository
+[INFO] Scanning for projects...
+[DEBUG] Extension realms for project com.ericbarnhill:jvcl:jar:0.0.1-SNAPSHOT: (none)
+[DEBUG] Looking up lifecyle mappings for packaging jar from ClassRealm[plexus.core, parent: null]
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.ericbarnhill:jvcl:jar:0.0.1-SNAPSHOT
+[WARNING] 'dependencies.dependency.systemPath' for edu.emory.mathcs:jtransforms:jar should use a variable instead of a hard-coded path /home/ericbarnhill/Documents/code/jtransforms-2.4.jar @ line 44, column 17
+[WARNING] 'dependencies.dependency.systemPath' for com.jogamp:jocl-demos:jar should use a variable instead of a hard-coded path /home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar @ line 51, column 17
+[WARNING] 'dependencies.dependency.systemPath' for com.jogamp:jocl:jar should use a variable instead of a hard-coded path /home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar @ line 59, column 17
+[WARNING] 'dependencies.dependency.systemPath' for com.jogamp:gluegen:jar should use a variable instead of a hard-coded path /home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar @ line 66, column 17
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[DEBUG] === REACTOR BUILD PLAN ================================================
+[DEBUG] Project: com.ericbarnhill:jvcl:jar:0.0.1-SNAPSHOT
+[DEBUG] Tasks:   [compile]
+[DEBUG] Style:   Regular
+[DEBUG] =======================================================================
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java Volumetric Convolution Library 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] === PROJECT BUILD PLAN ================================================
+[DEBUG] Project:       com.ericbarnhill:jvcl:0.0.1-SNAPSHOT
+[DEBUG] Dependencies (collect): []
+[DEBUG] Dependencies (resolve): [compile]
+[DEBUG] Repositories (dependencies): [central (https://repo.maven.apache.org/maven2, default, releases)]
+[DEBUG] Repositories (plugins)     : [central (https://repo.maven.apache.org/maven2, default, releases)]
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-resources-plugin:2.6:resources (default-resources)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildFilters default-value="${project.build.filters}"/>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <escapeString>${maven.resources.escapeString}</escapeString>
+  <escapeWindowsPaths default-value="true">${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+  <includeEmptyDirs default-value="false">${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <overwrite default-value="false">${maven.resources.overwrite}</overwrite>
+  <project default-value="${project}"/>
+  <resources default-value="${project.resources}"/>
+  <session default-value="${session}"/>
+  <supportMultiLineFiltering default-value="false">${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+  <useBuildFilters default-value="true"/>
+  <useDefaultDelimiters default-value="true"/>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-compiler-plugin:3.3:compile (default-compile)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <basedir default-value="${basedir}"/>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <classpathElements default-value="${project.compileClasspathElements}"/>
+  <compileSourceRoots default-value="${project.compileSourceRoots}"/>
+  <compilerId default-value="javac">${maven.compiler.compilerId}</compilerId>
+  <compilerReuseStrategy default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+  <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+  <debug default-value="true">${maven.compiler.debug}</debug>
+  <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <executable>${maven.compiler.executable}</executable>
+  <failOnError default-value="true">${maven.compiler.failOnError}</failOnError>
+  <forceJavacCompilerUse default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+  <fork default-value="false">${maven.compiler.fork}</fork>
+  <generatedSourcesDirectory default-value="${project.build.directory}/generated-sources/annotations"/>
+  <maxmem>${maven.compiler.maxmem}</maxmem>
+  <meminitial>${maven.compiler.meminitial}</meminitial>
+  <mojoExecution default-value="${mojoExecution}"/>
+  <optimize default-value="false">${maven.compiler.optimize}</optimize>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <project default-value="${project}"/>
+  <projectArtifact default-value="${project.artifact}"/>
+  <session default-value="${session}"/>
+  <showDeprecation default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
+  <showWarnings default-value="false">${maven.compiler.showWarnings}</showWarnings>
+  <skipMain>${maven.main.skip}</skipMain>
+  <skipMultiThreadWarning default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+  <source default-value="1.5">1.7</source>
+  <staleMillis default-value="0">${lastModGranularityMs}</staleMillis>
+  <target default-value="1.5">1.7</target>
+  <useIncrementalCompilation default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+  <verbose default-value="false">${maven.compiler.verbose}</verbose>
+</configuration>
+[DEBUG] =======================================================================
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=1, ConflictMarker.markTime=0, ConflictMarker.nodeCount=8, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=1, ConflictIdSorter.conflictIdCount=6, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=2, ConflictResolver.conflictItemCount=7, DefaultDependencyCollector.collectTime=25, DefaultDependencyCollector.transformTime=5}
+[DEBUG] com.ericbarnhill:jvcl:jar:0.0.1-SNAPSHOT
+[DEBUG]    org.apache.commons:commons-math4:jar:4.0-SNAPSHOT:compile
+[DEBUG]    com.ericbarnhill:arrayMath:jar:0.0.1-SNAPSHOT:compile
+[DEBUG]    edu.emory.mathcs:jtransforms:jar:2.4:system
+[DEBUG]    com.jogamp:jocl-demos:jar:1.0:system
+[DEBUG]    com.jogamp:jocl:jar:1.0:system
+[DEBUG]    com.jogamp:gluegen:jar:1.0:system
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ jvcl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=0, ConflictMarker.nodeCount=77, ConflictIdSorter.graphTime=1, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=26, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1, ConflictResolver.conflictItemCount=74, DefaultDependencyCollector.collectTime=86, DefaultDependencyCollector.transformTime=2}
+[DEBUG] org.apache.maven.plugins:maven-resources-plugin:jar:2.6:
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-project:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-profile:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-plugin-registry:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-core:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.6:compile
+[DEBUG]       org.apache.maven.reporting:maven-reporting-api:jar:2.0.6:compile
+[DEBUG]          org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-7:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.0.6:compile
+[DEBUG]       commons-cli:commons-cli:jar:1.0:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.0.6:compile
+[DEBUG]       org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4:compile
+[DEBUG]       classworlds:classworlds:jar:1.1:compile
+[DEBUG]    org.apache.maven:maven-artifact:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-settings:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-model:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-monitor:jar:2.0.6:compile
+[DEBUG]    org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile
+[DEBUG]       junit:junit:jar:3.8.1:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:2.0.5:compile
+[DEBUG]    org.apache.maven.shared:maven-filtering:jar:1.1:compile
+[DEBUG]       org.sonatype.plexus:plexus-build-api:jar:0.0.4:compile
+[DEBUG]    org.codehaus.plexus:plexus-interpolation:jar:1.13:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-resources-plugin:2.6
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-resources-plugin:2.6
+[DEBUG]   Imported:  < maven.api
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-resources-plugin:2.6
+[DEBUG]   Included: org.apache.maven.plugins:maven-resources-plugin:jar:2.6
+[DEBUG]   Included: org.apache.maven.reporting:maven-reporting-api:jar:2.0.6
+[DEBUG]   Included: org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-7
+[DEBUG]   Included: commons-cli:commons-cli:jar:1.0
+[DEBUG]   Included: org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+[DEBUG]   Included: junit:junit:jar:3.8.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:2.0.5
+[DEBUG]   Included: org.apache.maven.shared:maven-filtering:jar:1.1
+[DEBUG]   Included: org.sonatype.plexus:plexus-build-api:jar:0.0.4
+[DEBUG]   Included: org.codehaus.plexus:plexus-interpolation:jar:1.13
+[DEBUG] Configuring mojo org.apache.maven.plugins:maven-resources-plugin:2.6:resources from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-resources-plugin:2.6, parent: sun.misc.Launcher$AppClassLoader@1b6d3586]
+[DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-resources-plugin:2.6:resources' with basic configurator -->
+[DEBUG]   (f) buildFilters = []
+[DEBUG]   (f) escapeWindowsPaths = true
+[DEBUG]   (s) includeEmptyDirs = false
+[DEBUG]   (s) outputDirectory = /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes
+[DEBUG]   (s) overwrite = false
+[DEBUG]   (f) project = MavenProject: com.ericbarnhill:jvcl:0.0.1-SNAPSHOT @ /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/pom.xml
+[DEBUG]   (s) resources = [Resource {targetPath: null, filtering: false, FileSet {directory: /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src, PatternSet [includes: {}, excludes: {**/*.java}]}}]
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@7df587ef
+[DEBUG]   (f) supportMultiLineFiltering = false
+[DEBUG]   (f) useBuildFilters = true
+[DEBUG]   (s) useDefaultDelimiters = true
+[DEBUG] -- end configuration --
+[DEBUG] properties used {env.DESKTOP_SESSION=mate, env.OLDPWD=/home/ericbarnhill/barnhill-eclipse-workspace/JVCL, file.encoding.pkg=sun.io, env.JOGAMP=/home/ericbarnhill/Documents/code//jogamp, java.home=/usr/lib/jvm/java-8-openjdk-amd64/jre, env.QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1, env.GDM_LANG=en_US, env.DISPLAY=:0.0, env.LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:, env.XDG_VTNR=7, env.WEBSITE=/home/ericbarnhill/Documents/cognitive-eurhythmics.com, classworlds.conf=/usr/share/maven/bin/m2.conf, env.XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/ericbarnhill, java.endorsed.dirs=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/endorsed, env.LOGNAME=ericbarnhill, env.UBUNTU_MENUPROXY=0, env.HISTTIMEFORMAT=%d/%m/%y %T , env.XDG_SEAT=seat0, env.MATLABPATH=/home/ericbarnhill/Documents/MATLAB, env.LC_PAPER=de_DE.UTF-8, env.SESSION_MANAGER=local/pwr-lep:@/tmp/.ICE-unix/1327,unix/pwr-lep:/tmp/.ICE-unix/1327, sun.os.patch.level=unknown, java.vendor.url=http://java.oracle.com/, env.XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0, env.MANDATORY_PATH=/usr/share/gconf/mate.mandatory.path, java.version=1.8.0_02-Ubuntu, env.CHARITEDICOM=mre@datenwelle:/data2/, env.JOCL_CLASSPATH=/home/ericbarnhill/Documents/code/jogamp/:/home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar:/home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar, env.QT_STYLE_OVERRIDE=gtk, java.vendor.url.bug=http://bugreport.sun.com/bugreport/, env.LANGUAGE=en_US, env.XDG_DATA_DIRS=/usr/share/mate:/usr/share/mate:/usr/local/share/:/usr/share/, env.PS1=\u@\h:\w$ , env.DOCS=/home/ericbarnhill/Documents/MRElastography/documents, user.name=ericbarnhill, env.LANG=en_US.UTF-8, env.LC_MONETARY=de_DE.UTF-8, sun.io.unicode.encoding=UnicodeLittle, sun.jnu.encoding=UTF-8, env.DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-lg3XpSPZ10,guid=aa1917f2d555f12fae1e558656ff66b7, java.runtime.name=OpenJDK Runtime Environment, env.LC_NAME=de_DE.UTF-8, env.THESIS=/home/ericbarnhill/Documents/MRElastography/documents/2014-09-01-PhD-Thesis, java.specification.name=Java Platform API Specification, user.timezone=, env.LESSOPEN=| /usr/bin/lesspipe %s, path.separator=:, env.MAVEN_CMD_LINE_ARGS= compile -e -X, file.encoding=UTF-8, env.HOME=/home/ericbarnhill, sun.java.command=org.codehaus.plexus.classworlds.launcher.Launcher compile -e -X, env.PHASE=/home/ericbarnhill/Documents/MRElastography/documents/2013-06-08-phase-unwrapping-paper, env.LC_TELEPHONE=de_DE.UTF-8, env.WINEPREFIX=/home/ericbarnhill/.wine32, env.CHARITETARBALLS=mre@datenwelle:/data2//eb-tarballs, env._=/usr/bin/mvn, java.io.tmpdir=/tmp, env.LC_IDENTIFICATION=de_DE.UTF-8, user.language=en, line.separator=
+, env.ARRAYMATH=/home/ericbarnhill/barnhill-eclipse-workspace/ArrayMath, env.SSH_AGENT_PID=1385, java.vm.info=mixed mode, env.MATLABMRE=/home/ericbarnhill/Documents/MATLAB/MATLABMRE, java.vm.specification.name=Java Virtual Machine Specification, env.COLORTERM=mate-terminal, env.LC_MEASUREMENT=de_DE.UTF-8, env.LC_TIME=de_DE.UTF-8, env.GDMSESSION=mate, env.QT_ACCESSIBILITY=1, env.XDG_SESSION_DESKTOP=mate, java.awt.printerjob=sun.print.PSPrinterJob, env.DEFAULTS_PATH=/usr/share/gconf/mate.default.path, env.MATE_DESKTOP_SESSION_ID=this-is-deprecated, env.LEXAR=/media/ericbarnhill/Lexar, env.XDG_SESSION_TYPE=x11, env.WINDOWID=7669960, env.MREIMAGES=/home/ericbarnhill/Documents/MRElastography/images, env.COMPIZ_CONFIG_PROFILE=mate, env.XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0, env.MICCAI=/home/ericbarnhill/Documents/MRElastography/documents/2014-08-21-springpot-mapping-article, os.name=Linux, java.specification.vendor=Oracle Corporation, env.ECLIPSE=/home/ericbarnhill/barnhill-eclipse-workspace, env.TERM=xterm, java.vm.name=OpenJDK 64-Bit Server VM, env.REMOTEMATLAB=s1065614@129.215.66.118:/home/s1065614/Documents/MATLAB/, java.library.path=/home/ericbarnhill/Documents/code//Halide_source/bin:/usr/local/cuda-7.0/lib64:/home/ericbarnhill/Documents/code//itk_build/lib:/usr/lib/x86_64-linux-gnu/:/usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib, env.PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/cuda-7.0/lib64, env.CHARITESCAN=mre@datenwelle:/local_data/datentausch/scan, env.LESSCLOSE=/usr/bin/lesspipe %s %s, java.class.version=52.0, env.SHLVL=1, maven.multiModuleProjectDirectory=/home/ericbarnhill/barnhill-eclipse-workspace/JVCL, env.LD_LIBRARY_PATH=/home/ericbarnhill/Documents/code//Halide_source/bin:/usr/local/cuda-7.0/lib64:/home/ericbarnhill/Documents/code//itk_build/lib:/usr/lib/x86_64-linux-gnu/, env.WHICHNVIDIA=346.96, env.IMAGES=/home/ericbarnhill/Documents/MRElastography/images/, sun.boot.library.path=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64, sun.management.compiler=HotSpot 64-Bit Tiered Compilers, java.awt.graphicsenv=sun.awt.X11GraphicsEnvironment, env.USER=ericbarnhill, env.GTK_MODULES=gail:atk-bridge:canberra-gtk-module:topmenu-gtk-module, env.EDDIEMATLAB=/exports/work/mcm_cric_nas/barnhill/barnhill_matlab, env.ESP=/home/ericbarnhill/java-workspace/ESP, env.FEMCOURSE=/home/ericbarnhill/Documents/MRElastography/papers/maths-papers/coursera-fem-course, java.vm.specification.version=1.8, awt.toolkit=sun.awt.X11.XToolkit, env.PROMPT_COMMAND=echo -ne "\033]0;eb_terminal\007", sun.cpu.isalist=, env.MAVEN_PROJECTBASEDIR=/home/ericbarnhill/barnhill-eclipse-workspace/JVCL, java.ext.dirs=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext:/usr/java/packages/lib/ext, os.version=4.4.0-7-generic, user.home=/home/ericbarnhill, env.XDG_CURRENT_DESKTOP=MATE, java.vm.vendor=Oracle Corporation, env.GTK_OVERLAY_SCROLLING=0, env.JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/, env.XDG_SESSION_ID=c2, env.XAUTHORITY=/home/ericbarnhill/.Xauthority, env.EDDIEHOME=/exports/home/s1065614, user.dir=/home/ericbarnhill/barnhill-eclipse-workspace/JVCL, env.PWD=/home/ericbarnhill/barnhill-eclipse-workspace/JVCL, env.EDDIE=s1065614@eddie.ecdf.ed.ac.uk, env.CLUTTER_BACKEND=x11, sun.cpu.endian=little, env.MREDOCS=/home/ericbarnhill/Documents/MRElastography/documents, java.vm.version=25.02-b03, java.class.path=/usr/share/maven/boot/plexus-classworlds-2.x.jar, org.slf4j.simpleLogger.defaultLogLevel=debug, env.LC_ADDRESS=de_DE.UTF-8, os.arch=amd64, maven.build.version=Apache Maven 3.3.9, env.LC_NUMERIC=de_DE.UTF-8, sun.java.launcher=SUN_STANDARD, java.vm.specification.vendor=Oracle Corporation, file.separator=/, java.runtime.version=1.8.0_02-Ubuntu-8u77-b03-3ubuntu2-b03, env.SSH_AUTH_SOCK=/run/user/1000/keyring/ssh, sun.boot.class.path=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/resources.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jsse.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/charsets.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jfr.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/classes, env.CODE=/home/ericbarnhill/Documents/code/, env.XDG_CONFIG_DIRS=/etc/xdg/xdg-mate:/etc/xdg, env.XDG_RUNTIME_DIR=/run/user/1000, maven.version=3.3.9, env.JVCL=/home/ericbarnhill/barnhill-eclipse-workspace/JVCL, env.PIA=p6168863_gMib7NMTgE, env.PAPERS=/home/ericbarnhill/Documents/MRElastography/papers, user.country=US, maven.home=/usr/share/maven, env.SHELL=/bin/bash, java.vendor=Oracle Corporation, env.REPROD=/home/ericbarnhill/Documents/MRElastography/documents/2015-10-07-reproducibility-results/, env.ECL=/home/ericbarnhill/barnhill-eclipse-workspace, java.specification.version=1.8, sun.arch.data.model=64, env.JOCL_JNI=/home/ericbarnhill/Documents/code/jogamp/gluegen/build/obj/:/home/ericbarnhill/Documents/code/jogamp/natives/linux-amd64/}
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[DEBUG] resource with targetPath null
+directory /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src
+excludes [**/*.java]
+includes []
+[DEBUG] ignoreDelta true
+[INFO] Copying 12 resources
+[DEBUG] file Convolve3d.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve3d.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve3d.cl
+[DEBUG] file Convolve31Complex.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve31Complex.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve31Complex.cl
+[DEBUG] file Convolve2d.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve2d.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve2d.cl
+[DEBUG] file Convolve21.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve21.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve21.cl
+[DEBUG] file Convolve1d.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve1d.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve1d.cl
+[DEBUG] file Convolve2dComplex.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve2dComplex.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve2dComplex.cl
+[DEBUG] file Convolve3dComplex.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve3dComplex.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve3dComplex.cl
+[DEBUG] file Convolve31.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve31.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve31.cl
+[DEBUG] file Convolve21Complex.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve21Complex.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve21Complex.cl
+[DEBUG] file Convolve1dComplex.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/Convolve1dComplex.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/Convolve1dComplex.cl
+[DEBUG] file stockhamStride.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/stockhamStride.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/stockhamStride.cl
+[DEBUG] file stockham.cl has a filtered file extension
+[DEBUG] copy /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/stockham.cl to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes/stockham.cl
+[DEBUG] no use filter components
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.3:compile (default-compile) @ jvcl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=1, ConflictMarker.markTime=0, ConflictMarker.nodeCount=143, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=44, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=2, ConflictResolver.conflictItemCount=73, DefaultDependencyCollector.collectTime=101, DefaultDependencyCollector.transformTime=3}
+[DEBUG] org.apache.maven.plugins:maven-compiler-plugin:jar:3.3:
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.2.1:compile
+[DEBUG]    org.apache.maven:maven-artifact:jar:2.2.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-utils:jar:1.5.15:compile
+[DEBUG]    org.apache.maven:maven-core:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-settings:jar:2.2.1:compile
+[DEBUG]          org.codehaus.plexus:plexus-interpolation:jar:1.11:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.2.1:compile
+[DEBUG]       org.slf4j:slf4j-jdk14:jar:1.5.6:runtime
+[DEBUG]          org.slf4j:slf4j-api:jar:1.5.6:runtime
+[DEBUG]       org.slf4j:jcl-over-slf4j:jar:1.5.6:runtime
+[DEBUG]       org.apache.maven:maven-profile:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-model:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-project:jar:2.2.1:compile
+[DEBUG]          org.apache.maven:maven-plugin-registry:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.2.1:compile
+[DEBUG]          backport-util-concurrent:backport-util-concurrent:jar:3.1:compile
+[DEBUG]       org.apache.maven:maven-monitor:jar:2.2.1:compile
+[DEBUG]       org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3:compile
+[DEBUG]          org.sonatype.plexus:plexus-cipher:jar:1.4:compile
+[DEBUG]    org.apache.maven:maven-toolchain:jar:2.2.1:compile
+[DEBUG]    org.apache.maven.shared:maven-shared-utils:jar:0.7:compile
+[DEBUG]       com.google.code.findbugs:jsr305:jar:2.0.1:compile
+[DEBUG]    org.apache.maven.shared:maven-shared-incremental:jar:1.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-component-annotations:jar:1.5.5:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-api:jar:2.5:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-manager:jar:2.5:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-javac:jar:2.5:runtime
+[DEBUG]    org.codehaus.plexus:plexus-container-default:jar:1.5.5:compile
+[DEBUG]       org.codehaus.plexus:plexus-classworlds:jar:2.2.2:compile
+[DEBUG]       org.apache.xbean:xbean-reflect:jar:3.4:compile
+[DEBUG]          log4j:log4j:jar:1.2.12:compile
+[DEBUG]          commons-logging:commons-logging-api:jar:1.1:compile
+[DEBUG]       com.google.collections:google-collections:jar:1.0:compile
+[DEBUG]       junit:junit:jar:3.8.2:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.3
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.3
+[DEBUG]   Imported:  < maven.api
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.3
+[DEBUG]   Included: org.apache.maven.plugins:maven-compiler-plugin:jar:3.3
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:1.5.15
+[DEBUG]   Included: org.codehaus.plexus:plexus-interpolation:jar:1.11
+[DEBUG]   Included: org.slf4j:slf4j-jdk14:jar:1.5.6
+[DEBUG]   Included: org.slf4j:jcl-over-slf4j:jar:1.5.6
+[DEBUG]   Included: backport-util-concurrent:backport-util-concurrent:jar:3.1
+[DEBUG]   Included: org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3
+[DEBUG]   Included: org.sonatype.plexus:plexus-cipher:jar:1.4
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-utils:jar:0.7
+[DEBUG]   Included: com.google.code.findbugs:jsr305:jar:2.0.1
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-incremental:jar:1.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-component-annotations:jar:1.5.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-api:jar:2.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-manager:jar:2.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-javac:jar:2.5
+[DEBUG]   Included: org.apache.xbean:xbean-reflect:jar:3.4
+[DEBUG]   Included: log4j:log4j:jar:1.2.12
+[DEBUG]   Included: commons-logging:commons-logging-api:jar:1.1
+[DEBUG]   Included: com.google.collections:google-collections:jar:1.0
+[DEBUG]   Included: junit:junit:jar:3.8.2
+[DEBUG] Configuring mojo org.apache.maven.plugins:maven-compiler-plugin:3.3:compile from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-compiler-plugin:3.3, parent: sun.misc.Launcher$AppClassLoader@1b6d3586]
+[DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-compiler-plugin:3.3:compile' with basic configurator -->
+[DEBUG]   (f) basedir = /home/ericbarnhill/barnhill-eclipse-workspace/JVCL
+[DEBUG]   (f) buildDirectory = /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target
+[DEBUG]   (f) classpathElements = [/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes, /home/ericbarnhill/.m2/repository/org/apache/commons/commons-math4/4.0-SNAPSHOT/commons-math4-4.0-SNAPSHOT.jar, /home/ericbarnhill/.m2/repository/com/ericbarnhill/arrayMath/0.0.1-SNAPSHOT/arrayMath-0.0.1-SNAPSHOT.jar, /home/ericbarnhill/Documents/code/jtransforms-2.4.jar, /home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar, /home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar, /home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar]
+[DEBUG]   (f) compileSourceRoots = [/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src]
+[DEBUG]   (f) compilerId = javac
+[DEBUG]   (f) debug = true
+[DEBUG]   (f) failOnError = true
+[DEBUG]   (f) forceJavacCompilerUse = false
+[DEBUG]   (f) fork = false
+[DEBUG]   (f) generatedSourcesDirectory = /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/generated-sources/annotations
+[DEBUG]   (f) mojoExecution = org.apache.maven.plugins:maven-compiler-plugin:3.3:compile {execution: default-compile}
+[DEBUG]   (f) optimize = false
+[DEBUG]   (f) outputDirectory = /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes
+[DEBUG]   (f) project = MavenProject: com.ericbarnhill:jvcl:0.0.1-SNAPSHOT @ /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/pom.xml
+[DEBUG]   (f) projectArtifact = com.ericbarnhill:jvcl:jar:0.0.1-SNAPSHOT
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@7df587ef
+[DEBUG]   (f) showDeprecation = false
+[DEBUG]   (f) showWarnings = false
+[DEBUG]   (f) skipMultiThreadWarning = false
+[DEBUG]   (f) source = 1.7
+[DEBUG]   (f) staleMillis = 0
+[DEBUG]   (f) target = 1.7
+[DEBUG]   (f) useIncrementalCompilation = true
+[DEBUG]   (f) verbose = false
+[DEBUG] -- end configuration --
+[DEBUG] Using compiler 'javac'.
+[DEBUG] Source directories: [/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src]
+[DEBUG] Classpath: [/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes
+ /home/ericbarnhill/.m2/repository/org/apache/commons/commons-math4/4.0-SNAPSHOT/commons-math4-4.0-SNAPSHOT.jar
+ /home/ericbarnhill/.m2/repository/com/ericbarnhill/arrayMath/0.0.1-SNAPSHOT/arrayMath-0.0.1-SNAPSHOT.jar
+ /home/ericbarnhill/Documents/code/jtransforms-2.4.jar
+ /home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar
+ /home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar
+ /home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar]
+[DEBUG] Output directory: /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes
+[DEBUG] Adding /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/generated-sources/annotations to compile source roots:
+  /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src
+[DEBUG] New compile source roots:
+  /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src
+  /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/generated-sources/annotations
+[DEBUG] CompilerReuseStrategy: reuseCreated
+[DEBUG] useIncrementalCompilation enabled
+[DEBUG] Stale source detected: /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/com/ericbarnhill/jvcl/Unrolled.java
+[DEBUG] Stale source detected: /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/com/ericbarnhill/jvcl/Unroller.java
+[DEBUG] Stale source detected: /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/com/ericbarnhill/jvcl/FDCPU.java
+[DEBUG] Stale source detected: /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src/com/ericbarnhill/jvcl/FDGPU.java
+[INFO] Changes detected - recompiling the module!
+[DEBUG] Classpath:
+[DEBUG]  /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes
+[DEBUG]  /home/ericbarnhill/.m2/repository/org/apache/commons/commons-math4/4.0-SNAPSHOT/commons-math4-4.0-SNAPSHOT.jar
+[DEBUG]  /home/ericbarnhill/.m2/repository/com/ericbarnhill/arrayMath/0.0.1-SNAPSHOT/arrayMath-0.0.1-SNAPSHOT.jar
+[DEBUG]  /home/ericbarnhill/Documents/code/jtransforms-2.4.jar
+[DEBUG]  /home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar
+[DEBUG]  /home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar
+[DEBUG]  /home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar
+[DEBUG] Source roots:
+[DEBUG]  /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src
+[DEBUG]  /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/generated-sources/annotations
+[DEBUG] Command line options:
+[DEBUG] -d /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes -classpath /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes:/home/ericbarnhill/.m2/repository/org/apache/commons/commons-math4/4.0-SNAPSHOT/commons-math4-4.0-SNAPSHOT.jar:/home/ericbarnhill/.m2/repository/com/ericbarnhill/arrayMath/0.0.1-SNAPSHOT/arrayMath-0.0.1-SNAPSHOT.jar:/home/ericbarnhill/Documents/code/jtransforms-2.4.jar:/home/ericbarnhill/Documents/code/jogamp/jocl-demos/build/jar/jocl-demos.jar:/home/ericbarnhill/Documents/code/jogamp/jocl/build/jar/jocl.jar:/home/ericbarnhill/Documents/code/jogamp/gluegen/build/gluegen-rt.jar: -sourcepath /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/src:/home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/generated-sources/annotations: -s /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/generated-sources/annotations -g -nowarn -target 1.7 -source 1.7
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[DEBUG] incrementalBuildHelper#beforeRebuildExecution
+[INFO] Compiling 10 source files to /home/ericbarnhill/barnhill-eclipse-workspace/JVCL/target/classes
+
+
+The system is out of resources.
+Consult the following stack trace for details.
+java.lang.StackOverflowError
+	at com.sun.tools.javac.code.Type.hasTag(Type.java:112)
+	at com.sun.tools.javac.comp.Resolve.rawInstantiate(Resolve.java:563)
+	at com.sun.tools.javac.comp.Resolve.selectBest(Resolve.java:1440)
+	at com.sun.tools.javac.comp.Resolve.findMethodInScope(Resolve.java:1627)
+	at com.sun.tools.javac.comp.Resolve.findMethod(Resolve.java:1698)
+	at com.sun.tools.javac.comp.Resolve.findMethod(Resolve.java:1671)
+	at com.sun.tools.javac.comp.Resolve$14.doLookup(Resolve.java:2675)
+	at com.sun.tools.javac.comp.Resolve$BasicLookupHelper.lookup(Resolve.java:3083)
+	at com.sun.tools.javac.comp.Resolve.lookupMethod(Resolve.java:3334)
+	at com.sun.tools.javac.comp.Resolve.resolveOperator(Resolve.java:2671)
+	at com.sun.tools.javac.comp.Resolve.resolveBinaryOperator(Resolve.java:2712)
+	at com.sun.tools.javac.comp.Attr.visitBinary(Attr.java:3037)
+	at com.sun.tools.javac.tree.JCTree$JCBinary.accept(JCTree.java:1785)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.attribExpr(Attr.java:615)
+	at com.sun.tools.javac.comp.Attr.visitBinary(Attr.java:3033)
+	at com.sun.tools.javac.tree.JCTree$JCBinary.accept(JCTree.java:1785)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.attribExpr(Attr.java:615)
+	at com.sun.tools.javac.comp.Attr.visitBinary(Attr.java:3032)
+	at com.sun.tools.javac.tree.JCTree$JCBinary.accept(JCTree.java:1785)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.attribExpr(Attr.java:608)
+	at com.sun.tools.javac.comp.Attr.visitIndexed(Attr.java:3125)
+	at com.sun.tools.javac.tree.JCTree$JCArrayAccess.accept(JCTree.java:1866)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.attribArgs(Attr.java:664)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1806)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+	at com.sun.tools.javac.tree.JCTree$JCMethodInvocation.accept(JCTree.java:1465)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitSelect(Attr.java:3226)
+	at com.sun.tools.javac.tree.JCTree$JCFieldAccess.accept(JCTree.java:1897)
+	at com.sun.tools.javac.comp.Attr.attribTree(Attr.java:566)
+	at com.sun.tools.javac.comp.Attr.visitApply(Attr.java:1815)
+[DEBUG] incrementalBuildHelper#afterRebuildExecution
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] An unknown compilation problem occurred
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.541 s
+[INFO] Finished at: 2016-04-11T22:32:58+02:00
+[INFO] Final Memory: 15M/401M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.3:compile (default-compile) on project jvcl: Compilation failure
+[ERROR] An unknown compilation problem occurred
+[ERROR] -> [Help 1]
+org.apache.maven.lifecycle.LifecycleExecutionException: Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.3:compile (default-compile) on project jvcl: Compilation failure
+An unknown compilation problem occurred
+
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:153)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:145)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:116)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:80)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:51)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:128)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:307)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:193)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:106)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:863)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:288)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:199)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:289)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:229)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:415)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:356)
+Caused by: org.apache.maven.plugin.compiler.CompilationFailureException: Compilation failure
+An unknown compilation problem occurred
+
+	at org.apache.maven.plugin.compiler.AbstractCompilerMojo.execute(AbstractCompilerMojo.java:911)
+	at org.apache.maven.plugin.compiler.CompilerMojo.execute(CompilerMojo.java:129)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:134)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:207)
+	... 20 more
+[ERROR] 
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.apache.commons.math4.complex.Complex;
-import org.apache.commons.math4.complex.ComplexUtils;
+import org.apache.commons.numbers.complex.Complex;
+import org.apache.commons.numbers.complex.ComplexUtils;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 
@@ -45,7 +45,7 @@ public class JVCLUtils {
 
 	/**
 	 * Flips dimensions of 2D image without leaving 1D representation
-	 * @param image {@code float[]} vectorised image
+	 * @param image {@code float[]} vectorized image
 	 * @param width int first depth level dimension
 	 * @return {@code float[]} with dimensions swapped
 	 */
@@ -708,14 +708,14 @@ public class JVCLUtils {
 	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
 	 */
 	public static void display(double[][] array, String message, int b) {
-		display(ArrayMath.vectorise(array), message, b);
+		display(ArrayMath.vectorize(array), message, b);
 	}
 
 	/**
 	 * Display contents of {@code array} in standard output, headed by {@code message} and breaking lines every {@code b} entries.
 	 */
 	public static void display(double[][][] array, String message, int b) {
-		display(ArrayMath.vectorise(array), message, b);
+		display(ArrayMath.vectorize(array), message, b);
 	}
 
  	public static double[] cat(double[] d1, double[] d2) {

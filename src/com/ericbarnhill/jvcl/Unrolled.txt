@@ -23,7 +23,7 @@
  */
 package com.ericbarnhill.jvcl;
 
-import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.numbers.complex.Complex;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 
@@ -83,12 +83,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         double[][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -116,12 +116,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         Complex[][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -155,13 +155,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         double[][][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -213,13 +213,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         Complex[][][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -307,12 +307,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         double[][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -356,12 +356,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         Complex[][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -411,13 +411,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         double[][][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -567,13 +567,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         Complex[][][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -763,12 +763,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         double[][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -836,12 +836,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         Complex[][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -915,13 +915,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         double[][][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -1289,13 +1289,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         Complex[][][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -1707,12 +1707,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         double[][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -1812,12 +1812,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         Complex[][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -1923,13 +1923,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         double[][][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -2683,13 +2683,13 @@ public class Unrolled {
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));
         Complex[][][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = rr.length;
         final int rj = rr[0].length;
         final int rk = rr[0][0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ijk;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -3489,12 +3489,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        double[] gg = ArrayMath.vectorise(g);
-        double[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        double[] gg = ArrayMath.vectorize(g);
+        double[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         double[][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        double[] r = ArrayMath.vectorise(rr);
+        double[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {
@@ -3657,12 +3657,12 @@ public class Unrolled {
         final int hgj = (int)( (gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        Complex[] gg = ArrayMath.vectorise(g);
-        Complex[] fPad = ArrayMath.vectorise(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
+        Complex[] gg = ArrayMath.vectorize(g);
+        Complex[] fPad = ArrayMath.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));
         Complex[][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = rr.length;
         final int rj = rr[0].length;
-        Complex[] r = ArrayMath.vectorise(rr);
+        Complex[] r = ArrayMath.vectorize(rr);
         int ij;
         for (int i = hgi; i < fi - 1 - hgie; i++) {
             for (int j = hgj; j < fj - 1 - hgje; j++) {

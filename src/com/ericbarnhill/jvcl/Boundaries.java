@@ -24,7 +24,7 @@
 
 package com.ericbarnhill.jvcl;
 
-import org.apache.commons.math4.complex.Complex;
+import org.apache.commons.numbers.complex.Complex;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 
@@ -106,7 +106,7 @@ public class Boundaries {
 	}
 
 	/**
-	 * Adds convolutions at boundaries for 2D {@code double[][]} vectorised to a 1D {@code double[]}.
+	 * Adds convolutions at boundaries for 2D {@code double[][]} vectorized to a 1D {@code double[]}.
 	 * @param fPad padded original array
 	 * @param g kernel
 	 * @param r convolved result array
@@ -183,11 +183,11 @@ public class Boundaries {
 				}
 			}
 		}
-		return ArrayMath.devectorise(r, ri);
+		return ArrayMath.devectorize(r, ri);
 	}
 
 	/**
-	 * Adds convolutions at boundaries for 2D {@code Complex[][]} vectorised to a 1D {@code Complex[]}.
+	 * Adds convolutions at boundaries for 2D {@code Complex[][]} vectorized to a 1D {@code Complex[]}.
 	 * @param fPad padded original array
 	 * @param g kernel
 	 * @param r convolved result array
@@ -264,11 +264,11 @@ public class Boundaries {
 				}
 			}
 		}
-		return ArrayMath.devectorise(r, ri);
+		return ArrayMath.devectorize(r, ri);
 	}
 
 	/**
-	 * Adds convolutions at boundaries for 3D {@code double[][][]} vectorised to a 1D {@code double[]}.
+	 * Adds convolutions at boundaries for 3D {@code double[][][]} vectorized to a 1D {@code double[]}.
 	 * @param fPad padded original array
 	 * @param g kernel
 	 * @param r convolved result array
@@ -317,11 +317,11 @@ public class Boundaries {
 			}
 		}
 
-		return ArrayMath.devectorise(r, ri, rj);
+		return ArrayMath.devectorize(r, ri, rj);
 	}
 
 	/**
-	 * Adds convolutions at boundaries for 3D {@code Complex[][][]} vectorised to a 1D {@code Complex[]}.
+	 * Adds convolutions at boundaries for 3D {@code Complex[][][]} vectorized to a 1D {@code Complex[]}.
 	 * @param fPad padded original array
 	 * @param g kernel
 	 * @param r convolved result array
@@ -370,7 +370,7 @@ public class Boundaries {
 			}
 		}
 
-		return ArrayMath.devectorise(r, ri, rj);
+		return ArrayMath.devectorize(r, ri, rj);
 	}
 
 

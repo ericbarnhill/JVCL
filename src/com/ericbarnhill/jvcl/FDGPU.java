@@ -29,8 +29,8 @@ import static java.lang.Math.min;
 
 import java.nio.FloatBuffer;
 
-import org.apache.commons.math4.complex.Complex;
-import org.apache.commons.math4.complex.ComplexUtils;
+import org.apache.commons.numbers.complex.Complex;
+import org.apache.commons.numbers.complex.ComplexUtils;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.jogamp.opencl.CLBuffer;
@@ -188,7 +188,7 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.double2Float(ArrayMath.vectorise(fPad))).rewind();
+        clF.getBuffer().put(ArrayMath.double2Float(ArrayMath.vectorize(fPad))).rewind();
         clG.getBuffer().put(ArrayMath.double2Float(g)).rewind();
         CLKernel Kernel = program21.createCLKernel("Convolve21");
         Kernel.putArg(clF)
@@ -208,7 +208,7 @@ public class FDGPU{
 		clF.release();
 		clG.release();
 		clR.release();
-        double[][] result = ArrayMath.devectorise(ArrayMath.float2Double(resultVec), ri);
+        double[][] result = ArrayMath.devectorize(ArrayMath.float2Double(resultVec), ri);
 		// if (dim == 1) result = JVCLUtils.shiftDim(result);
 		return result;
 	}
@@ -235,7 +235,7 @@ public class FDGPU{
 		if (dim == 1) {
 			f = ArrayMath.shiftDim(f);
 		}
-        JVCLUtils.display(ArrayMath.vectorise(f), "21c f", f.length);
+        JVCLUtils.display(ArrayMath.vectorize(f), "21c f", f.length);
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int gi = g.length;
@@ -247,8 +247,8 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*2, WRITE_ONLY);
-        clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorise(fPad))).rewind();
-        JVCLUtils.display(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorise(fPad)), "21c fpad", ri*2);
+        clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorize(fPad))).rewind();
+        JVCLUtils.display(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorize(fPad)), "21c fpad", ri*2);
         clG.getBuffer().put(ComplexUtils.complex2InterleavedFloat(g)).rewind();
         CLKernel Kernel = program21Complex.createCLKernel("Convolve21Complex");
         Kernel.putArg(clF)
@@ -268,7 +268,7 @@ public class FDGPU{
 		clF.release();
 		clG.release();
 		clR.release();
-		Complex[][] result = ArrayMath.devectorise(ComplexUtils.interleaved2Complex(resultVec), ri);
+		Complex[][] result = ArrayMath.devectorize(ComplexUtils.interleaved2Complex(resultVec), ri);
 		if (dim == 1) result = ArrayMath.shiftDim(result);
         return result;
 	}
@@ -305,7 +305,7 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*fk, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.double2Float(ArrayMath.vectorise(fPad))).rewind();
+        clF.getBuffer().put(ArrayMath.double2Float(ArrayMath.vectorize(fPad))).rewind();
         clG.getBuffer().put(ArrayMath.double2Float(g)).rewind();
         CLKernel Kernel = program31.createCLKernel("Convolve31");
         Kernel.putArg(clF)
@@ -325,7 +325,7 @@ public class FDGPU{
 		clF.release();
 		clG.release();
 		clR.release();
-        double[][][] result = ArrayMath.devectorise(ArrayMath.float2Double(resultVec), ri, fj);
+        double[][][] result = ArrayMath.devectorize(ArrayMath.float2Double(resultVec), ri, fj);
         if (dim == 1) result = ArrayMath.shiftDim(result, 2);
 		if (dim == 2) result = ArrayMath.shiftDim(result, 1);
 		return result;
@@ -364,7 +364,7 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*fk*2, WRITE_ONLY);
-        clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorise(fPad))).rewind();
+        clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorize(fPad))).rewind();
         clG.getBuffer().put(ComplexUtils.complex2InterleavedFloat(g)).rewind();
         CLKernel Kernel = program31Complex.createCLKernel("Convolve31Complex");
         Kernel.putArg(clF)
@@ -384,7 +384,7 @@ public class FDGPU{
 		clF.release();
 		clG.release();
 		clR.release();
-        Complex[][][] result = ArrayMath.devectorise(ComplexUtils.interleaved2Complex(resultVec), ri, fj);
+        Complex[][][] result = ArrayMath.devectorize(ComplexUtils.interleaved2Complex(resultVec), ri, fj);
         if (dim == 1) result = ArrayMath.shiftDim(result, 2);
 		if (dim == 2) result = ArrayMath.shiftDim(result, 1);
 		return result;
@@ -423,9 +423,9 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorise(ArrayMath.double2Float(fPad)))
+        clF.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(fPad)))
         	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorise(ArrayMath.double2Float(g)))
+        clG.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(g)))
     		.rewind();
         CLKernel Kernel = program2d.createCLKernel("Convolve2d");
         Kernel.putArg(clF)
@@ -448,7 +448,7 @@ public class FDGPU{
 		clF.release();
         clG.release();
         clR.release();
-        return ArrayMath.devectorise(ArrayMath.float2Double(result), ri);
+        return ArrayMath.devectorize(ArrayMath.float2Double(result), ri);
 	}
 
 	/**
@@ -474,9 +474,9 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj*2, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorise(ComplexUtils.complex2InterleavedFloat(fPad, 0)))
+        clF.getBuffer().put(ArrayMath.vectorize(ComplexUtils.complex2InterleavedFloat(fPad, 0)))
         	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorise(ComplexUtils.complex2InterleavedFloat(g, 0)))
+        clG.getBuffer().put(ArrayMath.vectorize(ComplexUtils.complex2InterleavedFloat(g, 0)))
     		.rewind();
         CLKernel Kernel = program2dComplex.createCLKernel("Convolve2dComplex");
         Kernel.putArg(clF)
@@ -499,7 +499,7 @@ public class FDGPU{
 		clF.release();
         clG.release();
         clR.release();
-        return ArrayMath.devectorise(ComplexUtils.interleaved2Complex(result), ri);
+        return ArrayMath.devectorize(ComplexUtils.interleaved2Complex(result), ri);
 	}
 
 	/**
@@ -529,9 +529,9 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj*rk, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj*gk, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj*rk, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorise(ArrayMath.double2Float(fPad)))
+        clF.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(fPad)))
         	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorise(ArrayMath.double2Float(g)))
+        clG.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(g)))
     		.rewind();
         CLKernel Kernel = program3d.createCLKernel("Convolve3d");
         Kernel.putArg(clF)
@@ -558,7 +558,7 @@ public class FDGPU{
 		clF.release();
         clG.release();
         clR.release();
-        return ArrayMath.devectorise(ArrayMath.float2Double(result), ri, rj);
+        return ArrayMath.devectorize(ArrayMath.float2Double(result), ri, rj);
 	}
 
 	/**
@@ -582,7 +582,7 @@ public class FDGPU{
 		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
 		//Complex[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
 		Complex[][][] fPad = JVCLUtils.zeroPadBoundaries(f, 1);
-		JVCLUtils.display(ArrayMath.vectorise(ComplexUtils.complex2InterleavedFloat(fPad, 0)), "3D Complex FPad", fPad.length*2);
+		JVCLUtils.display(ArrayMath.vectorize(ComplexUtils.complex2InterleavedFloat(fPad, 0)), "3D Complex FPad", fPad.length*2);
 		//Complex[][][] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]),
 		//		hgi, hgie, hgj, hgje, hgk, hgke);
 		Complex[][][] r = JVCLUtils.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]),1);
@@ -592,9 +592,9 @@ public class FDGPU{
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj*rk*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj*gk*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj*rk*2, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorise(ComplexUtils.complex2InterleavedFloat(fPad, 0)))
+        clF.getBuffer().put(ArrayMath.vectorize(ComplexUtils.complex2InterleavedFloat(fPad, 0)))
         	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorise(ComplexUtils.complex2InterleavedFloat(g, 0)))
+        clG.getBuffer().put(ArrayMath.vectorize(ComplexUtils.complex2InterleavedFloat(g, 0)))
     		.rewind();
         CLKernel Kernel = program3dComplex.createCLKernel("Convolve3dComplex");
         Kernel.putArg(clF)
@@ -622,7 +622,7 @@ public class FDGPU{
 		clF.release();
         clG.release();
         clR.release();
-        return ArrayMath.devectorise(ComplexUtils.interleaved2Complex(result), ri, rj);
+        return ArrayMath.devectorize(ComplexUtils.interleaved2Complex(result), ri, rj);
 	}
 
 	/**

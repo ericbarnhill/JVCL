@@ -1,0 +1,106 @@
+package jvcl;
+
+import java.nio.FloatBuffer;
+
+import com.jogamp.opencl.CLBuffer;
+import com.jogamp.opencl.CLCommandQueue;
+import com.jogamp.opencl.CLContext;
+import com.jogamp.opencl.CLDevice;
+import com.jogamp.opencl.CLKernel;
+import com.jogamp.opencl.CLProgram;
+import com.jogamp.opencl.demos.fft.CLFFTPlan;
+
+public class StockhamGPU {
+	
+	CLFFTPlan fft;
+    DimShift ds;
+    CLDevice device;
+    CLProgram program;
+    CLContext context;
+    long totalTime;
+    CLKernel Kernel;
+    CLCommandQueue queue;
+    int local, global;
+    CLBuffer<FloatBuffer> CLBufferReal;
+	CLBuffer<FloatBuffer> CLBufferImag;  
+	FloatBuffer realBuffer;
+	FloatBuffer imagBuffer;
+	int N;
+    
+    
+	public StockhamGPU() {	
+	}
+	
+	public StockhamGPU(CLContext context, CLDevice device, CLCommandQueue queue, CLProgram program, int N) {
+		this.context = context;
+		this.device = device;
+		this.queue = queue;
+		this.program = program;
+		this.N = N;
+		//CLBufferReal = context.createFloatBuffer(N);
+		//CLBufferImag = context.createFloatBuffer(N);
+		//realBuffer = CLBufferReal.getBuffer();
+		//imagBuffer = CLBufferImag.getBuffer();
+		Kernel = program.createCLKernel("stockham");
+	}
+	
+	void fft(float[] real, float[] imag, boolean isForward) {
+	    int blockSize = Math.min(N, 64);
+		int sign;
+		if (isForward) {
+			sign = 1;
+		} else {
+			sign = -1;
+		}
+		CLBufferReal = context.createFloatBuffer(N);
+		CLBufferImag = context.createFloatBuffer(N);
+		realBuffer = CLBufferReal.getBuffer();
+		imagBuffer = CLBufferImag.getBuffer();
+		realBuffer.clear();
+		realBuffer.put(real).rewind();
+		imagBuffer.clear();
+		imagBuffer.put(imag).rewind();
+		Kernel.setArg(0, CLBufferReal)
+			.setArg(1, CLBufferImag)	
+			.setArg(2, sign)
+			.setArg(3, N)
+			.setArg(4, (int)(Math.log(N)/Math.log(2)))
+			.setArg(5, blockSize);
+		
+		queue.putWriteBuffer(CLBufferReal, true);
+		queue.putWriteBuffer(CLBufferImag, true);
+		queue.flush();
+		queue.put1DRangeKernel(Kernel, 0, roundUp(N,blockSize), blockSize);
+		queue.flush();
+		queue.putReadBuffer(CLBufferReal, true);
+		queue.putReadBuffer(CLBufferImag, true);
+		
+		realBuffer.get(real);
+		imagBuffer.get(imag);
+		//testing release +
+		CLBufferReal.release();
+		CLBufferImag.release();
+		//testing release -
+		if (!isForward) {
+			for (int n = 0; n < N; n++) {
+				real[n] = real[n] / (float)N;
+				imag[n] = imag[n] / (float)N;
+			}
+		}
+	}
+	
+
+	private static int roundUp(int groupSize, int globalSize) {
+	    int r = globalSize % groupSize;
+	    if (r == 0) {
+	        return globalSize;
+	    } else {
+	        return globalSize + groupSize - r;
+	    }
+	}
+
+	public void close() {
+		Kernel.release();
+	}
+
+}
