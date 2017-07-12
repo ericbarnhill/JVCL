@@ -1,6 +1,6 @@
 # JVCL
 
-Java Volumetric Convolution Library 0.1 (JVCL) (c) Eric Barnhill 2016 All Rights Reserved.
+Java Volumetric Convolution Library 0.1 (JVCL) (c) Eric Barnhill 2016 All Rights Reserved. [![DOI](https://zenodo.org/badge/20868/ericbarnhill/JVCL.svg)](https://zenodo.org/badge/latestdoi/20868/ericbarnhill/JVCL)
 
 Note: This package is in alpha until I code the JUnit tests, then it will move to beta.
 
@@ -14,6 +14,8 @@ Formal testing is still to come, however initial tests suggested that contrary t
 
 To further support convolution unrolling, an Unroller class is in the package which will create a public unrolled Convolution method to dimensions of your specification, which can be added to the Unrolled.java source file. The ant buildfile can then be run to re-compile the package. This method will be streamlined in future releases.
 
+Also to come: a Fourier-domain convolution on the GPU using Stockham's FFT. It is close to operational but cannot be finished at this time, so I have excluded it.
+
 JVCL is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
   
 JVCL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with JVCL.  If not, see http://www.gnu.org/licenses/ .
@@ -26,16 +28,17 @@ This code uses methods from the JTransforms package by Piotr Wendykier. JTransfo
 
 
 
---- A glossary of variables
-f: array
-g: kernel
-r: result
-fi, fj, fk: array dimension
-gi, gj, gk: kernel dimension
-hgi, hgj, hgk = kernel half dimension
-ai, aj, ak = adjusted dimension
-i, j, k: array loops
-p, q, s: kernel loops
-
+<b>A glossary of variables</b>
+<ul>
+<li>f: array
+<li>g: kernel
+<li>r: result
+<li>fi, fj, fk: array dimension
+<li>gi, gj, gk: kernel dimension
+<li>hgi, hgj, hgk = kernel half dimension
+<li>ai, aj, ak = adjusted dimension
+<li>i, j, k: array loops
+<li>p, q, s: kernel loops
+</ul>
 
 
