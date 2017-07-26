@@ -1,8 +1,9 @@
+com/ericbarnhill/jvcl/UpFirDn.class
 com/ericbarnhill/jvcl/FDGPU.class
 com/ericbarnhill/jvcl/Boundaries.class
 com/ericbarnhill/jvcl/Unroller.class
-com/ericbarnhill/jvcl/FTCPU.class
 com/ericbarnhill/jvcl/FDCPU.class
 com/ericbarnhill/jvcl/JVCLUtils.class
 com/ericbarnhill/jvcl/StockhamFFT.class
+com/ericbarnhill/jvcl/FTCPU.class
 com/ericbarnhill/jvcl/FTGPU.class

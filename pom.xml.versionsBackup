@@ -2,13 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ericbarnhill</groupId>
   <artifactId>jvcl</artifactId>
-  <version>0.1</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>Java Volumetric Convolution Library</name>
   <description>Optimised performance of convolutions in Java with emphasis on  complex valued 3D medical images.</description>
-  <scm>
-      <connection>scm:git:git@github.com/ericbarnhill/JVCL.git</connection>
-      <url>scm:git:https://github.com/ericbarnhill/JVCL.git</url>
-  </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -27,18 +23,6 @@
           <source>1.7</source>
           <target>1.7</target>
         </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.codehaus.moko</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>2.1</version>
-      </plugin>
-      <plugin>
-          <artifactId>maven-scm-plugin</artifactId>
-          <version>1.8.1</version>
-          <configuration>
-              <tag>${project.artifactId}-${project.version}</tag>
-          </configuration>
       </plugin>
     </plugins>
   </build>
