@@ -48,13 +48,11 @@
   		<artifactId>arrayMath</artifactId>
   		<version>0.2-SNAPSHOT</version>
   	</dependency>
-  	<dependency>
-  		<groupId>edu.emory.mathcs</groupId>
-  		<artifactId>jtransforms</artifactId>
-  		<scope>system</scope>
-  		<systemPath>/home/ericbarnhill/Documents/code/jtransforms-2.4.jar</systemPath>
-  		<version>2.4</version>
-  	</dependency>
+    <dependency>
+          <groupId>edu.emory.mathcs</groupId>
+          <artifactId>JTransforms</artifactId>
+          <version>2.4</version>
+    </dependency>
   	<dependency>
   		<groupId>org.jogamp.jocl</groupId>
   		<artifactId>jocl-main</artifactId>

@@ -62,53 +62,7 @@ public class JVCLUtils {
 		return result;
 	}
 
-	/**
-	 * A standard utility method for OpenCL thread and block allocation
-	 * @param groupSize
-	 * @param globalSize
-	 * @return minimum required global size for group size
-	 */
-	public static int roundUp(int groupSize, int globalSize) {
-        int r = globalSize % groupSize;
-        if (r == 0) {
-            return globalSize;
-        } else {
-            return globalSize + groupSize - r;
-        }
-    }
-
-    public static String readFile(String fileName) {
-        try  {
-            BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(fileName)));
-            StringBuffer sb = new StringBuffer();
-            String line = null;
-            while (true) {
-                line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                sb.append(line).append("\n");
-            }
-            br.close();
-            return sb.toString();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-            return null;
-        }
-    }
-
-	public static int nextPwr2(int length) {
-
-		int pwr2Length = 1;
-		while(pwr2Length < length) {
-			pwr2Length *= 2;
-		}
-		return pwr2Length;
-	}
-
+//DOUBLE
 	public static double[] zeroPadBoundaries(double[] array, int paddingF, int paddingB) {
 		int length = array.length;
 		int newLength = length + paddingF + paddingB;
@@ -172,6 +126,75 @@ public class JVCLUtils {
 	}
 
 	public static double[][][] zeroPadBoundaries(double[][][] volume, int padding) {
+		return zeroPadBoundaries(volume, padding, padding, padding);
+	}
+
+    // BOOLEAN
+
+
+	public static boolean[] zeroPadBoundaries(boolean[] array, int paddingF, int paddingB) {
+		int length = array.length;
+		int newLength = length + paddingF + paddingB;
+		boolean[] paddedArray = new boolean[newLength];
+		for (int n = 0; n < length; n++) {
+			paddedArray[paddingF+n] = array[n];
+		}
+		return paddedArray;
+	}
+
+	public static boolean[] zeroPadBoundaries(boolean[] array, int padding) {
+		return zeroPadBoundaries(array, padding, padding);
+	}
+
+	public static boolean[][] zeroPadBoundaries(boolean[][] image, int paddingXF,
+		int paddingXB, int paddingYF, int paddingYB) {
+		int width = image.length;
+		int height = image[0].length;
+		int newWidth = width + paddingXF + paddingXB;
+		int newHeight = height + paddingYF + paddingYB;
+		boolean[][] paddedImage = new boolean[newWidth][newHeight];
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				paddedImage[x+paddingXF][y+paddingYF] = image[x][y];
+			}
+		}
+		return paddedImage;
+	}
+
+	public static boolean[][] zeroPadBoundaries(boolean[][] image, int paddingX, int paddingY) {
+		return zeroPadBoundaries(image, paddingX, paddingX, paddingY, paddingY);
+	}
+
+
+	public static boolean[][] zeroPadBoundaries(boolean[][] image, int padding) {
+		return zeroPadBoundaries(image, padding, padding);
+	}
+
+	public static boolean[][][] zeroPadBoundaries(boolean[][][] volume, int paddingXF,
+			int paddingXB, int paddingYF, int paddingYB, int paddingZF, int paddingZB) {
+		int width = volume.length;
+		int height = volume[0].length;
+		int depth = volume[0][0].length;
+		int newWidth = width + paddingXF + paddingXB;
+		int newHeight = height + paddingYF + paddingYB;
+		int newDepth = depth + paddingZF + paddingZB;
+		boolean[][][] paddedImage = new boolean[newWidth][newHeight][newDepth];
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				for (int z = 0; z < depth; z++) {
+					paddedImage[x+paddingXF][y+paddingYF][z+paddingZF] = volume[x][y][z];
+				}
+			}
+		}
+		return paddedImage;
+	}
+
+	public static boolean[][][] zeroPadBoundaries(boolean[][][] volume, int paddingX,
+			int paddingY, int paddingZ) {
+		return zeroPadBoundaries(volume, paddingX, paddingX, paddingY, paddingY, paddingZ, paddingZ);
+	}
+
+	public static boolean[][][] zeroPadBoundaries(boolean[][][] volume, int padding) {
 		return zeroPadBoundaries(volume, padding, padding, padding);
 	}
 
