@@ -10,7 +10,7 @@ abstract class ConvolverFloat<T> extends Convolver<T> {
     abstract float[][] convolve(float[][] f, float[] g);
     abstract float[][][] convolve(float[][][] f, float[] g);
     abstract float[][] convolve(float[][] f, float[][] g);
-    abstract float[][] convolve(float[][][] f, float[][] g);
+    abstract float[][][] convolve(float[][][] f, float[][] g);
     abstract float[][][] convolve(float[][][] f, float[][][] g);
 
 	public static float[] zeroPadBoundaries(float[] array, int paddingF, int paddingB) {

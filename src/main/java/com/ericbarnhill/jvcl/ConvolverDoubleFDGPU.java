@@ -63,16 +63,16 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 			device = context.getMaxFlopsDevice();
 	        queue = device.createCommandQueue();
 	        String path="openCL/";
-	        String source1d = JVCLUtils.readFile(path+"Convolve1d.cl");
-	        String source2d = JVCLUtils.readFile(path+"Convolve2d.cl");
-	        String source3d = JVCLUtils.readFile(path+"Convolve3d.cl");
-	        String source1dComplex = JVCLUtils.readFile(path+"Convolve1dComplex.cl");
-	        String source2dComplex = JVCLUtils.readFile(path+"Convolve2dComplex.cl");
-	        String source3dComplex = JVCLUtils.readFile(path+"Convolve3dComplex.cl");
-	        String source21 = JVCLUtils.readFile(path+"Convolve21.cl");
-	        String source21Complex = JVCLUtils.readFile(path+"Convolve21Complex.cl");
-	        String source31 = JVCLUtils.readFile(path+"Convolve31.cl");
-	        String source31Complex = JVCLUtils.readFile(path+"Convolve31Complex.cl");
+	        String source1d = readFile(path+"Convolve1d.cl");
+	        String source2d = readFile(path+"Convolve2d.cl");
+	        String source3d = readFile(path+"Convolve3d.cl");
+	        String source1dComplex = readFile(path+"Convolve1dComplex.cl");
+	        String source2dComplex = readFile(path+"Convolve2dComplex.cl");
+	        String source3dComplex = readFile(path+"Convolve3dComplex.cl");
+	        String source21 = readFile(path+"Convolve21.cl");
+	        String source21Complex = readFile(path+"Convolve21Complex.cl");
+	        String source31 = readFile(path+"Convolve31.cl");
+	        String source31Complex = readFile(path+"Convolve31Complex.cl");
 	        program1d = context.createProgram(source1d).build();
 	        program2d = context.createProgram(source2d).build();
 	        program3d = context.createProgram(source3d).build();
@@ -100,8 +100,8 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);
-		double[] r = JVCLUtils.zeroPadBoundaries(new double[fi], hgi, hgie);
+		double[] fPad = zeroPadBoundaries(f, hgi, hgie);
+		double[] r = zeroPadBoundaries(new double[fi], hgi, hgie);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
@@ -118,7 +118,7 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
         	.putArg(hgie);
         queue.putWriteBuffer(clF, false)
         	.putWriteBuffer(clG, false)
-        	.put1DRangeKernel(Kernel, 0, JVCLUtils.roundUp(ri, localWorkSize),0)
+        	.put1DRangeKernel(Kernel, 0, roundUp(ri, localWorkSize),0)
         	.putReadBuffer(clR, true);
 		float[] result = new float[ri];
 		clR.getBuffer().get(result);
@@ -142,8 +142,8 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, 0, 0);
-		double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, 0, 0);
+		double[][] fPad = zeroPadBoundaries(f, hgi, hgie, 0, 0);
+		double[][] r = zeroPadBoundaries(new double[fi][fj], hgi, hgie, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
@@ -169,7 +169,7 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		clG.release();
 		clR.release();
         double[][] result = ArrayMath.devectorize(ArrayMath.float2Double(resultVec), ri);
-		// if (dim == 1) result = JVCLUtils.shiftDim(result);
+		// if (dim == 1) result = shiftDim(result);
 		return result;
 	}
 
@@ -199,8 +199,8 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
-		double[][][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
+		double[][][] fPad = zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
+		double[][][] r = zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
@@ -258,8 +258,8 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		Complex[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
-		Complex[][][] r = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
+		Complex[][][] fPad = zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
+		Complex[][][] r = zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
@@ -305,8 +305,8 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int hgj = (int)( (gj - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
 		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		double[][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-		double[][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
+		double[][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+		double[][] r = zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
 		final int ri = r.length;
 		final int rj = r[0].length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj, READ_ONLY);
@@ -359,8 +359,8 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
 		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
 		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-		double[][][] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-		double[][][] r = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
+		double[][][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+		double[][][] r = zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
 		final int ri = r.length;
 		final int rj = r[0].length;
 		final int rk = r[0][0].length;

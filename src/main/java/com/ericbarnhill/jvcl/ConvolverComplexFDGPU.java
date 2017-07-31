@@ -48,7 +48,7 @@ import com.jogamp.opencl.CLProgram;
  * @since 0.1
  */
 
-public class FDGPU{
+public class ConvolverComplexFDGPU{
 
     CLDevice device;
     CLCommandQueue queue;
@@ -57,7 +57,7 @@ public class FDGPU{
     CLContext context;
     int localWorkSize;
 
-	public FDGPU() {
+	public ConvolverComplexFDGPU() {
 		//try {
 			context = CLContext.create();
 			device = context.getMaxFlopsDevice();

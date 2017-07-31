@@ -41,15 +41,19 @@ import edu.emory.mathcs.jtransforms.fft.FloatFFT_3D;
  */
 public class ConvolverFloatFTCPU {
 
+    ConvolverComplexFTCPU ccf;
+    ConvolverFloatFTCPU() {
+        ccf = new ConvolverComplexFTCPU();
+    }
 	/**
 	 * Convolve 1D {@code float[]} array with 1D {@code float[]} g
 	 * @param f {@code float[]} array
 	 * @param g {@code float[]} g
 	 * @return {@code float[]}
 	 */
-	public static float[] convolve(float[] f, float[] g) {
+	public float[] convolve(float[] f, float[] g) {
 		return ComplexUtils.complex2RealFloat(
-				convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
+				ccf.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
 						)
 				);
 	}
@@ -60,9 +64,9 @@ public class ConvolverFloatFTCPU {
 	 * @param g {@code float[][]} g
 	 * @return {@code float[][]}
 	 */
-	public static float[][] convolve(float[][] f, float[][] g) {
+	public float[][] convolve(float[][] f, float[][] g) {
 		return ComplexUtils.complex2RealFloat(
-				convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
+				ccf.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
 						)
 				);
 	}
@@ -73,9 +77,9 @@ public class ConvolverFloatFTCPU {
 	 * @param g {@code float[][][]} g
 	 * @return {@code float[][][]}
 	 */
-	public static float[][][] convolve(float[][][] f, float[][][] g) {
+	public float[][][] convolve(float[][][] f, float[][][] g) {
 		return ComplexUtils.complex2RealFloat(
-				convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
+				ccf.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(g)
 						)
 				);
 	}

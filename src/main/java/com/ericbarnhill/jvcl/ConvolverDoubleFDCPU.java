@@ -47,7 +47,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            {@code double[]} kernel
      * @return {@code double[]}
      */
-    public static double[] convolve(double[] f, double[] g) {
+    public double[] convolve(double[] f, double[] g) {
         final int fi = f.length;
         final int gi = g.length;
         final int hgi = (int) ((gi - 1) / 2.0);
@@ -78,7 +78,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            orientation of kernel(0 or 1)
      * @return {@code double[][]}
      */
-    public static double[][] convolve(double[][] f, double[] g, int dim) {
+    public double[][] convolve(double[][] f, double[] g, int dim) {
         if (dim < 0 || dim > 1) {
             throw new OutOfRangeException(dim, 0, 1);
         }
@@ -103,7 +103,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            {@code double[]} kernel
      * @return {@code double[][]}
      */
-    public static double[][] convolve(double[][] f, double[] g) {
+    public double[][] convolve(double[][] f, double[] g) {
         return convolve(f, g, 0);
     }
 
@@ -118,7 +118,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            orientation of kernel (0, 1 or 2)
      * @return {@code double[][][]}
      */
-    public static double[][][] convolve(double[][][] f, double[] g, int dim) {
+    public double[][][] convolve(double[][][] f, double[] g, int dim) {
         if (dim < 0 || dim > 2) {
             throw new OutOfRangeException(dim, 0, 2);
         }
@@ -143,7 +143,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            {@code double[]} kernel
      * @return {@code double[][][]}
      */
-    public static double[][][] convolve(double[][][] f, double[] g) {
+    public double[][][] convolve(double[][][] f, double[] g) {
         return convolve(f, g, 0);
     }
 
@@ -156,7 +156,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            {@code double[][]} kernel
      * @return {@code double[][]}
      */
-    public static double[][] convolve(double[][] f, double[][] g) {
+    public double[][] convolve(double[][] f, double[][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int gi = g.length;
@@ -199,7 +199,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            orientation of kernel (0, 1 or 2)
      * @return {@code double[][][]}
      */
-    public static double[][][] convolve(double[][][] f, double[][] g, int dim) {
+    public double[][][] convolve(double[][][] f, double[][] g, int dim) {
         if (dim < 0 || dim > 2) {
             throw new OutOfRangeException(dim, 0, 2);
         }
@@ -224,7 +224,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            {@code double[][]} kernel
      * @return {@code double[][][]}
      */
-    public static double[][][] convolve(double[][][] f, double[][] g) {
+    public double[][][] convolve(double[][][] f, double[][] g) {
         return convolve(f, g, 0);
     }
 
@@ -238,7 +238,7 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
      *            {@code double[][][]} kernel
      * @return {@code double[][][]}
      */
-    public static double[][][] convolve(double[][][] f, double[][][] g) {
+    public double[][][] convolve(double[][][] f, double[][][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int fk = f[0][0].length;

@@ -39,7 +39,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
  * @author ericbarnhill
  * @since 0.1
  */
-public class ConvolverComplexFTCPU {
+public class ConvolverComplexFTCPU extends ConvolverComplex {
 
 	/**
 	 * Convolve 1D {@code Complex[]} array with 1D {@code Complex[]} g
@@ -47,7 +47,7 @@ public class ConvolverComplexFTCPU {
 	 * @param g {@code Complex[]} g
 	 * @return {@code Complex[]}
 	 */
-	public static Complex[] convolve(Complex[] f, Complex[] g) {
+	public Complex[] convolve(Complex[] f, Complex[] g) {
 		final int fi = f.length;
 		final int gi = g.length;
 		final int pad = gi*2;
@@ -75,7 +75,7 @@ public class ConvolverComplexFTCPU {
 	 * @param g {@code Complex[][]} g
 	 * @return {@code Complex[][]}
 	 */
-	public static Complex[][] convolve(Complex[][] f, Complex[][] g) {
+	public Complex[][] convolve(Complex[][] f, Complex[][] g) {
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int gi = g.length;
@@ -111,7 +111,7 @@ public class ConvolverComplexFTCPU {
 	 * @param g {@code Complex[][][]} g
 	 * @return {@code Complex[][][]}
 	 */
-	public static Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
+	public Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
 
 		final int fi = f.length;
 		final int fj = f[0].length;

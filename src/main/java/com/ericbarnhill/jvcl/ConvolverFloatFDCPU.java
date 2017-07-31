@@ -35,7 +35,7 @@ import com.ericbarnhill.arrayMath.ArrayMath;
  * @since 0.1
  *
  */
-public class ConvolverFloatFDCPU extends ConvolverFloat{
+public class ConvolverFloatFDCPU extends ConvolverFloat<Float>{
     /**
      * Convolve 1D {@code float[]} array with 1D {@code float[]} kernel
      * 
@@ -45,7 +45,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            {@code float[]} kernel
      * @return {@code float[]}
      */
-    public static float[] convolve(float[] f, float[] g) {
+    public float[] convolve(float[] f, float[] g) {
         final int fi = f.length;
         final int gi = g.length;
         final int hgi = (int) ((gi - 1) / 2.0);
@@ -76,7 +76,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            orientation of kernel(0 or 1)
      * @return {@code float[][]}
      */
-    public static float[][] convolve(float[][] f, float[] g, int dim) {
+    public float[][] convolve(float[][] f, float[] g, int dim) {
         if (dim < 0 || dim > 1) {
             throw new OutOfRangeException(dim, 0, 1);
         }
@@ -101,7 +101,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            {@code float[]} kernel
      * @return {@code float[][]}
      */
-    public static float[][] convolve(float[][] f, float[] g) {
+    public float[][] convolve(float[][] f, float[] g) {
         return convolve(f, g, 0);
     }
 
@@ -116,7 +116,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            orientation of kernel (0, 1 or 2)
      * @return {@code float[][][]}
      */
-    public static float[][][] convolve(float[][][] f, float[] g, int dim) {
+    public float[][][] convolve(float[][][] f, float[] g, int dim) {
         if (dim < 0 || dim > 2) {
             throw new OutOfRangeException(dim, 0, 2);
         }
@@ -141,7 +141,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            {@code float[]} kernel
      * @return {@code float[][][]}
      */
-    public static float[][][] convolve(float[][][] f, float[] g) {
+    public float[][][] convolve(float[][][] f, float[] g) {
         return convolve(f, g, 0);
     }
 
@@ -154,7 +154,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            {@code float[][]} kernel
      * @return {@code float[][]}
      */
-    public static float[][] convolve(float[][] f, float[][] g) {
+    public float[][] convolve(float[][] f, float[][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int gi = g.length;
@@ -197,7 +197,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            orientation of kernel (0, 1 or 2)
      * @return {@code float[][][]}
      */
-    public static float[][][] convolve(float[][][] f, float[][] g, int dim) {
+    public float[][][] convolve(float[][][] f, float[][] g, int dim) {
         if (dim < 0 || dim > 2) {
             throw new OutOfRangeException(dim, 0, 2);
         }
@@ -222,7 +222,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            {@code float[][]} kernel
      * @return {@code float[][][]}
      */
-    public static float[][][] convolve(float[][][] f, float[][] g) {
+    public float[][][] convolve(float[][][] f, float[][] g) {
         return convolve(f, g, 0);
     }
 
@@ -236,7 +236,7 @@ public class ConvolverFloatFDCPU extends ConvolverFloat{
      *            {@code float[][][]} kernel
      * @return {@code float[][][]}
      */
-    public static float[][][] convolve(float[][][] f, float[][][] g) {
+    public float[][][] convolve(float[][][] f, float[][][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int fk = f[0][0].length;

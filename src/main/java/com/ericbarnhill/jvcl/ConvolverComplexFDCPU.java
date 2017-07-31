@@ -37,7 +37,7 @@ import com.ericbarnhill.arrayMath.ArrayMath;
  * @since 0.1
  *
  */
-public class ConvolverFDCPUDouble extends Convolver{
+public class ConvolverComplexFDCPU extends Convolver{
 
     /**
      * Convolve 1D {@code Complex[]} array with 1D {@code Complex[]} kernel
@@ -48,7 +48,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code Complex[]} kernel
      * @return {@code Complex[]}
      */
-    public static Complex[] convolve(Complex[] f, Complex[] g) {
+    public Complex[] convolve(Complex[] f, Complex[] g) {
         final int fi = f.length;
         final int gi = g.length;
         final int hgi = (int) ((gi - 1) / 2.0);
@@ -78,7 +78,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            orientation of kernel(0 or 1)
      * @return {@code Complex[][]}
      */
-    public static Complex[][] convolve(Complex[][] f, Complex[] g, int dim) {
+    public Complex[][] convolve(Complex[][] f, Complex[] g, int dim) {
         if (dim < 0 || dim > 1) {
             throw new OutOfRangeException(dim, 0, 1);
         }
@@ -103,7 +103,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code Complex[]} kernel
      * @return {@code Complex[][]}
      */
-    public static Complex[][] convolve(Complex[][] f, Complex[] g) {
+    public Complex[][] convolve(Complex[][] f, Complex[] g) {
         return convolve(f, g, 0);
     }
 
@@ -118,7 +118,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            orientation of kernel (0, 1 or 2)
      * @return {@code Complex[][][]}
      */
-    public static Complex[][][] convolve(Complex[][][] f, Complex[] g, int dim) {
+    public Complex[][][] convolve(Complex[][][] f, Complex[] g, int dim) {
         if (dim < 0 || dim > 2) {
             throw new OutOfRangeException(dim, 0, 2);
         }
@@ -143,7 +143,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code Complex[]} kernel
      * @return {@code Complex[][][]}
      */
-    public static Complex[][][] convolve(Complex[][][] f, Complex[] g) {
+    public Complex[][][] convolve(Complex[][][] f, Complex[] g) {
         return convolve(f, g, 0);
     }
 
@@ -156,7 +156,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code Complex[][]} kernel
      * @return {@code Complex[][]}
      */
-    public static Complex[][] convolve(Complex[][] f, Complex[][] g) {
+    public Complex[][] convolve(Complex[][] f, Complex[][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int gi = g.length;
@@ -200,7 +200,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            orientation of kernel (0, 1 or 2)
      * @return {@code Complex[][][]}
      */
-    public static Complex[][][] convolve(Complex[][][] f, Complex[][] g, int dim) {
+    public Complex[][][] convolve(Complex[][][] f, Complex[][] g, int dim) {
         if (dim < 0 || dim > 2) {
             throw new OutOfRangeException(dim, 0, 2);
         }
@@ -225,7 +225,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code Complex[][]} kernel
      * @return {@code Complex[][][]}
      */
-    public static Complex[][][] convolve(Complex[][][] f, Complex[][] g) {
+    public Complex[][][] convolve(Complex[][][] f, Complex[][] g) {
         return convolve(f, g, 0);
     }
 
@@ -239,7 +239,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code double[][][]} kernel
      * @return {@code double[][][]}
      */
-    public static double[][][] convolve(double[][][] f, double[][][] g) {
+    public double[][][] convolve(double[][][] f, double[][][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int fk = f[0][0].length;
@@ -293,7 +293,7 @@ public class ConvolverFDCPUDouble extends Convolver{
      *            {@code Complex[][][]} kernel
      * @return {@code Complex[][][]}
      */
-    public static Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
+    public Complex[][][] convolve(Complex[][][] f, Complex[][][] g) {
         final int fi = f.length;
         final int fj = f[0].length;
         final int fk = f[0][0].length;

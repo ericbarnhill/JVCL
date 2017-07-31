@@ -2,7 +2,7 @@ package com.ericbarnhill.jvcl;
 
 import org.apache.commons.numbers.complex.Complex;
 
-abstract class ConvolverComplex<T> extends Convolver<T> {
+abstract class ConvolverComplex<T> extends Convolver<Complex> {
 
     public ConvolverComplex() {
             super();
@@ -12,7 +12,7 @@ abstract class ConvolverComplex<T> extends Convolver<T> {
     abstract Complex[][] convolve(Complex[][] f, Complex[] g);
     abstract Complex[][][] convolve(Complex[][][] f, Complex[] g);
     abstract Complex[][] convolve(Complex[][] f, Complex[][] g);
-    abstract Complex[][] convolve(Complex[][][] f, Complex[][] g);
+    abstract Complex[][][] convolve(Complex[][][] f, Complex[][] g);
     abstract Complex[][][] convolve(Complex[][][] f, Complex[][][] g);
 
 	public static Complex[] zeroPadBoundaries(Complex[] array, int paddingF, int paddingB) {
