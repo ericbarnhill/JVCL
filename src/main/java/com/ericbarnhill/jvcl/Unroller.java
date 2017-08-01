@@ -95,8 +95,8 @@ public class Unroller {
 		sb.append(String.format("        final int gi = g.length;%n"));
 		sb.append(String.format("        final int hgi = (int)( (gi - 1) / 2.0);%n"));
 		sb.append(String.format("        final int hgie = (gi %s 2 == 0) ? hgi + 1 : hgi;%n", "%"));
-		sb.append(String.format("		 double[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);%n"));
-		sb.append(String.format("		 double[] r = JVCLUtils.zeroPadBoundaries(new double[fi], hgi, hgie);%n"));
+		sb.append(String.format("		 double[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);%n"));
+		sb.append(String.format("		 double[] r = ArrayMath.zeroPadBoundaries(new double[fi], hgi, hgie);%n"));
 		sb.append(String.format("		 final int ri = r.length;%n"));
 		sb.append(String.format("		 for (int i = hgi; i < ri-1-hgie; i++) {%n"));
 		return sb.toString();
@@ -111,8 +111,8 @@ public class Unroller {
 		sb.append(String.format("        final int gi = g.length;%n"));
 		sb.append(String.format("        final int hgi = (int)( (gi - 1) / 2.0);%n"));
 		sb.append(String.format("        final int hgie = (gi %s 2 == 0) ? hgi + 1 : hgi;%n", "%"));
-		sb.append(String.format("		 Complex[] fPad = JVCLUtils.zeroPadBoundaries(f, hgi, hgie);%n"));
-		sb.append(String.format("		 Complex[] r = JVCLUtils.zeroPadBoundaries(new Complex[fi], hgi, hgie);%n"));
+		sb.append(String.format("		 Complex[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);%n"));
+		sb.append(String.format("		 Complex[] r = ArrayMath.zeroPadBoundaries(new Complex[fi], hgi, hgie);%n"));
 		sb.append(String.format("		 final int ri = r.length;%n"));
 		sb.append(String.format("		 for (int i = hgi; i < ri-1-hgie; i++) {%n"));
 		return sb.toString();
@@ -189,8 +189,8 @@ public class Unroller {
 		sb.append(String.format("        final int hgie = (gi %s 2 == 0) ? hgi + 1 : hgi;%n", "%"));
 		sb.append(String.format("        final int hgje = (gj %s 2 == 0) ? hgj + 1 : hgj;%n", "%"));
 		sb.append(String.format("        double[] gg = JVCLUtils.vectorize(g);%n"));
-		sb.append(String.format("        double[] fPad = JVCLUtils.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));%n"));
-		sb.append(String.format("        double[][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);%n"));
+		sb.append(String.format("        double[] fPad = JVCLUtils.vectorize(ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));%n"));
+		sb.append(String.format("        double[][] rr = ArrayMath.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);%n"));
 		sb.append(String.format("        final int ri = rr.length;%n"));
 		sb.append(String.format("        final int rj = rr[0].length;%n"));
 		sb.append(String.format("        double[] r = JVCLUtils.vectorize(rr);%n"));
@@ -216,8 +216,8 @@ public class Unroller {
 		sb.append(String.format("        final int hgie = (gi %s 2 == 0) ? hgi + 1 : hgi;%n", "%"));
 		sb.append(String.format("        final int hgje = (gj %s 2 == 0) ? hgj + 1 : hgj;%n", "%"));
 		sb.append(String.format("        Complex[] gg = JVCLUtils.vectorize(g);%n"));
-		sb.append(String.format("        Complex[] fPad = JVCLUtils.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));%n"));
-		sb.append(String.format("        Complex[][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);%n"));
+		sb.append(String.format("        Complex[] fPad = JVCLUtils.vectorize(ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje));%n"));
+		sb.append(String.format("        Complex[][] rr = ArrayMath.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, hgj, hgje);%n"));
 		sb.append(String.format("        final int ri = rr.length;%n"));
 		sb.append(String.format("        final int rj = rr[0].length;%n"));
 		sb.append(String.format("        Complex[] r = JVCLUtils.vectorize(rr);%n"));
@@ -315,8 +315,8 @@ public class Unroller {
 		sb.append(String.format("        final int hgje = (gj %s 2 == 0) ? hgj + 1 : hgj;%n", "%"));
 		sb.append(String.format("        final int hgke = (gk %s 2 == 0) ? hgk + 1 : hgk;%n", "%"));
 		sb.append(String.format("        double[] gg = JVCLUtils.vectorize(g);%n"));
-		sb.append(String.format("        double[] fPad = JVCLUtils.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));%n"));
-		sb.append(String.format("        double[][][] rr = JVCLUtils.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);%n"));
+		sb.append(String.format("        double[] fPad = JVCLUtils.vectorize(ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));%n"));
+		sb.append(String.format("        double[][][] rr = ArrayMath.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);%n"));
 		sb.append(String.format("        final int ri = rr.length;%n"));
 		sb.append(String.format("        final int rj = rr[0].length;%n"));
 		sb.append(String.format("        final int rk = rr[0][0].length;%n"));
@@ -346,8 +346,8 @@ public class Unroller {
 		sb.append(String.format("        final int hgje = (gj %s 2 == 0) ? hgj + 1 : hgj;%n", "%"));
 		sb.append(String.format("        final int hgke = (gk %s 2 == 0) ? hgk + 1 : hgk;%n", "%"));
 		sb.append(String.format("        Complex[] gg = JVCLUtils.vectorize(g);%n"));
-		sb.append(String.format("        Complex[] fPad = JVCLUtils.vectorize(JVCLUtils.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));%n"));
-		sb.append(String.format("        Complex[][][] rr = JVCLUtils.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);%n"));
+		sb.append(String.format("        Complex[] fPad = JVCLUtils.vectorize(ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke));%n"));
+		sb.append(String.format("        Complex[][][] rr = ArrayMath.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);%n"));
 		sb.append(String.format("        final int ri = rr.length;%n"));
 		sb.append(String.format("        final int rj = rr[0].length;%n"));
 		sb.append(String.format("        final int rk = rr[0][0].length;%n"));

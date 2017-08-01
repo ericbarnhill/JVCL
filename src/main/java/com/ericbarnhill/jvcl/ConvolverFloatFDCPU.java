@@ -35,7 +35,7 @@ import com.ericbarnhill.arrayMath.ArrayMath;
  * @since 0.1
  *
  */
-public class ConvolverFloatFDCPU extends ConvolverFloat<Float>{
+public class ConvolverFloatFDCPU extends ConvolverFloat{
     /**
      * Convolve 1D {@code float[]} array with 1D {@code float[]} kernel
      * 
@@ -50,8 +50,8 @@ public class ConvolverFloatFDCPU extends ConvolverFloat<Float>{
         final int gi = g.length;
         final int hgi = (int) ((gi - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-        float[] fPad = zeroPadBoundaries(f, hgi, hgie);
-        float[] r = zeroPadBoundaries(new float[fi], hgi, hgie);
+        float[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);
+        float[] r = ArrayMath.zeroPadBoundaries(new float[fi], hgi, hgie);
         final int ri = r.length;
         int ai;
         for (int i = 0; i < ri; i++) {
@@ -163,8 +163,8 @@ public class ConvolverFloatFDCPU extends ConvolverFloat<Float>{
         final int hgj = (int) ((gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        float[][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-        float[][] r = zeroPadBoundaries(new float[fi][fj], hgi, hgie, hgj, hgje);
+        float[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+        float[][] r = ArrayMath.zeroPadBoundaries(new float[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = r.length;
         final int rj = r[0].length;
         int ai, aj;
@@ -249,8 +249,8 @@ public class ConvolverFloatFDCPU extends ConvolverFloat<Float>{
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        float[][][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-        float[][][] r = zeroPadBoundaries(new float[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
+        float[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+        float[][][] r = ArrayMath.zeroPadBoundaries(new float[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = r.length;
         final int rj = r[0].length;
         final int rk = r[0][0].length;
@@ -279,4 +279,31 @@ public class ConvolverFloatFDCPU extends ConvolverFloat<Float>{
         }
         return r;
     }
+
+
+
+    public Float[] convolve(Float[] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][] convolve(Float[][] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][] convolve(Float[][] f, Float[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][][] convolve(Float[][][] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][][] convolve(Float[][][] f, Float[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][][] convolve(Float[][][] f, Float[][][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
 }

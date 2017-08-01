@@ -12,4 +12,11 @@ abstract class ConvolverDouble extends Convolver<Double> {
     abstract double[][] convolve(double[][] f, double[][] g);
     abstract double[][][] convolve(double[][][] f, double[][] g);
     abstract double[][][] convolve(double[][][] f, double[][][] g);
+
+    abstract Double[] convolve(Double[] f, Double[] g);
+    abstract Double[][] convolve(Double[][] f, Double[] g);
+    abstract Double[][][] convolve(Double[][][] f, Double[] g);
+    abstract Double[][] convolve(Double[][] f, Double[][] g);
+    abstract Double[][][] convolve(Double[][][] f, Double[][] g);
+    abstract Double[][][] convolve(Double[][][] f, Double[][][] g);
 }

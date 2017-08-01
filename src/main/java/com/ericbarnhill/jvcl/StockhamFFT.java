@@ -47,7 +47,7 @@ import com.jogamp.opencl.CLProgram;
  * @see FTGPU
  */
 class StockhamFFT {
-
+/*
     JVCLUtils ds;
     CLDevice device;
     CLProgram program;
@@ -152,11 +152,9 @@ class StockhamFFT {
     }
 
 
-	/**
-	 * should be called as destructor method
-	 */
 	void close() {
 		Kernel.release();
 	}
+    */
 
 }

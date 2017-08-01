@@ -52,11 +52,11 @@ public class ConvolverComplexFTCPU extends ConvolverComplex {
 		final int gi = g.length;
 		final int pad = gi*2;
 		final double[] v = ComplexUtils.complex2Interleaved(
-						zeroPadBoundaries(f, pad)
+						ArrayMath.zeroPadBoundaries(f, pad)
 					);
-		final double[] k = deepCopyToPadded(
+		final double[] k = ArrayMath.deepCopyToPadded(
 						ComplexUtils.complex2Interleaved(
-							zeroPadBoundaries(g, pad)
+							ArrayMath.zeroPadBoundaries(g, pad)
 						),
 					v.length);
 		final DoubleFFT_1D fft = new DoubleFFT_1D(v.length/2);
@@ -64,7 +64,7 @@ public class ConvolverComplexFTCPU extends ConvolverComplex {
 		fft.complexForward(k);
 		ArrayMath.multiply(v, k);
 		fft.complexInverse(v, true);
-		return 	stripBorderPadding(
+		return 	ArrayMath.stripBorderPadding(
 						ComplexUtils.interleaved2Complex(
 								v),
 						pad, pad);
@@ -86,11 +86,11 @@ public class ConvolverComplexFTCPU extends ConvolverComplex {
 		final int gjInterleaved = 2*gj;
 		final int fiPadded = fiInterleaved+2*giInterleaved;
 		final int fjPadded = fjInterleaved+2*gjInterleaved;
-		final double[][] v = zeroPadBoundaries(
+		final double[][] v = ArrayMath.zeroPadBoundaries(
 							ComplexUtils.complex2Interleaved(f),
 					giInterleaved, gjInterleaved);
-		final double[][] k = deepCopyToPadded(
-						zeroPadBoundaries(
+		final double[][] k = ArrayMath.deepCopyToPadded(
+						ArrayMath.zeroPadBoundaries(
 								ComplexUtils.complex2Interleaved(g),
 						giInterleaved, gjInterleaved),
 						fiPadded, fjPadded);
@@ -100,10 +100,14 @@ public class ConvolverComplexFTCPU extends ConvolverComplex {
 		ArrayMath.multiply(v,k);
 		fft.complexInverse(v, true);
 		return ComplexUtils.interleaved2Complex(
-				stripBorderPadding(
+				ArrayMath.stripBorderPadding(
 					v, 2*giInterleaved, 2*gjInterleaved)
 				);
 	}
+
+    public Complex[][] convolve(Complex[][] f, Complex[] g) {
+        return convolve(f, ArrayMath.convertTo2d(g));
+    }
 
 	/**
 	 * Convolve 3D {@code Complex[][][]} array with 2D {@code Complex[][][]} g
@@ -128,12 +132,12 @@ public class ConvolverComplexFTCPU extends ConvolverComplex {
 		final int fiPadded = nextPwr2(fiInterleaved+2*giInterleaved);
 		final int fjPadded = nextPwr2(fjInterleaved+2*gjInterleaved);
 		final int paddedDepth = nextPwr2(fkInterleaved+2*gkInterleaved);
-		final double[][][] v = zeroPadBoundaries(
+		final double[][][] v = ArrayMath.zeroPadBoundaries(
 							ComplexUtils.complex2Interleaved(f),
 					giInterleaved, gjInterleaved, gkInterleaved
 				);
-		final double[][][] k = deepCopyToPadded(
-					zeroPadBoundaries(
+		final double[][][] k = ArrayMath.deepCopyToPadded(
+					ArrayMath.zeroPadBoundaries(
 						ComplexUtils.complex2Interleaved(f),
 						giInterleaved, gjInterleaved, gkInterleaved),
 					fiPadded, fjPadded, paddedDepth);
@@ -143,11 +147,19 @@ public class ConvolverComplexFTCPU extends ConvolverComplex {
 		ArrayMath.multiply(v, k);
 		fft.complexInverse(v, true);
 		return ComplexUtils.interleaved2Complex(
-					stripBorderPadding(v,
+					ArrayMath.stripBorderPadding(v,
 					giInterleaved, gjInterleaved, gkInterleaved)
 			);
 
 	}
+
+    public Complex[][][] convolve(Complex[][][] f, Complex[] g) {
+        return convolve(f, ArrayMath.convertTo3d(ArrayMath.convertTo2d(g)));
+    }
+
+    public Complex[][][] convolve(Complex[][][] f, Complex[][] g) {
+        return convolve(f, ArrayMath.convertTo3d(g));
+    }
 
 
 }

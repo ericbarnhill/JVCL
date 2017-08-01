@@ -48,7 +48,7 @@ import com.jogamp.opencl.CLProgram;
  * @since 0.1
  */
 
-public class ConvolverDoubleFDGPU extends ConvolverDouble {
+public class ConvolverFloatFDGPU extends ConvolverFloat {
 
     CLDevice device;
     CLCommandQueue queue;
@@ -57,7 +57,7 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
     CLContext context;
     int localWorkSize;
 
-	public ConvolverDoubleFDGPU() {
+	public ConvolverFloatFDGPU() {
 		//try {
 			context = CLContext.create();
 			device = context.getMaxFlopsDevice();
@@ -90,24 +90,24 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 	}
 
 	/**
-	 * Convolve 1D {@code double[]} array with 1D {@code double[]} kernel
-	 * @param f {@code double[]} array
-	 * @param g {@code double[]} kernel
-	 * @return {@code double[]}
+	 * Convolve 1D {@code float[]} array with 1D {@code float[]} kernel
+	 * @param f {@code float[]} array
+	 * @param g {@code float[]} kernel
+	 * @return {@code float[]}
 	 */
-	public double[] convolve(double[] f, double[] g) {
+	public float[] convolve(float[] f, float[] g) {
 		final int fi = f.length;
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);
-		double[] r = ArrayMath.zeroPadBoundaries(new double[fi], hgi, hgie);
+		float[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);
+		float[] r = ArrayMath.zeroPadBoundaries(new float[fi], hgi, hgie);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.double2Float(fPad)).rewind();
-        clG.getBuffer().put(ArrayMath.double2Float(g)).rewind();
+        clF.getBuffer().put(fPad).rewind();
+        clG.getBuffer().put(g).rewind();
         CLKernel Kernel = program1d.createCLKernel("Convolve1d");
         Kernel.putArg(clF)
         	.putArg(clG)
@@ -125,31 +125,31 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		clF.release();
 		clG.release();
 		clR.release();
-        return ArrayMath.float2Double(result);
+        return result;
 	}
 
 	/**
-	 * Convolve 2D {@code double[][]} array with 1D {@code double[]} kernel
-	 * @param f {@code double[][]} array
-	 * @param g {@code double[]} kernel
+	 * Convolve 2D {@code float[][]} array with 1D {@code float[]} kernel
+	 * @param f {@code float[][]} array
+	 * @param g {@code float[]} kernel
 	 * @param dim orientation of kernel (0 or 1)
-	 * @return {@code double[][]}
+	 * @return {@code float[][]}
 	 */
-	public double[][] convolve(double[][] f, double[] g, int dim) {
+	public float[][] convolve(float[][] f, float[] g, int dim) {
 		if (dim == 1) f = ArrayMath.shiftDim(f);
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, 0, 0);
-		double[][] r = ArrayMath.zeroPadBoundaries(new double[fi][fj], hgi, hgie, 0, 0);
+		float[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, 0, 0);
+		float[][] r = ArrayMath.zeroPadBoundaries(new float[fi][fj], hgi, hgie, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.double2Float(ArrayMath.vectorize(fPad))).rewind();
-        clG.getBuffer().put(ArrayMath.double2Float(g)).rewind();
+        clF.getBuffer().put(ArrayMath.vectorize(fPad)).rewind();
+        clG.getBuffer().put(g).rewind();
         CLKernel Kernel = program21.createCLKernel("Convolve21");
         Kernel.putArg(clF)
         	.putArg(clG)
@@ -168,29 +168,29 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		clF.release();
 		clG.release();
 		clR.release();
-        double[][] result = ArrayMath.devectorize(ArrayMath.float2Double(resultVec), ri);
+        float[][] result = ArrayMath.devectorize(resultVec, ri);
 		// if (dim == 1) result = shiftDim(result);
 		return result;
 	}
 
 	/**
-	 * Convolve 2D {@code double[][]} array with 1D {@code double[]} kernel.
+	 * Convolve 2D {@code float[][]} array with 1D {@code float[]} kernel.
 	 * Default orientation of kernel along first dimension
-	 * @param f {@code double[][]} array
-	 * @param g {@code double[]} kernel
-	 * @return {@code double[][]}
+	 * @param f {@code float[][]} array
+	 * @param g {@code float[]} kernel
+	 * @return {@code float[][]}
 	 */
-	public double[][] convolve(double[][] f, double[] g) {
+	public float[][] convolve(float[][] f, float[] g) {
 		return convolve(f, g, 0);
 	}
 	/**
-	 * Convolve 3D {@code double[][][]} array with 1D {@code double[]} kernel.
-	 * @param f {@code double[][][]} array
-	 * @param g {@code double[]} kernel
+	 * Convolve 3D {@code float[][][]} array with 1D {@code float[]} kernel.
+	 * @param f {@code float[][][]} array
+	 * @param g {@code float[]} kernel
 	 * @param dim orientation of kernel (0,1, or 2)
-	 * @return {@code double[][][]}
+	 * @return {@code float[][][]}
 	 */
-	public double[][][] convolve(double[][][] f, double[] g, int dim) {
+	public float[][][] convolve(float[][][] f, float[] g, int dim) {
 		if (dim == 1) f = ArrayMath.shiftDim(f, 1);
 		if (dim == 2) f = ArrayMath.shiftDim(f, 2);
 		final int fi = f.length;
@@ -199,14 +199,14 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		double[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
-		double[][][] r = ArrayMath.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
+		float[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
+		float[][][] r = ArrayMath.zeroPadBoundaries(new float[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*fk, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.double2Float(ArrayMath.vectorize(fPad))).rewind();
-        clG.getBuffer().put(ArrayMath.double2Float(g)).rewind();
+        clF.getBuffer().put(ArrayMath.vectorize(fPad)).rewind();
+        clG.getBuffer().put(g).rewind();
         CLKernel Kernel = program31.createCLKernel("Convolve31");
         Kernel.putArg(clF)
         	.putArg(clG)
@@ -225,32 +225,21 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		clF.release();
 		clG.release();
 		clR.release();
-        double[][][] result = ArrayMath.devectorize(ArrayMath.float2Double(resultVec), ri, fj);
+        float[][][] result = ArrayMath.devectorize(resultVec, ri, fj);
         if (dim == 1) result = ArrayMath.shiftDim(result, 2);
 		if (dim == 2) result = ArrayMath.shiftDim(result, 1);
 		return result;
 	}
 
 	/**
-	 * Convolve 3D {@code double[][][]} array with 1D {@code double[]} kernel.
+	 * Convolve 3D {@code float[][][]} array with 1D {@code float[]} kernel.
 	 * Default orientation of kernel along 1st dimension
-	 * @param f {@code double[][][]} array
-	 * @param g {@code double[]} kernel
-	 * @return {@code double[][][]}
+	 * @param f {@code float[][][]} array
+	 * @param g {@code float[]} kernel
+	 * @return {@code float[][][]}
 	 */
-	public double[][][] convolve(double[][][] f, double[] g) {
+	public float[][][] convolve(float[][][] f, float[] g) {
 		return convolve(f, g, 0);
-	}
-
-	/**
-	 * Convolve 3D {@code double[][][]} array with 2D {@code double[]} kernel.
-	 * Default orientation of kernel along first two dimensions
-	 * @param f {@code double[][][]} array
-	 * @param g {@code double[][]} kernel
-	 * @return {@code double[][][]}
-	 */
-	public double[][][] convolve(double[][][] f, double[][] g) {
-		return convolve(f, ArrayMath.convertTo3d(g));
 	}
 
 	/**
@@ -302,12 +291,12 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 	}
 
     /**
-     * Convolve 2D {@code double[][]} array with 2D {@code double[][]} kernel.
-	 * @param f {@code double[][]} array
-	 * @param g {@code double[][]} kernel
-	 * @return {@code double[][]}
+     * Convolve 2D {@code float[][]} array with 2D {@code float[][]} kernel.
+	 * @param f {@code float[][]} array
+	 * @param g {@code float[][]} kernel
+	 * @return {@code float[][]}
 	 */
-	public double[][] convolve(double[][] f, double[][] g) {
+	public float[][] convolve(float[][] f, float[][] g) {
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int gi = g.length;
@@ -316,16 +305,16 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int hgj = (int)( (gj - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
 		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		double[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-		double[][] r = ArrayMath.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
+		float[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+		float[][] r = ArrayMath.zeroPadBoundaries(new float[fi][fj], hgi, hgie, hgj, hgje);
 		final int ri = r.length;
 		final int rj = r[0].length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(fPad)))
+        clF.getBuffer().put(ArrayMath.vectorize(fPad))
         	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(g)))
+        clG.getBuffer().put(ArrayMath.vectorize(g))
     		.rewind();
         CLKernel Kernel = program2d.createCLKernel("Convolve2d");
         Kernel.putArg(clF)
@@ -348,16 +337,16 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		clF.release();
         clG.release();
         clR.release();
-        return ArrayMath.devectorize(ArrayMath.float2Double(result), ri);
+        return ArrayMath.devectorize(result, ri);
 	}
 
 	/**
-	 * Convolve 3D {@code double[][][]} array with 3D {@code double[][][]} kernel.
-	 * @param f {@code double[][][]} array
-	 * @param g {@code double[][][]} kernel
-	 * @return {@code double[][][]}
+	 * Convolve 3D {@code float[][][]} array with 3D {@code float[][][]} kernel.
+	 * @param f {@code float[][][]} array
+	 * @param g {@code float[][][]} kernel
+	 * @return {@code float[][][]}
 	 */
-	public double[][][] convolve(double[][][] f, double[][][] g) {
+	public float[][][] convolve(float[][][] f, float[][][] g) {
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int fk = f[0][0].length;
@@ -370,17 +359,17 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
 		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
 		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-		double[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-		double[][][] r = ArrayMath.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
+		float[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+		float[][][] r = ArrayMath.zeroPadBoundaries(new float[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
 		final int ri = r.length;
 		final int rj = r[0].length;
 		final int rk = r[0][0].length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj*rk, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj*gk, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj*rk, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(fPad)))
+        clF.getBuffer().put(ArrayMath.vectorize(fPad))
         	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(g)))
+        clG.getBuffer().put(ArrayMath.vectorize(g))
     		.rewind();
         CLKernel Kernel = program3d.createCLKernel("Convolve3d");
         Kernel.putArg(clF)
@@ -407,7 +396,7 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
 		clF.release();
         clG.release();
         clR.release();
-        return ArrayMath.devectorize(ArrayMath.float2Double(result), ri, rj);
+        return ArrayMath.devectorize(result, ri, rj);
 	}
 
 	/**
@@ -417,27 +406,27 @@ public class ConvolverDoubleFDGPU extends ConvolverDouble {
         context.release();
 	}
 
-    public Double[] convolve(Double[] f, Double[] g) {
+    public Float[] convolve(Float[] f, Float[] g) {
         return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
     }
 
-    public Double[][] convolve(Double[][] f, Double[] g) {
+    public Float[][] convolve(Float[][] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo2d(ArrayMath.unbox(g))));
+    }
+
+    public Float[][] convolve(Float[][] f, Float[][] g) {
         return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
     }
 
-    public Double[][] convolve(Double[][] f, Double[][] g) {
-        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    public Float[][][] convolve(Float[][][] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo3d(ArrayMath.convertTo2d(ArrayMath.unbox(g)))));
     }
 
-    public Double[][][] convolve(Double[][][] f, Double[] g) {
-        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
-    }
-
-    public Double[][][] convolve(Double[][][] f, Double[][] g) {
+    public Float[][][] convolve(Float[][][] f, Float[][] g) {
         return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo3d(ArrayMath.unbox(g))));
     }
 
-    public Double[][][] convolve(Double[][][] f, Double[][][] g) {
+    public Float[][][] convolve(Float[][][] f, Float[][][] g) {
         return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
     }
 

@@ -52,8 +52,8 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
         final int gi = g.length;
         final int hgi = (int) ((gi - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-        double[] fPad = zeroPadBoundaries(f, hgi, hgie);
-        double[] r = zeroPadBoundaries(new double[fi], hgi, hgie);
+        double[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);
+        double[] r = ArrayMath.zeroPadBoundaries(new double[fi], hgi, hgie);
         final int ri = r.length;
         int ai;
         for (int i = 0; i < ri; i++) {
@@ -165,8 +165,8 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
         final int hgj = (int) ((gj - 1) / 2.0);
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-        double[][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-        double[][] r = zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
+        double[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+        double[][] r = ArrayMath.zeroPadBoundaries(new double[fi][fj], hgi, hgie, hgj, hgje);
         final int ri = r.length;
         final int rj = r[0].length;
         int ai, aj;
@@ -251,8 +251,8 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
         final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
         final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
         final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-        double[][][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-        double[][][] r = zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
+        double[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+        double[][][] r = ArrayMath.zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
         final int ri = r.length;
         final int rj = r[0].length;
         final int rk = r[0][0].length;
@@ -281,4 +281,30 @@ public class ConvolverDoubleFDCPU extends ConvolverDouble{
         }
         return r;
     }
+
+
+    public Double[] convolve(Double[] f, Double[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][] convolve(Double[][] f, Double[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][] convolve(Double[][] f, Double[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][][] convolve(Double[][][] f, Double[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][][] convolve(Double[][][] f, Double[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][][] convolve(Double[][][] f, Double[][][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
 }

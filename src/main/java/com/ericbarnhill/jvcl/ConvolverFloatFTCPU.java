@@ -39,7 +39,7 @@ import edu.emory.mathcs.jtransforms.fft.FloatFFT_3D;
  * @author ericbarnhill
  * @since 0.1
  */
-public class ConvolverFloatFTCPU {
+public class ConvolverFloatFTCPU extends ConvolverFloat {
 
     ConvolverComplexFTCPU ccf;
     ConvolverFloatFTCPU() {
@@ -83,6 +83,32 @@ public class ConvolverFloatFTCPU {
 						)
 				);
 	}
+
+
+    public Float[] convolve(Float[] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][] convolve(Float[][] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo2d(ArrayMath.unbox(g))));
+    }
+
+    public Float[][] convolve(Float[][] f, Float[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Float[][][] convolve(Float[][][] f, Float[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo3d(ArrayMath.convertTo2d(ArrayMath.unbox(g)))));
+    }
+
+    public Float[][][] convolve(Float[][][] f, Float[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo3d(ArrayMath.unbox(g))));
+    }
+
+    public Float[][][] convolve(Float[][][] f, Float[][][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
 
 }
 

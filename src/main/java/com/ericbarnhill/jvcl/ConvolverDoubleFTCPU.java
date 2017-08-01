@@ -39,7 +39,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
  * @author ericbarnhill
  * @since 0.1
  */
-public class ConvolverDoubleFTCPU {
+public class ConvolverDoubleFTCPU extends ConvolverDouble {
 
     ConvolverComplexFTCPU ccf;
     ConvolverDoubleFTCPU() {
@@ -59,6 +59,19 @@ public class ConvolverDoubleFTCPU {
 	}
 
 	/**
+	 * Convolve 2D {@code double[][]} array with 1D {@code double[]} g
+	 * @param f {@code double[][]} array
+	 * @param g {@code double[]} g
+	 * @return {@code double[][]}
+	 */
+	public double[][] convolve(double[][] f, double[] g) {
+		return ComplexUtils.complex2Real(
+				ccf.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(ArrayMath.convertTo2d(g))
+						)
+				);
+	}
+
+	/**
 	 * Convolve 2D {@code double[][]} array with 2D {@code double[][]} g
 	 * @param f {@code double[][]} array
 	 * @param g {@code double[][]} g
@@ -72,7 +85,7 @@ public class ConvolverDoubleFTCPU {
 	}
 
 	/**
-	 * Convolve 1D {@code double[][][]} array with 1D {@code double[][][]} g
+	 * Convolve 3D {@code double[][][]} array with 3D {@code double[][][]} g
 	 * @param f {@code double[][][]} array
 	 * @param g {@code double[][][]} g
 	 * @return {@code double[][][]}
@@ -83,6 +96,56 @@ public class ConvolverDoubleFTCPU {
 						)
 				);
 	}
+
+	/**
+	 * Convolve 3D {@code double[][][]} array with 1D {@code double[]} g
+	 * @param f {@code double[][][]} array
+	 * @param g {@code double[]} g
+	 * @return {@code double[][][]}
+	 */
+	public double[][][] convolve(double[][][] f, double[] g) {
+		return ComplexUtils.complex2Real(
+				ccf.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(ArrayMath.convertTo3d(ArrayMath.convertTo2d(g)))
+						)
+				);
+	}
+
+	/**
+	 * Convolve 3D {@code double[][][]} array with 2D {@code double[][]} g
+	 * @param f {@code double[][][]} array
+	 * @param g {@code double[][]} g
+	 * @return {@code double[][][]}
+	 */
+	public double[][][] convolve(double[][][] f, double[][] g) {
+		return ComplexUtils.complex2Real(
+				ccf.convolve(ComplexUtils.real2Complex(f), ComplexUtils.real2Complex(ArrayMath.convertTo3d(g))
+						)
+				);
+	}
+
+    public Double[] convolve(Double[] f, Double[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][] convolve(Double[][] f, Double[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo2d(ArrayMath.unbox(g))));
+    }
+
+    public Double[][] convolve(Double[][] f, Double[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
+
+    public Double[][][] convolve(Double[][][] f, Double[] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo3d(ArrayMath.convertTo2d(ArrayMath.unbox(g)))));
+    }
+
+    public Double[][][] convolve(Double[][][] f, Double[][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.convertTo3d(ArrayMath.unbox(g))));
+    }
+
+    public Double[][][] convolve(Double[][][] f, Double[][][] g) {
+        return ArrayMath.box(convolve(ArrayMath.unbox(f), ArrayMath.unbox(g)));
+    }
 
 }
 

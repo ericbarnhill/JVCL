@@ -48,7 +48,7 @@ import com.jogamp.opencl.CLProgram;
  * @since 0.1
  */
 
-public class ConvolverComplexFDGPU{
+public class ConvolverComplexFDGPU extends ConvolverComplex {
 
     CLDevice device;
     CLCommandQueue queue;
@@ -100,8 +100,8 @@ public class ConvolverComplexFDGPU{
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		Complex[] fPad = zeroPadBoundaries(f, hgi, hgie);
-		Complex[] r = zeroPadBoundaries(new Complex[fi], hgi, hgie);
+		Complex[] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie);
+		Complex[] r = ArrayMath.zeroPadBoundaries(new Complex[fi], hgi, hgie);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
@@ -140,20 +140,18 @@ public class ConvolverComplexFDGPU{
 		if (dim == 1) {
 			f = ArrayMath.shiftDim(f);
 		}
-        display(ArrayMath.vectorize(f), "21c f", f.length);
 		final int fi = f.length;
 		final int fj = f[0].length;
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		Complex[][] fPad = zeroPadBoundaries(f, hgi, hgie, 0, 0);
-		Complex[][] r = zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, 0, 0);
+		Complex[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, 0, 0);
+		Complex[][] r = ArrayMath.zeroPadBoundaries(new Complex[fi][fj], hgi, hgie, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
         CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*fj*2, WRITE_ONLY);
         clF.getBuffer().put(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorize(fPad))).rewind();
-        display(ComplexUtils.complex2InterleavedFloat(ArrayMath.vectorize(fPad)), "21c fpad", ri*2);
         clG.getBuffer().put(ComplexUtils.complex2InterleavedFloat(g)).rewind();
         CLKernel Kernel = program21Complex.createCLKernel("Convolve21Complex");
         Kernel.putArg(clF)
@@ -204,8 +202,8 @@ public class ConvolverComplexFDGPU{
 		final int gi = g.length;
 		final int hgi = (int)( (gi - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		Complex[][][] fPad = zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
-		Complex[][][] r = zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
+		Complex[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, 0, 0, 0, 0);
+		Complex[][][] r = ArrayMath.zeroPadBoundaries(new Complex[fi][fj][fk], hgi, hgie, 0, 0, 0, 0);
 		final int ri = r.length;
     	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*fj*fk*2, READ_ONLY);
         CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*2, READ_ONLY);
@@ -251,8 +249,8 @@ public class ConvolverComplexFDGPU{
 		final int hgj = (int)( (gj - 1) / 2.0);
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
 		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		Complex[][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
-		Complex[][] r = zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj]),
+		Complex[][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje);
+		Complex[][] r = ArrayMath.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj]),
 				hgi, hgie, hgj, hgje);
 		final int ri = r.length;
 		final int rj = r[0].length;
@@ -288,65 +286,6 @@ public class ConvolverComplexFDGPU{
 	}
 
 	/**
-	 * Convolve 3D {@code double[][][]} array with 3D {@code double[][][]} kernel.
-	 * @param f {@code double[][][]} array
-	 * @param g {@code double[][][]} kernel
-	 * @return {@code double[][][]}
-	 */
-	public double[][][] convolve(double[][][] f, double[][][] g) {
-		final int fi = f.length;
-		final int fj = f[0].length;
-		final int fk = f[0][0].length;
-		final int gi = g.length;
-		final int gj = g[0].length;
-		final int gk = g[0][0].length;
-		final int hgi = (int)( (gi - 1) / 2.0);
-		final int hgj = (int)( (gj - 1) / 2.0);
-		final int hgk = (int)( (gk - 1) / 2.0);
-		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
-		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
-		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-		double[][][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-		double[][][] r = zeroPadBoundaries(new double[fi][fj][fk], hgi, hgie, hgj, hgje, hgk, hgke);
-		final int ri = r.length;
-		final int rj = r[0].length;
-		final int rk = r[0][0].length;
-    	CLBuffer<FloatBuffer> clF = context.createFloatBuffer(ri*rj*rk, READ_ONLY);
-        CLBuffer<FloatBuffer> clG = context.createFloatBuffer(gi*gj*gk, READ_ONLY);
-        CLBuffer<FloatBuffer> clR = context.createFloatBuffer(ri*rj*rk, WRITE_ONLY);
-        clF.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(fPad)))
-        	.rewind();
-        clG.getBuffer().put(ArrayMath.vectorize(ArrayMath.double2Float(g)))
-    		.rewind();
-        CLKernel Kernel = program3d.createCLKernel("Convolve3d");
-        Kernel.putArg(clF)
-        	.putArg(clG)
-        	.putArg(clR)
-        	.putArg(ri)
-        	.putArg(rj)
-        	.putArg(rk)
-        	.putArg(gi)
-        	.putArg(gj)
-        	.putArg(gk)
-        	.putArg(hgi)
-        	.putArg(hgj)
-        	.putArg(hgk)
-        	.putArg(hgie)
-        	.putArg(hgje)
-        	.putArg(hgke);
-        queue.putWriteBuffer(clF, false)
-        	.putWriteBuffer(clG, false)
-        	.put3DRangeKernel(Kernel, 0, 0, 0, ri, rj, rk, 0,0,0)
-        	.putReadBuffer(clR, true);
-		float[] result = new float[ri*rj*rk];
-		clR.getBuffer().get(result);
-		clF.release();
-        clG.release();
-        clR.release();
-        return ArrayMath.devectorize(ArrayMath.float2Double(result), ri, rj);
-	}
-
-	/**
 	 * Convolve 3D {@code Complex[][][]} array with 3D {@code Complex[][][]} kernel.
 	 * @param f {@code Complex[][][]} array
 	 * @param g {@code Complex[][][]} kernel
@@ -365,12 +304,11 @@ public class ConvolverComplexFDGPU{
 		final int hgie = (gi % 2 == 0) ? hgi + 1 : hgi;
 		final int hgje = (gj % 2 == 0) ? hgj + 1 : hgj;
 		final int hgke = (gk % 2 == 0) ? hgk + 1 : hgk;
-		//Complex[][][] fPad = zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
-		Complex[][][] fPad = zeroPadBoundaries(f, 1);
-		display(ArrayMath.vectorize(ComplexUtils.complex2InterleavedFloat(fPad, 0)), "3D Complex FPad", fPad.length*2);
-		//Complex[][][] r = zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]),
+		//Complex[][][] fPad = ArrayMath.zeroPadBoundaries(f, hgi, hgie, hgj, hgje, hgk, hgke);
+		Complex[][][] fPad = ArrayMath.zeroPadBoundaries(f, 1);
+		//Complex[][][] r = ArrayMath.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]),
 		//		hgi, hgie, hgj, hgje, hgk, hgke);
-		Complex[][][] r = zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]),1);
+		Complex[][][] r = ArrayMath.zeroPadBoundaries(ComplexUtils.initialize(new Complex[fi][fj][fk]),1);
 		final int ri = r.length;
 		final int rj = r[0].length;
 		final int rk = r[0][0].length;
@@ -403,7 +341,6 @@ public class ConvolverComplexFDGPU{
         	.putReadBuffer(clR, true);
 		float[] result = new float[ri*rj*rk*2];
 		clR.getBuffer().get(result);
-		display(result, "3D Complex Result", fPad.length*2);
 		clF.release();
         clG.release();
         clR.release();
@@ -416,4 +353,12 @@ public class ConvolverComplexFDGPU{
 	public void close() {
         context.release();
 	}
+
+    public Complex[][][] convolve(Complex[][][] f, Complex[] g) {
+        return convolve(f, ArrayMath.convertTo3d(ArrayMath.convertTo2d(g)));
+    }
+
+    public Complex[][][] convolve(Complex[][][] f, Complex[][] g) {
+        return convolve(f, ArrayMath.convertTo3d(g));
+    }
 }
