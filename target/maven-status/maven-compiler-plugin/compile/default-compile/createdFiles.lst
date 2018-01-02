@@ -7,7 +7,6 @@ com/ericbarnhill/jvcl/ConvolverFloatFDCPU.class
 com/ericbarnhill/jvcl/ConvolverDoubleFTCPU.class
 com/ericbarnhill/jvcl/ConvolverComplexFDCPU.class
 com/ericbarnhill/jvcl/ConvolverDoubleFDCPU.class
-com/ericbarnhill/jvcl/JVCLUtils.class
 com/ericbarnhill/jvcl/StockhamFFT.class
 com/ericbarnhill/jvcl/Convolver.class
 com/ericbarnhill/jvcl/ConvolverFloatFDGPU.class

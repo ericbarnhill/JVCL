@@ -68,8 +68,8 @@ import com.ericbarnhill.arrayMath.ArrayMath;
 			throw new RuntimeException("Switch to invalid dimension");
 		}
 		if (dim == 1) f = ArrayMath.shiftDim(f);
-		int height = f[0].length;
-		for (int i = 0; i <height-1; i++) {
+		int height = f.length;
+		for (int i = 0; i < height; i++) {
 			f[i] = upFirDn(f[i], g, upFactor, downFactor);
 		}
 		if (dim ==1) f = ArrayMath.shiftDim(f);
